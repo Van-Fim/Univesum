@@ -35,6 +35,7 @@ public class GameInstaller : MonoInstaller
         WorldChunkManager worldChunkManagerVar = Container.InstantiatePrefab(worldChunkManager).GetComponent<WorldChunkManager>();
         Container.Bind<WorldChunkManager>().FromInstance(worldChunkManagerVar).AsSingle();
 
+        Container.Bind<GameStartedHandler>().AsSingle();
         Container.BindSignal<SignalGameStarted>()
     .ToMethod<GameStartedHandler>(handler => handler.HandleGameStarted)
     .FromResolve();

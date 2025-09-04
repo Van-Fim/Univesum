@@ -18,6 +18,31 @@ public class WorldChunkManager : MonoBehaviour
 
     public Vector3Int currentChunk;
     public Dictionary<Vector3Int, GameObject> loadedChunks = new();
+    Queue<(Transform, Vector3Int)> spawnQueue = new();
+    bool isSpawningChunks = false;
+    public bool isFirstChunksReady = false;
+
+    void EnqueueChunkSpawn(Transform chunkTransform, Vector3Int chunkCoord)
+    {
+        spawnQueue.Enqueue((chunkTransform, chunkCoord));
+        if (!isSpawningChunks)
+            StartCoroutine(ChunkSpawnWorker());
+    }
+
+    IEnumerator ChunkSpawnWorker()
+    {
+        isSpawningChunks = true;
+
+        while (spawnQueue.Count > 0)
+        {
+            var (chunkTransform, chunkCoord) = spawnQueue.Dequeue();
+            yield return SpawnAsteroidsAsync(chunkTransform, chunkCoord);
+            yield return null; // пауза между чанками
+        }
+
+        isSpawningChunks = false;
+    }
+
     void Start()
     {
         playerTransform = playerController.transform;
@@ -25,6 +50,7 @@ public class WorldChunkManager : MonoBehaviour
         UpdateCurrentChunk();
         UpdateChunksAround(currentChunk);
         Tick();
+        signalBus.Fire(new SignalGameStarted());
     }
     void Update()
     {
@@ -35,7 +61,7 @@ public class WorldChunkManager : MonoBehaviour
         HandleFloatingOrigin();
         HandleChunks();
     }
-    IEnumerator SpawnAsteroidsAsync(Transform chunkTransform, Vector3Int chunkCoord)
+    void SpawnAsteroids(Transform chunkTransform, Vector3Int chunkCoord)
     {
         Random.InitState($"{chunkCoord}".GetHashCode());
         int count = Random.Range(2, 3);
@@ -58,8 +84,32 @@ public class WorldChunkManager : MonoBehaviour
             asteroid.chunkCoord = chunkCoord;
             asteroid.transform.SetParent(chunkTransform);
             asteroid.transform.localPosition = localOffset;
+        }
+    }
+    IEnumerator SpawnAsteroidsAsync(Transform chunkTransform, Vector3Int chunkCoord)
+    {
+        Random.InitState($"{chunkCoord}".GetHashCode());
+        int count = Random.Range(5, 6);
 
-            yield return new WaitForSeconds(0.05f);
+        for (int i = 0; i < count; i++)
+        {
+            if (chunkTransform == null)
+                yield break;
+
+            Random.InitState($"{chunkCoord}{i}".GetHashCode());
+            Vector3 localOffset = new Vector3(
+                Random.Range(-chunkSize / 2f, chunkSize / 2f),
+                Random.Range(-chunkSize / 2f, chunkSize / 2f),
+                Random.Range(-chunkSize / 2f, chunkSize / 2f)
+            );
+
+            Asteroid asteroid = asteroidPool.Spawn();
+            asteroid.worldChunkManager = this;
+            asteroid.chunkCoord = chunkCoord;
+            asteroid.transform.SetParent(chunkTransform);
+            asteroid.transform.localPosition = localOffset;
+
+            yield return null; // вместо WaitForSeconds — быстрее и легче
         }
     }
 
@@ -109,7 +159,7 @@ public class WorldChunkManager : MonoBehaviour
 
     void UpdateChunksAround(Vector3Int centerChunk)
     {
-        int loadRadius = 5; // сколько чанков вокруг загружать
+        int loadRadius = 2; // сколько чанков вокруг загружать
 
         HashSet<Vector3Int> requiredChunks = new();
 
@@ -150,10 +200,15 @@ public class WorldChunkManager : MonoBehaviour
         GameObject chunk = new GameObject("Chunk_" + chunkCoord);
         chunk.transform.parent = worldTransform;
         chunk.transform.localPosition = (chunkCoord * chunkSize);
-
-        StartCoroutine(SpawnAsteroidsAsync(chunk.transform, chunkCoord));
-
-        // Здесь можно добавить генерацию астероидов, станций и т.д.
+        if (isFirstChunksReady)
+        {
+            EnqueueChunkSpawn(chunk.transform, chunkCoord);
+        }
+        else
+        {
+            SpawnAsteroids(chunk.transform, chunkCoord);
+        }
         return chunk;
     }
+
 }

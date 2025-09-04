@@ -1,9 +1,13 @@
 using UnityEngine;
+using Zenject;
 
 public class GameStartedHandler
 {
-    public void HandleGameStarted()
+    [Inject] private WorldChunkManager worldChunkManager;
+    public void HandleGameStarted(SignalGameStarted signal)
     {
-        Debug.Log("HandleGameStarted");
+        worldChunkManager.isFirstChunksReady = true;
+        Debug.Log("Game Started Signal Received");
     }
 }
+
