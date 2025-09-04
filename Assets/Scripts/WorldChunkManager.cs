@@ -14,8 +14,6 @@ public class WorldChunkManager : MonoBehaviour
     public float originThreshold = 10000f;
     public int chunkSize = 1000;
 
-    bool offTest = true;
-
     public Vector3Int currentChunk;
     public Dictionary<Vector3Int, GameObject> loadedChunks = new();
     Queue<(Transform, Vector3Int)> spawnQueue = new();
