@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 968f8be971b2275c88c9cd4e72553a92
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - playerController: {fileID: 7235458086259300639, guid: 6860314a124c5e28cac906407ddd612d, type: 3}
+  - worldChunkManager: {fileID: 7203834980126322879, guid: 68aab178c2c8d0e2eab654560064725f, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
