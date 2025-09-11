@@ -156,8 +156,6 @@ MonoBehaviour:
   playerController: {fileID: 7061531186021394471, guid: 6860314a124c5e28cac906407ddd612d, type: 3}
   worldChunkManager: {fileID: 7203834980126322879, guid: 68aab178c2c8d0e2eab654560064725f, type: 3}
   canvasController: {fileID: 7273055421178977205, guid: ea9a22172ea23cc24b02b3f87f3c95d8, type: 3}
-  asteroidPrefab: {fileID: 4207294603991129027, guid: f46c7064749ac284f9e96230fdd24b2d, type: 3}
-  initialSize: 15
 --- !u!4 &355019320
 Transform:
   m_ObjectHideFlags: 0
@@ -343,6 +341,51 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 883c68a13be989448a313a3b9aefb275, type: 3}
+--- !u!1 &1403212953
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1403212955}
+  - component: {fileID: 1403212954}
+  m_Layer: 0
+  m_Name: AsteroidPoolInstaller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1403212954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1403212953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1e4b2b25024f944299a351c53a33d63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  asteroidConfigs: []
+--- !u!4 &1403212955
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1403212953}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1635322167}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1635322165
 GameObject:
   m_ObjectHideFlags: 0
@@ -374,6 +417,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scriptableObjectInstallers: []
   _monoInstallers:
+  - {fileID: 1403212954}
   - {fileID: 355019319}
   _installerPrefabs: []
   _autoRun: 1
@@ -405,6 +449,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1403212955}
   - {fileID: 355019320}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

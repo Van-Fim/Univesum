@@ -5,20 +5,26 @@ using Zenject;
 
 public class WorldChunkManager : MonoBehaviour
 {
+    List<Chunk> chunks = new List<Chunk>();
     [Inject] public PlayerController playerController;
-    [Inject] Asteroid.Pool asteroidPool;
     [Inject] SignalBus signalBus;
 
     public Transform playerTransform;
     public Transform worldTransform; // THEWORLD
-    public float originThreshold = 10000f;
-    public int chunkSize = 1000;
+    public float originThreshold = 25000f;
+    public int chunkSize = 20000;
 
     public Vector3Int currentChunk;
-    public Dictionary<Vector3Int, GameObject> loadedChunks = new();
+    public Dictionary<Vector3Int, Chunk> loadedChunks = new();
     Queue<(Transform, Vector3Int)> spawnQueue = new();
     bool isSpawningChunks = false;
     public bool isFirstChunksReady = false;
+    [Inject] DiContainer container;
+
+    Asteroid.Pool GetPool(string id)
+    {
+        return container.ResolveId<Asteroid.Pool>(id);
+    }
 
     void EnqueueChunkSpawn(Transform chunkTransform, Vector3Int chunkCoord)
     {
@@ -35,7 +41,7 @@ public class WorldChunkManager : MonoBehaviour
         {
             var (chunkTransform, chunkCoord) = spawnQueue.Dequeue();
             yield return SpawnAsteroidsAsync(chunkTransform, chunkCoord);
-            yield return null; // пауза между чанками
+            yield return new WaitForSeconds(0.1f); // пауза между чанками
         }
 
         isSpawningChunks = false;
@@ -59,10 +65,22 @@ public class WorldChunkManager : MonoBehaviour
         HandleFloatingOrigin();
         HandleChunks();
     }
+    Asteroid SpawnAsteroid(Transform chunkTransform, Vector3Int chunkCoord, Vector3 localOffset)
+    {
+        Asteroid.Pool pool = GetPool("Ast01");
+        Asteroid asteroid = pool.Spawn();
+        asteroid.SetPool(pool);
+        asteroid.worldChunkManager = this;
+        asteroid.chunkCoord = chunkCoord;
+        asteroid.chunkTransform = chunkTransform;
+        asteroid.transform.SetParent(chunkTransform);
+        asteroid.transform.localPosition = localOffset;
+        return asteroid;
+    }
     void SpawnAsteroids(Transform chunkTransform, Vector3Int chunkCoord)
     {
         Random.InitState($"{chunkCoord}".GetHashCode());
-        int count = Random.Range(2, 3);
+        int count = Random.Range(4, 5);
 
         for (int i = 0; i < count; i++)
         {
@@ -76,18 +94,18 @@ public class WorldChunkManager : MonoBehaviour
                 Random.Range(-chunkSize / 2f, chunkSize / 2f),
                 Random.Range(-chunkSize / 2f, chunkSize / 2f)
             );
-
-            Asteroid asteroid = asteroidPool.Spawn();
-            asteroid.worldChunkManager = this;
-            asteroid.chunkCoord = chunkCoord;
-            asteroid.transform.SetParent(chunkTransform);
-            asteroid.transform.localPosition = localOffset;
+            int scale = Random.Range(1700, 4000 + 1);
+            int rotX = Random.Range(0, 180 + 1);
+            int rotY = Random.Range(0, 180 + 1);
+            int rotZ = Random.Range(0, 180 + 1);
+            Asteroid asteroid = SpawnAsteroid(chunkTransform, chunkCoord, localOffset);
+            asteroid.transform.localEulerAngles = new Vector3(rotX, rotY, rotZ);
+            asteroid.transform.localScale = new Vector3(scale, scale, scale);
         }
     }
     IEnumerator SpawnAsteroidsAsync(Transform chunkTransform, Vector3Int chunkCoord)
     {
-        Random.InitState($"{chunkCoord}".GetHashCode());
-        int count = Random.Range(5, 6);
+        int count = Random.Range(4, 5);
 
         for (int i = 0; i < count; i++)
         {
@@ -101,11 +119,15 @@ public class WorldChunkManager : MonoBehaviour
                 Random.Range(-chunkSize / 2f, chunkSize / 2f)
             );
 
-            Asteroid asteroid = asteroidPool.Spawn();
-            asteroid.worldChunkManager = this;
-            asteroid.chunkCoord = chunkCoord;
-            asteroid.transform.SetParent(chunkTransform);
-            asteroid.transform.localPosition = localOffset;
+            int scale = Random.Range(1700, 4000 + 1);
+            int rotX = Random.Range(0, 180 + 1);
+            int rotY = Random.Range(0, 180 + 1);
+            int rotZ = Random.Range(0, 180 + 1);
+            Asteroid.Pool pool = GetPool("Ast01");
+            Asteroid asteroid = SpawnAsteroid(chunkTransform, chunkCoord, localOffset);
+            asteroid.transform.localEulerAngles = new Vector3(rotX, rotY, rotZ);
+            asteroid.transform.localScale = new Vector3(scale, scale, scale);
+            asteroid.transform.localEulerAngles = new Vector3(rotX, rotY, rotZ);
 
             yield return null; // вместо WaitForSeconds — быстрее и легче
         }
@@ -157,7 +179,7 @@ public class WorldChunkManager : MonoBehaviour
 
     void UpdateChunksAround(Vector3Int centerChunk)
     {
-        int loadRadius = 2; // сколько чанков вокруг загружать
+        int loadRadius = 3; // сколько чанков вокруг загружать
 
         HashSet<Vector3Int> requiredChunks = new();
 
@@ -170,7 +192,7 @@ public class WorldChunkManager : MonoBehaviour
 
                     if (!loadedChunks.ContainsKey(chunkCoord))
                     {
-                        GameObject chunk = GenerateChunk(chunkCoord);
+                        Chunk chunk = GenerateChunk(chunkCoord);
                         loadedChunks[chunkCoord] = chunk;
                     }
                 }
@@ -182,7 +204,7 @@ public class WorldChunkManager : MonoBehaviour
             if (!requiredChunks.Contains(kvp.Key))
             {
                 signalBus.Fire(new SignalDestroyChunkAsteroids(kvp.Key));
-                Destroy(kvp.Value);
+                kvp.Value.Destroy();
                 toRemove.Add(kvp.Key);
             }
         }
@@ -193,9 +215,16 @@ public class WorldChunkManager : MonoBehaviour
         }
     }
 
-    GameObject GenerateChunk(Vector3Int chunkCoord)
+    Chunk GenerateChunk(Vector3Int chunkCoord)
     {
-        GameObject chunk = new GameObject("Chunk_" + chunkCoord);
+        Chunk chunk = chunks.Find(x => x.isDestroyed == true);
+        if (chunk == null)
+        {
+            chunk = new GameObject().AddComponent<Chunk>();
+            chunks.Add(chunk);
+        }
+        chunk.name = "Chunk_" + chunkCoord;
+        chunk.isDestroyed = false;
         chunk.transform.parent = worldTransform;
         chunk.transform.localPosition = (chunkCoord * chunkSize);
         if (isFirstChunksReady)

@@ -8,9 +8,6 @@ public class GameInstaller : MonoInstaller
     public WorldChunkManager worldChunkManager;
     public CanvasController canvasController;
 
-    public GameObject asteroidPrefab;
-    public int initialSize = 50;
-
     public override void InstallBindings()
     {
         Application.targetFrameRate = 70;
@@ -26,11 +23,6 @@ public class GameInstaller : MonoInstaller
 
         PlayerController playerControllerVar = Container.InstantiatePrefab(playerController).GetComponent<PlayerController>();
         Container.Bind<PlayerController>().FromInstance(playerControllerVar).AsSingle();
-
-        Container.BindMemoryPool<Asteroid, Asteroid.Pool>()
-    .WithInitialSize(initialSize)
-    .FromComponentInNewPrefab(asteroidPrefab)
-    .UnderTransformGroup("AsteroidPool");
 
         WorldChunkManager worldChunkManagerVar = Container.InstantiatePrefab(worldChunkManager).GetComponent<WorldChunkManager>();
         Container.Bind<WorldChunkManager>().FromInstance(worldChunkManagerVar).AsSingle();

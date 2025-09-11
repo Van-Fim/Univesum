@@ -6,10 +6,20 @@ public class Asteroid : MonoBehaviour
     public Vector3Int chunkCoord;
     [Inject]
     SignalBus _signalBus;
-    [Inject]
     Asteroid.Pool _pool;
     public WorldChunkManager worldChunkManager;
     private bool _isDespawned;
+    public Transform chunkTransform;
+    [Inject] DiContainer container;
+    public void SetPool(Asteroid.Pool pool)
+    {
+        _pool = pool;
+    }
+    Asteroid.Pool GetPool(string id)
+    {
+        return container.ResolveId<Asteroid.Pool>(id);
+    }
+
     public void OnSpawned()
     {
         _isDespawned = false;
@@ -27,6 +37,12 @@ public class Asteroid : MonoBehaviour
     }
     public class Pool : MonoMemoryPool<Asteroid>
     {
+        AsteroidConfig config;
+        public void Configure(AsteroidConfig cfg)
+        {
+            config = cfg;
+            this.Resize(cfg.poolSize);
+        }
         protected override void OnDespawned(Asteroid item)
         {
             item.transform.SetParent(item.worldChunkManager.worldTransform);

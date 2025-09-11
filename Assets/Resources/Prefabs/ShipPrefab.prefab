@@ -216,7 +216,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvasController: {fileID: 0}
-  _maxSpeed: 2000
+  _maxSpeed: 4000
   _rotationSpeed: 150
   _accelerationSpeed: 10000
   _targetSpeedFactor: 0
