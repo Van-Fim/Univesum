@@ -1,0 +1,19 @@
+{
+    "name":"AsteroidField01",
+    "asteroids": [
+        {
+            "name": "Asteroid01",
+            "spaceObjectPath":"Configs/SpaceObjects/Asteroid/Asteroid01",
+            "poolSize": 10,
+            "scaleMin": 500,
+            "scaleMax": 3000
+        },
+        {
+            "name": "Asteroid02",
+            "spaceObjectPath":"Configs/SpaceObjects/Asteroid/Asteroid01",
+            "poolSize": 10,
+            "scaleMin": 500,
+            "scaleMax": 3000
+        }
+    ]
+}

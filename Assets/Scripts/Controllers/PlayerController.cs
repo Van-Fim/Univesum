@@ -1,3 +1,4 @@
+using TMPro.Examples;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -5,7 +6,7 @@ using Zenject;
 public class PlayerController : MonoBehaviour
 {
     public CanvasController canvasController;
-
+    public CameraManager cameraManager;
     // Настройки движения
     [Header("Movement Settings")]
     [SerializeField] public int _maxSpeed = 1000000;
@@ -31,15 +32,21 @@ public class PlayerController : MonoBehaviour
     public Vector2 _screenCenter;
 
     [Inject]
-    public void Construct(CanvasController canvasController)
+    public void Construct(CanvasController canvasController, CameraManager cameraManager)
     {
         this.canvasController = canvasController;
+        this.cameraManager = cameraManager;
     }
 
-    public virtual void Awake()
+    public virtual void Start()
     {
         this.canvasController.crosshair.sprite = Resources.Load<Sprite>("Textures/UI/center_crosshair01");
         _screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+        Transform mainTransform = transform.Find("MAIN");
+        Transform cameraTransform = mainTransform.Find("CAMERA");
+        Camera cam = cameraManager.GetMainCamera();
+        cam.transform.SetParent(cameraTransform);
+        cam.transform.localPosition = Vector3.zero;
     }
 
     public virtual void FixedUpdate()

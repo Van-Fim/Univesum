@@ -45,9 +45,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerController: {fileID: 0}
+  worldPos: {x: 0, y: 0, z: 0}
   playerTransform: {fileID: 0}
-  worldTransform: {fileID: 0}
   originThreshold: 25000
-  chunkSize: 30000
+  chunkSize: 15000
   currentChunk: {x: 0, y: 0, z: 0}
   isFirstChunksReady: 0

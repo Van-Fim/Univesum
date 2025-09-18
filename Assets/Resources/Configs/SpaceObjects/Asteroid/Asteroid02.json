@@ -1,0 +1,7 @@
+{
+    "pathToModel": "Meshes/Asteroids/asteroids_base_model_02",
+    "chinldName": "asteroid_02_low",
+    "mass": 10000,
+    "linearDrag": 2,
+    "angularDrag": 2
+}

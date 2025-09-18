@@ -1,15 +1,14 @@
 using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
-public class Asteroid : MonoBehaviour
+public class Asteroid : SpaceObject
 {
-    public Vector3Int chunkCoord;
     [Inject]
     SignalBus _signalBus;
     Asteroid.Pool _pool;
     public WorldChunkManager worldChunkManager;
     private bool _isDespawned;
-    public Transform chunkTransform;
+    public Chunk chunk;
     [Inject] DiContainer container;
     public void SetPool(Asteroid.Pool pool)
     {
@@ -19,44 +18,43 @@ public class Asteroid : MonoBehaviour
     {
         return container.ResolveId<Asteroid.Pool>(id);
     }
-
     public void OnSpawned()
     {
         _isDespawned = false;
+        Show();
         _signalBus.Subscribe<SignalDestroyChunkAsteroids>(OnDestroyChunkAsteroids);
     }
     public void OnDespawned()
     {
+        Hide();
         _signalBus.Unsubscribe<SignalDestroyChunkAsteroids>(OnDestroyChunkAsteroids);
-    }
-
-    [Inject]
-    void Construct(SignalBus signalBus)
-    {
-        signalBus.Subscribe<SignalDestroyChunkAsteroids>(OnDestroyChunkAsteroids);
     }
     public class Pool : MonoMemoryPool<Asteroid>
     {
-        AsteroidConfig config;
-        public void Configure(AsteroidConfig cfg)
+        AsteroidFieldItemConfig config;
+        public void Configure(AsteroidFieldItemConfig cfg)
         {
             config = cfg;
             this.Resize(cfg.poolSize);
         }
         protected override void OnDespawned(Asteroid item)
         {
-            item.transform.SetParent(item.worldChunkManager.worldTransform);
-            item.gameObject.SetActive(false);
+            item.transform.SetParent(null);
+            item.Hide();
         }
 
         protected override void OnSpawned(Asteroid item)
         {
-            item.gameObject.SetActive(true);
+            item.Show();
         }
     }
     public void OnDestroyChunkAsteroids(SignalDestroyChunkAsteroids signal)
     {
-        if (chunkCoord == signal.ChunkCoord)
+        if (chunk != null && chunk.isDestroyed)
+        {
+            Despawn();
+        }
+        else if (chunk == null)
         {
             Despawn();
         }

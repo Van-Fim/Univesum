@@ -153,7 +153,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968f8be971b2275c88c9cd4e72553a92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerController: {fileID: 7061531186021394471, guid: 6860314a124c5e28cac906407ddd612d, type: 3}
   worldChunkManager: {fileID: 7203834980126322879, guid: 68aab178c2c8d0e2eab654560064725f, type: 3}
   canvasController: {fileID: 7273055421178977205, guid: ea9a22172ea23cc24b02b3f87f3c95d8, type: 3}
 --- !u!4 &355019320
@@ -170,6 +169,53 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1635322167}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &522320705
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 522320707}
+  - component: {fileID: 522320706}
+  m_Layer: 0
+  m_Name: CursorManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &522320706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 522320705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa1c7611bc044554fb83df4013659842, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  customCursor: {fileID: 2800000, guid: f8be555b0df1e9947a3c6fd8b1137a72, type: 3}
+  hotspot: {x: 0, y: 0}
+  cursorMode: 0
+--- !u!4 &522320707
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 522320705}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -29253.568, y: 299.82278, z: -16888.31}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &670831056
 GameObject:
@@ -370,7 +416,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1e4b2b25024f944299a351c53a33d63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  asteroidConfigs: []
+  asteroidPrefab: {fileID: -1824529967105302717, guid: 52d9ad3bf2195a347a66912de8ad96c9, type: 3}
 --- !u!4 &1403212955
 Transform:
   m_ObjectHideFlags: 0
@@ -659,3 +705,4 @@ SceneRoots:
   - {fileID: 1742037868}
   - {fileID: 1794206202}
   - {fileID: 1635322167}
+  - {fileID: 522320707}

@@ -1,4 +1,5 @@
 using UnityEngine;
+using Zenject;
 
 [RequireComponent(typeof(Rigidbody))]
 public class SuitController : PlayerController
@@ -14,12 +15,11 @@ public class SuitController : PlayerController
     private Vector3 input;
 
     float verticalLookRotation;
-    public Transform cameraTransform;
     public Transform groundChecker;
     public float mouseSensitivityX = 2;
     public float mouseSensitivityY = 2;
 
-    public override void Awake()
+    public override void Start()
     {
         _rigidbody.freezeRotation = true;
         canvasController.hud01.gameObject.SetActive(false);
@@ -27,14 +27,16 @@ public class SuitController : PlayerController
         canvasController.currentSpeed.gameObject.SetActive(false);
         this.canvasController.crosshair.sprite = Resources.Load<Sprite>("Textures/UI/center_crosshair02");
         isGravityActive = false;
+        Debug.Log(cameraManager);
     }
 
     void Update()
     {
+        Camera camera = cameraManager.GetMainCamera();
         transform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * mouseSensitivityX);
         verticalLookRotation += Input.GetAxis("Mouse Y") * mouseSensitivityY;
         verticalLookRotation = Mathf.Clamp(verticalLookRotation, -60, 60);
-        cameraTransform.localEulerAngles = Vector3.left * verticalLookRotation;
+        camera.transform.localEulerAngles = Vector3.left * verticalLookRotation;
         float moveVertical = 0f;
 
         if (!isGravityActive)

@@ -4,20 +4,20 @@ using UnityEngine;
 
 public class AsteroidTypeRegistry : MonoBehaviour
 {
-    public List<AsteroidConfig> configs;
+    public List<AsteroidFieldItemConfig> configs;
 
-    private Dictionary<string, AsteroidConfig> configMap;
+    private Dictionary<string, AsteroidFieldItemConfig> configMap;
 
     public void Init()
     {
-        configMap = configs.ToDictionary(c => c.id, c => c);
+        configMap = configs.ToDictionary(c => c.name, c => c);
     }
 
-    public AsteroidConfig Get(string id)
+    public AsteroidFieldItemConfig Get(string id)
     {
         return configMap[id];
     }
 
-    public IEnumerable<AsteroidConfig> All => configs;
+    public IEnumerable<AsteroidFieldItemConfig> All => configs;
 }
 

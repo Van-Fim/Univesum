@@ -1,0 +1,8 @@
+{
+    "pathToModel": "Meshes/Suits/suit01",
+    "chinldName": "",
+    "pathToHardpoints": "Hardpoints/Suits/suit01",
+    "mass": 1,
+    "linearDrag": 0,
+    "angularDrag": 0
+}

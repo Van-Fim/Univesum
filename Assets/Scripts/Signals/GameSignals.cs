@@ -4,3 +4,9 @@ public class SignalGameStarted
     {
     }
 }
+public class SignalChunkManagerReady
+{
+    public SignalChunkManagerReady()
+    {
+    }
+}

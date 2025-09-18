@@ -6,11 +6,6 @@ public class Player
 
     public bool IsInShip { get; private set; }
 
-    private void Awake()
-    {
-        SwitchToShip();
-    }
-
     public bool SwitchToShip()
     {
         IsInShip = true;
