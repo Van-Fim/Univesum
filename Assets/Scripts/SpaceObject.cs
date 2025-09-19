@@ -36,6 +36,8 @@ public abstract class SpaceObject : MonoBehaviour
         Transform camHardpoint = hardpoints.Find("CAMERA");
         Camera cam = cameraManager.GetMainCamera();
         cam.transform.SetParent(camHardpoint);
+        cam.transform.localPosition = Vector3.zero;
+        cam.transform.rotation = Quaternion.identity;
     }
 
     public virtual void InstallConfig(SpaceObjectConfig config)
@@ -64,6 +66,11 @@ public abstract class SpaceObject : MonoBehaviour
         main.AddComponent<MeshCollider>();
         gameObject.AddComponent<Rigidbody>();
         meshRenderer = main.GetComponent<MeshRenderer>();
+        main.transform.localScale = new Vector3(config.scale, config.scale, config.scale);
+        if (meshRenderer == null)
+        {
+            meshRenderer = main.AddComponent<MeshRenderer>();
+        }
         meshFilter = main.GetComponent<MeshFilter>();
         meshCollider = main.GetComponent<MeshCollider>();
         rigidbody = GetComponent<Rigidbody>();
@@ -72,6 +79,13 @@ public abstract class SpaceObject : MonoBehaviour
         rigidbody.angularDamping = config.angularDrag;
         meshCollider.convex = true;
         rigidbody.useGravity = false;
+
+        if (config.pathToMaterial != null && config.pathToMaterial.Length > 0)
+        {
+            Material mat = Resources.Load<Material>(config.pathToMaterial);
+            meshRenderer.material = mat;
+        }
+
         InstallHardpoints(config.pathToHardpoints);
     }
 

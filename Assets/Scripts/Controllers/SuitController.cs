@@ -27,7 +27,8 @@ public class SuitController : PlayerController
         canvasController.currentSpeed.gameObject.SetActive(false);
         this.canvasController.crosshair.sprite = Resources.Load<Sprite>("Textures/UI/center_crosshair02");
         isGravityActive = false;
-        Debug.Log(cameraManager);
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void Update()

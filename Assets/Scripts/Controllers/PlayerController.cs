@@ -9,9 +9,9 @@ public class PlayerController : MonoBehaviour
     public CameraManager cameraManager;
     // Настройки движения
     [Header("Movement Settings")]
-    [SerializeField] public int _maxSpeed = 1000000;
+    [SerializeField] public int _maxSpeed = 1000;
     [SerializeField] public int _rotationSpeed = 150;
-    [SerializeField] public float _accelerationSpeed = 10000f;
+    [SerializeField] public float _accelerationSpeed = 100;
 
     // Текущие параметры скорости
     public float _targetSpeedFactor = 0f;
@@ -42,11 +42,6 @@ public class PlayerController : MonoBehaviour
     {
         this.canvasController.crosshair.sprite = Resources.Load<Sprite>("Textures/UI/center_crosshair01");
         _screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
-        Transform mainTransform = transform.Find("MAIN");
-        Transform cameraTransform = mainTransform.Find("CAMERA");
-        Camera cam = cameraManager.GetMainCamera();
-        cam.transform.SetParent(cameraTransform);
-        cam.transform.localPosition = Vector3.zero;
     }
 
     public virtual void FixedUpdate()

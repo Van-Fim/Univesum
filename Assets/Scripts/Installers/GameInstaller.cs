@@ -26,13 +26,24 @@ public class GameInstaller : MonoInstaller
         CanvasController canvasControllerVar = Container.InstantiatePrefab(canvasController).GetComponent<CanvasController>();
         Container.Bind<CanvasController>().FromInstance(canvasControllerVar).AsSingle();
 
-        GameObject suitGO = Container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/SuitPrefab"));
-        Suit suit = suitGO.GetComponent<Suit>();
-        SpaceObjectConfig suitConfig = JsonConfigLoader.LoadFromResources<SpaceObjectConfig>("Configs/SpaceObjects/Suit/Suit01");
-        suit.InstallConfig(suitConfig);
-        suit.InstallCamera();
-        PlayerController playerControllerVar = suit.AddComponent<SuitController>();
-        playerControllerVar._rigidbody = suit.rigidbody;
+        // GameObject suitGO = Container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/SuitPrefab"));
+        // Suit suit = suitGO.GetComponent<Suit>();
+        // SpaceObjectConfig suitConfig = JsonConfigLoader.LoadFromResources<SpaceObjectConfig>("Configs/SpaceObjects/Suit/Suit01");
+        // suit.InstallConfig(suitConfig);
+        // suit.InstallCamera();
+        // PlayerController playerControllerVar = suit.AddComponent<SuitController>();
+        // playerControllerVar._rigidbody = suit.rigidbody;
+        // playerControllerVar.canvasController = Container.Resolve<CanvasController>();
+        // playerControllerVar.cameraManager = Container.Resolve<CameraManager>();
+        // Container.Bind<PlayerController>().FromInstance(playerControllerVar).AsSingle();
+
+        GameObject shipGO = Container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/ShipPrefab"));
+        Ship ship = shipGO.GetComponent<Ship>();
+        SpaceObjectConfig shipConfig = JsonConfigLoader.LoadFromResources<SpaceObjectConfig>("Configs/SpaceObjects/Ships/Ship01");
+        ship.InstallConfig(shipConfig);
+        ship.InstallCamera();
+        PlayerController playerControllerVar = ship.AddComponent<ShipController>();
+        playerControllerVar._rigidbody = ship.rigidbody;
         playerControllerVar.canvasController = Container.Resolve<CanvasController>();
         playerControllerVar.cameraManager = Container.Resolve<CameraManager>();
         Container.Bind<PlayerController>().FromInstance(playerControllerVar).AsSingle();

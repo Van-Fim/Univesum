@@ -123,7 +123,7 @@ public class WorldChunkManager : MonoBehaviour
             return;
         }
         Random.InitState($"{chunkCoord}".GetHashCode());
-        int count = Random.Range(4, 5);
+        int count = Random.Range(7, 8);
 
         for (int i = 0; i < count; i++)
         {
@@ -143,7 +143,7 @@ public class WorldChunkManager : MonoBehaviour
         {
             yield return null;
         }
-        int count = Random.Range(4, 5);
+        int count = Random.Range(7, 8);
 
         for (int i = 0; i < count; i++)
         {

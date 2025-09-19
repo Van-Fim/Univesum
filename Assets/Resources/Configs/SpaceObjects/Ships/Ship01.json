@@ -1,0 +1,10 @@
+{
+    "pathToModel": "Meshes/Ships/Ship01",
+    "chinldName": "",
+    "pathToHardpoints": "Hardpoints/Ships/Ship01",
+    "pathToMaterial": "Materials/Ships/Ship01",
+    "scale": 5,
+    "mass": 1,
+    "linearDrag": 0,
+    "angularDrag": 0
+}
