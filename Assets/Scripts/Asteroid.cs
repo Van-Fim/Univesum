@@ -1,7 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
-public class Asteroid : SpaceObject
+public class Asteroid : SpaceObject, ISelectable
 {
     [Inject]
     SignalBus _signalBus;
@@ -10,6 +10,7 @@ public class Asteroid : SpaceObject
     private bool _isDespawned;
     public Chunk chunk;
     [Inject] DiContainer container;
+    [Inject] TargetIndicator targetIndicator;
     public void SetPool(Asteroid.Pool pool)
     {
         _pool = pool;
@@ -27,6 +28,10 @@ public class Asteroid : SpaceObject
     public void OnDespawned()
     {
         Hide();
+        if (targetIndicator.target == transform)
+        {
+            targetIndicator.target = null;
+        }
         _signalBus.Unsubscribe<SignalDestroyChunkAsteroids>(OnDestroyChunkAsteroids);
     }
     public class Pool : MonoMemoryPool<Asteroid>
@@ -65,5 +70,19 @@ public class Asteroid : SpaceObject
         _isDespawned = true;
         OnDespawned();
         _pool.Despawn(this);
+    }
+    public void OnSelect()
+    {
+        targetIndicator.target = transform;
+    }
+
+    public void OnDeselect()
+    {
+        targetIndicator.target = null;
+    }
+
+    public string GetLabel()
+    {
+        throw new System.NotImplementedException();
     }
 }

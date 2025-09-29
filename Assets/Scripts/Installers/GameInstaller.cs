@@ -20,12 +20,16 @@ public class GameInstaller : MonoInstaller
 
         Container.Bind<Player>().AsSingle();
         Container.Bind<PlayerService>().AsSingle();
-        Container.Bind<CursorManager>().AsSingle();
         Container.Bind<CameraManager>().AsSingle();
+
+        CursorManager cursorManagerVar = Container.InstantiateComponent<CursorManager>(new GameObject());
+        cursorManagerVar.gameObject.name = "CursorManager";
+        Container.Bind<CursorManager>().FromInstance(cursorManagerVar).AsSingle();
 
         CanvasController canvasControllerVar = Container.InstantiatePrefab(canvasController).GetComponent<CanvasController>();
         Container.Bind<CanvasController>().FromInstance(canvasControllerVar).AsSingle();
-
+        TargetIndicator targetIndicator = canvasControllerVar.gameObject.GetComponent<TargetIndicator>();
+        Container.Bind<TargetIndicator>().FromInstance(targetIndicator).AsSingle();
         // GameObject suitGO = Container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/SuitPrefab"));
         // Suit suit = suitGO.GetComponent<Suit>();
         // SpaceObjectConfig suitConfig = JsonConfigLoader.LoadFromResources<SpaceObjectConfig>("Configs/SpaceObjects/Suit/Suit01");

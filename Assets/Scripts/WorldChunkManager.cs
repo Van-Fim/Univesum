@@ -9,7 +9,6 @@ public class WorldChunkManager : MonoBehaviour
     [Inject] public PlayerController playerController;
     [Inject] SignalBus signalBus;
     [Inject] private List<AsteroidFieldConfig> asteroidConfigs;
-
     public Vector3 worldPos = Vector3.zero;
 
     public Transform playerTransform;

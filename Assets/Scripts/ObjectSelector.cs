@@ -1,17 +1,36 @@
 using UnityEngine;
 using Zenject;
 
-public class AsteroidSelector : MonoBehaviour
+public class ObjectSelector : MonoBehaviour
 {
     ISelectable currentSelection;
     [Inject] CameraManager cameraManager;
-
+    [Inject] CursorManager cursorManager;
+    bool hoveredObject;
     void Update()
     {
-        if (Input.GetMouseButtonDown(1)) // ЛКМ
+        Ray ray = cameraManager.GetMainCamera().ScreenPointToRay(Input.mousePosition);
+        bool h = Physics.Raycast(ray, out RaycastHit hit, 30000f);
+        if (h)
         {
-            Ray ray = cameraManager.GetMainCamera().ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, 30000f))
+            var selectable = hit.collider.GetComponent<ISelectable>();
+            if (selectable != null && !hoveredObject)
+            {
+                hoveredObject = true;
+                cursorManager.SwitchCursor("Hover");
+            }
+        }
+        else
+        {
+            if (hoveredObject)
+            {
+                hoveredObject = false;
+                cursorManager.SwitchCursor("Default");
+            }
+        }
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (h)
             {
                 var selectable = hit.collider.GetComponent<ISelectable>();
                 if (selectable != null)

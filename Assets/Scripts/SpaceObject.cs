@@ -63,7 +63,7 @@ public abstract class SpaceObject : MonoBehaviour
         main.transform.localPosition = Vector3.zero;
         main.transform.localEulerAngles = Vector3.zero;
         main.name = "MAIN";
-        main.AddComponent<MeshCollider>();
+        gameObject.AddComponent<MeshCollider>();
         gameObject.AddComponent<Rigidbody>();
         meshRenderer = main.GetComponent<MeshRenderer>();
         main.transform.localScale = new Vector3(config.scale, config.scale, config.scale);
@@ -72,7 +72,11 @@ public abstract class SpaceObject : MonoBehaviour
             meshRenderer = main.AddComponent<MeshRenderer>();
         }
         meshFilter = main.GetComponent<MeshFilter>();
-        meshCollider = main.GetComponent<MeshCollider>();
+        meshCollider = GetComponent<MeshCollider>();
+        if (meshFilter != null)
+        {
+            meshCollider.sharedMesh = meshFilter.sharedMesh;
+        }
         rigidbody = GetComponent<Rigidbody>();
         rigidbody.mass = config.mass;
         rigidbody.linearDamping = config.linearDrag;
