@@ -11,6 +11,7 @@ public class Asteroid : SpaceObject, ISelectable
     public Chunk chunk;
     [Inject] DiContainer container;
     [Inject] TargetIndicator targetIndicator;
+    
     public void SetPool(Asteroid.Pool pool)
     {
         _pool = pool;
@@ -28,9 +29,9 @@ public class Asteroid : SpaceObject, ISelectable
     public void OnDespawned()
     {
         Hide();
-        if (targetIndicator.target == transform)
+        if (targetIndicator.target == this)
         {
-            targetIndicator.target = null;
+            targetIndicator.SetTarget(null);
         }
         _signalBus.Unsubscribe<SignalDestroyChunkAsteroids>(OnDestroyChunkAsteroids);
     }
@@ -73,12 +74,12 @@ public class Asteroid : SpaceObject, ISelectable
     }
     public void OnSelect()
     {
-        targetIndicator.target = transform;
+        targetIndicator.SetTarget(this);
     }
 
     public void OnDeselect()
     {
-        targetIndicator.target = null;
+        targetIndicator.SetTarget(null);
     }
 
     public string GetLabel()

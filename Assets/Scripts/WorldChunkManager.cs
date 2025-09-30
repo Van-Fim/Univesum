@@ -102,6 +102,7 @@ public class WorldChunkManager : MonoBehaviour
         int rotZ = Random.Range(0, 180 + 1);
         Asteroid.Pool pool = GetPool($"{configName}_{astItem.name}");
         Asteroid asteroid = pool.Spawn();
+        asteroid.maxShield = 0;
         asteroid.Init();
         SpaceObjectConfig asteroidSp = JsonConfigLoader.LoadFromResources<SpaceObjectConfig>(astItem.spaceObjectPath);
         asteroid.InstallConfig(asteroidSp);

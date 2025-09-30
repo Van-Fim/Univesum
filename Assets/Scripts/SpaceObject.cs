@@ -3,6 +3,10 @@ using UnityEngine;
 using Zenject;
 public abstract class SpaceObject : MonoBehaviour
 {
+    public int maxHull = 10000;
+    public int hull;
+    public int maxShield = 10000;
+    public int shield;
     public SpaceObjectConfig spaceObjectConfig;
     protected MeshFilter meshFilter;
     protected MeshRenderer meshRenderer;
@@ -16,6 +20,8 @@ public abstract class SpaceObject : MonoBehaviour
 
     public virtual void Init()
     {
+        hull = maxHull;
+        shield = maxShield;
         Hide();
     }
     public virtual void InstallHardpoints(string path)
