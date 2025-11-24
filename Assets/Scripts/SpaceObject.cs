@@ -24,22 +24,10 @@ public abstract class SpaceObject : MonoBehaviour
         shield = maxShield;
         Hide();
     }
-    public virtual void InstallHardpoints(string path)
-    {
-        if (path == null)
-        {
-            return;
-        }
-        Transform o1 = Resources.Load<Transform>(path);
-        o1 = GameObject.Instantiate(o1.transform, transform);
-        o1.transform.localPosition = Vector3.zero;
-        o1.transform.rotation = Quaternion.identity;
-        o1.name = "HARDPOINTS";
-        hardpoints = o1;
-    }
+
     public virtual void InstallCamera()
     {
-        Transform camHardpoint = hardpoints.Find("CAMERA");
+        Transform camHardpoint = hardpoints.Find("HPCamera");
         Camera cam = cameraManager.GetMainCamera();
         cam.transform.SetParent(camHardpoint);
         cam.transform.localPosition = Vector3.zero;
@@ -69,6 +57,15 @@ public abstract class SpaceObject : MonoBehaviour
         main.transform.localPosition = Vector3.zero;
         main.transform.localEulerAngles = Vector3.zero;
         main.name = "MAIN";
+        hardpoints = main.transform.Find("HARDPOINTS");
+        Transform fmain = main.transform.Find("MAIN");
+        if (fmain != null)
+        {
+            fmain.transform.SetParent(transform);
+            hardpoints.SetParent(transform);
+            Destroy(main);
+            main = fmain.gameObject;
+        }
         gameObject.AddComponent<MeshCollider>();
         gameObject.AddComponent<Rigidbody>();
         meshRenderer = main.GetComponent<MeshRenderer>();
@@ -95,8 +92,6 @@ public abstract class SpaceObject : MonoBehaviour
             Material mat = Resources.Load<Material>(config.pathToMaterial);
             meshRenderer.material = mat;
         }
-
-        InstallHardpoints(config.pathToHardpoints);
     }
 
     public virtual void Show()

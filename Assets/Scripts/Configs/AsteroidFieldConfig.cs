@@ -13,6 +13,6 @@ public class AsteroidFieldItemConfig
     public string name;
     public string spaceObjectPath;
     public int poolSize = 20;
-    public float scaleMin = 500f;
-    public float scaleMax = 3000f;
+    public float scaleMin = 10f;
+    public float scaleMax = 10f;
 }
