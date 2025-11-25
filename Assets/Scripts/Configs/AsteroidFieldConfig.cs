@@ -6,6 +6,7 @@ public class AsteroidFieldConfig
 {
     public string name;
     public List<AsteroidFieldItemConfig> asteroids;
+    public List<AsteroidSpeedThresholdsConfig> speedThresholds;
 }
 [System.Serializable]
 public class AsteroidFieldItemConfig
@@ -15,4 +16,10 @@ public class AsteroidFieldItemConfig
     public int poolSize = 20;
     public float scaleMin = 10f;
     public float scaleMax = 10f;
+}
+[System.Serializable]
+public class AsteroidSpeedThresholdsConfig
+{
+    public int speed = 20;
+    public int scale = 20;
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 using Zenject;
@@ -15,6 +16,7 @@ public abstract class SpaceObject : MonoBehaviour
     public Rigidbody rigidbody;
     public Transform hardpoints;
     protected Mesh mesh;
+    public List<TrailRenderer> trails;
 
     protected GameObject main = null;
 
@@ -91,6 +93,21 @@ public abstract class SpaceObject : MonoBehaviour
         {
             Material mat = Resources.Load<Material>(config.pathToMaterial);
             meshRenderer.material = mat;
+        }
+        if (hardpoints != null && hardpoints.childCount > 0)
+        {
+            for (int i = 0; i < hardpoints.childCount; i++)
+            {
+                Transform tr = hardpoints.GetChild(i);
+                if (tr.name.StartsWith("HPEngine"))
+                {
+                    TrailRenderer trail = GameObject.Instantiate(Resources.Load<TrailRenderer>("Prefabs/EngineTrail"));
+                    trail.transform.SetParent(tr);
+                    trail.transform.localPosition = Vector3.zero;
+                    trail.transform.localRotation = Quaternion.identity;
+                    trails.Add(trail);
+                }
+            }
         }
     }
 

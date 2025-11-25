@@ -39,6 +39,7 @@ public class GameInstaller : MonoInstaller
         // playerControllerVar._rigidbody = suit.rigidbody;
         // playerControllerVar.canvasController = Container.Resolve<CanvasController>();
         // playerControllerVar.cameraManager = Container.Resolve<CameraManager>();
+        //playerControllerVar.sp_object = suit;
         // Container.Bind<PlayerController>().FromInstance(playerControllerVar).AsSingle();
 
         GameObject shipGO = Container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/ShipPrefab"));
@@ -50,6 +51,7 @@ public class GameInstaller : MonoInstaller
         playerControllerVar._rigidbody = ship.rigidbody;
         playerControllerVar.canvasController = Container.Resolve<CanvasController>();
         playerControllerVar.cameraManager = Container.Resolve<CameraManager>();
+        playerControllerVar.sp_object = ship;
         Container.Bind<PlayerController>().FromInstance(playerControllerVar).AsSingle();
 
         WorldChunkManager worldChunkManagerVar = Container.InstantiatePrefab(worldChunkManager).GetComponent<WorldChunkManager>();

@@ -44,5 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be7065b63c34bbc4791c88fa2e260eee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHull: 10000
+  hull: 0
+  maxShield: 10000
+  shield: 0
   rigidbody: {fileID: 0}
   hardpoints: {fileID: 0}

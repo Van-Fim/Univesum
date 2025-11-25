@@ -7,9 +7,10 @@ public class PlayerController : MonoBehaviour
 {
     public CanvasController canvasController;
     public CameraManager cameraManager;
+    public SpaceObject sp_object;
     // Настройки движения
     [Header("Movement Settings")]
-    [SerializeField] public int _maxSpeed = 1000;
+    [SerializeField] public int _maxSpeed = 3000;
     [SerializeField] public int _rotationSpeed = 150;
     [SerializeField] public float _accelerationSpeed = 100;
 
@@ -53,6 +54,21 @@ public class PlayerController : MonoBehaviour
 
         Turn();
         Move();
+    }
+
+    public virtual void Update()
+    {
+        if (_rigidbody == null)
+        {
+            return;
+        }
+
+        // float speed = _rigidbody.linearVelocity.magnitude;
+        // for (int i = 0; i < sp_object.trails.Count; i++)
+        // {
+        //     TrailRenderer tr = sp_object.trails[i];
+        //     tr.time = Mathf.Lerp(0.010f, 0.025f, speed / 500f); 
+        // }
     }
 
     #region Rotation Logic

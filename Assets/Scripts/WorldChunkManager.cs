@@ -85,12 +85,34 @@ public class WorldChunkManager : MonoBehaviour
         {
             return null;
         }
+
         AsteroidFieldItemConfig astItem = cfg.asteroids[0];
         if (astItem == null)
         {
             return null;
         }
         float scale = Random.Range(astItem.scaleMin, astItem.scaleMax);
+
+        if (cfg.speedThresholds != null && cfg.speedThresholds.Count > 0)
+        {
+            float currentSpeed = playerController._rigidbody.linearVelocity.magnitude;
+            cfg.speedThresholds.Sort((a, b) => a.speed.CompareTo(b.speed));
+            int ascIndex = 0;
+            AsteroidSpeedThresholdsConfig asc = null;
+            for (int i = 0; i < cfg.speedThresholds.Count; i++)
+            {
+                asc = cfg.speedThresholds[i];
+                if (asc.speed <= currentSpeed)
+                {
+                    ascIndex = i;
+                }
+            }
+            asc = cfg.speedThresholds[ascIndex];
+            if (scale < asc.scale && currentSpeed >= asc.speed)
+            {
+                return null;
+            }
+        }
         Vector3 localOffset = new Vector3(
     Random.Range(-chunkSize / 2f, chunkSize / 2f),
     Random.Range(-chunkSize / 2f, chunkSize / 2f),
