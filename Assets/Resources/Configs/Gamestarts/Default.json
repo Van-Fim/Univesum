@@ -1,0 +1,9 @@
+{
+    "name": "My start",
+    "description": "My description",
+    "icon": "Materials/Ships/Ship01",
+    "ship": "Ship01",
+    "ship_loadout": "Ship01_Loadout01",
+    "suit": "",
+    "suit_loadout": ""
+}

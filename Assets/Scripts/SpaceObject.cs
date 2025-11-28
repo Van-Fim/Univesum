@@ -13,6 +13,7 @@ public abstract class SpaceObject : MonoBehaviour
     protected MeshRenderer meshRenderer;
     protected MeshCollider meshCollider;
     [Inject] protected CameraManager cameraManager;
+    [Inject] public DiContainer _container;
     public Rigidbody rigidbody;
     public Transform hardpoints;
     protected Mesh mesh;
@@ -33,6 +34,11 @@ public abstract class SpaceObject : MonoBehaviour
         cam.transform.SetParent(camHardpoint);
         cam.transform.localPosition = Vector3.zero;
         cam.transform.rotation = Quaternion.identity;
+    }
+
+    public virtual void InstallLoadout(Loadout loadout)
+    {
+
     }
 
     public virtual void InstallConfig(SpaceObjectConfig config)
@@ -92,25 +98,6 @@ public abstract class SpaceObject : MonoBehaviour
         {
             Material mat = Resources.Load<Material>(config.pathToMaterial);
             meshRenderer.material = mat;
-        }
-        if (hardpoints != null && hardpoints.childCount > 0)
-        {
-            for (int i = 0; i < hardpoints.childCount; i++)
-            {
-                Transform tr = hardpoints.GetChild(i);
-                if (tr.name.StartsWith("HPEngine"))
-                {
-                    TrailRenderer trail = GameObject.Instantiate(Resources.Load<TrailRenderer>("Prefabs/EngineTrail"));
-                    trail.transform.SetParent(tr);
-                    trail.transform.localPosition = Vector3.zero;
-                    trail.transform.localRotation = Quaternion.identity;
-
-                    GameObject JetEngine = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/JetEngine"));
-                    JetEngine.transform.SetParent(tr);
-                    JetEngine.transform.localPosition = Vector3.zero;
-                    JetEngine.transform.localRotation = Quaternion.identity;
-                }
-            }
         }
     }
 

@@ -1,9 +1,8 @@
 {
-    "pathToModel": "Meshes/Ships/Ship01",
-    "chinldName": "",
-    "pathToMaterial": "Materials/Ships/Ship01",
-    "scale": 1,
-    "mass": 1,
-    "linearDrag": 0,
-    "angularDrag": 2
+    "max_speed": 1700,
+    "rotation_speed": 150,
+    "acceleration_speed": 100,
+
+    "color01": {"r":100,"g":255,"b":100,"a":255},
+    "color02": {"r":0,"g":255,"b":0,"a":255}
 }

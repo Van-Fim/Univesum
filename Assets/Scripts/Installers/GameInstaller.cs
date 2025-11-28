@@ -17,6 +17,7 @@ public class GameInstaller : MonoInstaller
         Container.DeclareSignal<SignalGameStarted>();
         Container.DeclareSignal<SignalChunkManagerReady>();
         Container.DeclareSignal<SignalChunkFloatingOriginFix>();
+        Container.DeclareSignal<PlayerSpeedChangedSignal>();
 
         Container.Bind<Player>().AsSingle();
         Container.Bind<PlayerService>().AsSingle();
@@ -30,29 +31,46 @@ public class GameInstaller : MonoInstaller
         Container.Bind<CanvasController>().FromInstance(canvasControllerVar).AsSingle();
         TargetIndicator targetIndicator = canvasControllerVar.gameObject.GetComponent<TargetIndicator>();
         Container.Bind<TargetIndicator>().FromInstance(targetIndicator).AsSingle();
-        // GameObject suitGO = Container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/SuitPrefab"));
-        // Suit suit = suitGO.GetComponent<Suit>();
-        // SpaceObjectConfig suitConfig = JsonConfigLoader.LoadFromResources<SpaceObjectConfig>("Configs/SpaceObjects/Suit/Suit01");
-        // suit.InstallConfig(suitConfig);
-        // suit.InstallCamera();
-        // PlayerController playerControllerVar = suit.AddComponent<SuitController>();
-        // playerControllerVar._rigidbody = suit.rigidbody;
-        // playerControllerVar.canvasController = Container.Resolve<CanvasController>();
-        // playerControllerVar.cameraManager = Container.Resolve<CameraManager>();
-        //playerControllerVar.sp_object = suit;
-        // Container.Bind<PlayerController>().FromInstance(playerControllerVar).AsSingle();
 
-        GameObject shipGO = Container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/ShipPrefab"));
-        Ship ship = shipGO.GetComponent<Ship>();
-        SpaceObjectConfig shipConfig = JsonConfigLoader.LoadFromResources<SpaceObjectConfig>("Configs/SpaceObjects/Ships/Ship01");
-        ship.InstallConfig(shipConfig);
-        ship.InstallCamera();
-        PlayerController playerControllerVar = ship.AddComponent<ShipController>();
-        playerControllerVar._rigidbody = ship.rigidbody;
-        playerControllerVar.canvasController = Container.Resolve<CanvasController>();
-        playerControllerVar.cameraManager = Container.Resolve<CameraManager>();
-        playerControllerVar.sp_object = ship;
-        Container.Bind<PlayerController>().FromInstance(playerControllerVar).AsSingle();
+        GameStartConfig startConfig = JsonConfigLoader.LoadFromResources<GameStartConfig>("Configs/Gamestarts/Default");
+        PlayerController playerControllerVar = null;
+        if (startConfig.ship == null || startConfig.ship.Length == 0)
+        {
+            GameObject suitGO = Container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/SuitPrefab"));
+            Suit suit = suitGO.GetComponent<Suit>();
+            SpaceObjectConfig suitConfig = JsonConfigLoader.LoadFromResources<SpaceObjectConfig>("Configs/SpaceObjects/Suit/Suit01");
+            suit.InstallConfig(suitConfig);
+            suit.InstallCamera();
+            playerControllerVar = suit.AddComponent<SuitController>();
+            playerControllerVar._rigidbody = suit.rigidbody;
+            playerControllerVar.canvasController = Container.Resolve<CanvasController>();
+            playerControllerVar.cameraManager = Container.Resolve<CameraManager>();
+            playerControllerVar.sp_object = suit;
+            Container.Bind<PlayerController>().FromInstance(playerControllerVar).AsSingle();
+        }
+        else
+        {
+            GameObject shipGO = Container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/ShipPrefab"));
+            Ship ship = shipGO.GetComponent<Ship>();
+            SpaceObjectConfig shipConfig = JsonConfigLoader.LoadFromResources<SpaceObjectConfig>("Configs/SpaceObjects/Ships/" + startConfig.ship);
+
+            ship.InstallConfig(shipConfig);
+            ship.InstallCamera();
+
+            if (startConfig.ship_loadout != null && startConfig.ship_loadout.Length > 0)
+            {
+                Loadout loadout = JsonConfigLoader.LoadFromResources<Loadout>("Configs/Loadouts/" + startConfig.ship_loadout);
+                ship.InstallLoadout(loadout);
+            }
+
+            playerControllerVar = ship.AddComponent<ShipController>();
+            playerControllerVar._rigidbody = ship.rigidbody;
+            playerControllerVar.canvasController = Container.Resolve<CanvasController>();
+            playerControllerVar.cameraManager = Container.Resolve<CameraManager>();
+            playerControllerVar.signalBus = Container.Resolve<SignalBus>();
+            playerControllerVar.sp_object = ship;
+            Container.Bind<PlayerController>().FromInstance(playerControllerVar).AsSingle();
+        }
 
         WorldChunkManager worldChunkManagerVar = Container.InstantiatePrefab(worldChunkManager).GetComponent<WorldChunkManager>();
         Container.Bind<WorldChunkManager>().FromInstance(worldChunkManagerVar).AsSingle();
