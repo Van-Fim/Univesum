@@ -16,7 +16,6 @@ public abstract class SpaceObject : MonoBehaviour
     public Rigidbody rigidbody;
     public Transform hardpoints;
     protected Mesh mesh;
-    public List<TrailRenderer> trails;
 
     protected GameObject main = null;
 
@@ -105,7 +104,11 @@ public abstract class SpaceObject : MonoBehaviour
                     trail.transform.SetParent(tr);
                     trail.transform.localPosition = Vector3.zero;
                     trail.transform.localRotation = Quaternion.identity;
-                    trails.Add(trail);
+
+                    GameObject JetEngine = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/JetEngine"));
+                    JetEngine.transform.SetParent(tr);
+                    JetEngine.transform.localPosition = Vector3.zero;
+                    JetEngine.transform.localRotation = Quaternion.identity;
                 }
             }
         }

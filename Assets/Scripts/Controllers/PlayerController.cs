@@ -62,6 +62,14 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
+        if (Input.GetKey(KeyCode.X))
+        {
+            cameraManager.GetMainCamera().transform.localPosition = new Vector3(0,1,-20);
+        }
+        else
+        {
+            cameraManager.GetMainCamera().transform.localPosition = Vector3.zero;
+        }
 
         // float speed = _rigidbody.linearVelocity.magnitude;
         // for (int i = 0; i < sp_object.trails.Count; i++)
