@@ -9,7 +9,7 @@ public class ShipController : PlayerController
     public override void Turn()
     {
         Ship ship = (Ship)sp_object;
-        int _rotationSpeed = ship.engine.rotation_speed;
+        int _rotationSpeed = ship.engine.rotationSpeed;
         if (!Input.GetMouseButton(1))
         {
             // Управление клавиатурой
@@ -66,8 +66,8 @@ public class ShipController : PlayerController
     public override void Move()
     {
         Ship ship = (Ship)sp_object;
-        int _accelerationSpeed = ship.engine.acceleration_speed;
-        int _maxSpeed = ship.engine.max_speed;
+        int _accelerationSpeed = ship.engine.accelerationSpeed;
+        int _maxSpeed = ship.engine.maxSpeed;
         if (Input.GetKey(KeyCode.Space) && _rigidbody != null)
         {
             _rigidbody.linearVelocity = Vector3.zero;
@@ -105,8 +105,8 @@ public class ShipController : PlayerController
 
         // Применение силы движения
         _rigidbody.linearVelocity = (transform.forward * _maxSpeed * _currentSpeedFactor);
-        canvasController.currentSpeed.text = $"{Mathf.Round(_rigidbody.linearVelocity.magnitude)}/{_maxSpeed}";
-        signalBus.Fire(new PlayerSpeedChangedSignal(_currentSpeedFactor));
+        sp_object.canvasController.currentSpeed.text = $"{Mathf.Round(_rigidbody.linearVelocity.magnitude)}/{_maxSpeed}";
+        sp_object.signalBus.Fire(new PlayerSpeedChangedSignal(_currentSpeedFactor));
     }
     #endregion
 }

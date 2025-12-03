@@ -6,8 +6,12 @@ using UnityEngine.UI;
 public class CanvasController : MonoBehaviour
 {
     public TextMeshProUGUI currentSpeed;
-    public GameObject hud01;
-    public GameObject hud02;
+    public UnityEngine.UI.Image hud01;
+    public UnityEngine.UI.Image hull;
+    public UnityEngine.UI.Image hud02;
+    public UnityEngine.UI.Image shield;
+    public UnityEngine.UI.Image hud03;
+    public UnityEngine.UI.Image power;
     public UnityEngine.UI.Image crosshair;
 
     public void Start()

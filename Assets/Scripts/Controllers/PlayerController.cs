@@ -5,9 +5,6 @@ using Zenject;
 
 public class PlayerController : MonoBehaviour
 {
-    public SignalBus signalBus;
-    public CanvasController canvasController;
-    public CameraManager cameraManager;
     public SpaceObject sp_object;
 
     // Текущие параметры скорости
@@ -30,7 +27,7 @@ public class PlayerController : MonoBehaviour
 
     public virtual void Start()
     {
-        this.canvasController.crosshair.sprite = Resources.Load<Sprite>("Textures/UI/center_crosshair01");
+        sp_object.canvasController.crosshair.sprite = Resources.Load<Sprite>("Textures/UI/center_crosshair01");
         _screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
     }
 
@@ -53,11 +50,11 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.X))
         {
-            cameraManager.GetMainCamera().transform.localPosition = new Vector3(0, 1, -20);
+            sp_object.cameraManager.GetMainCamera().transform.localPosition = new Vector3(0, 1, -20);
         }
         else
         {
-            cameraManager.GetMainCamera().transform.localPosition = Vector3.zero;
+            sp_object.cameraManager.GetMainCamera().transform.localPosition = Vector3.zero;
         }
 
         // float speed = _rigidbody.linearVelocity.magnitude;

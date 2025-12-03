@@ -1,0 +1,7 @@
+{
+    "maxEnergy": 500,
+    "regenRate": 1,
+    "regenStepValue": 10,
+    "startRegenDelay":0.25,
+    "delayPenalty":2
+}

@@ -12,10 +12,14 @@ public abstract class SpaceObject : MonoBehaviour
     protected MeshFilter meshFilter;
     protected MeshRenderer meshRenderer;
     protected MeshCollider meshCollider;
-    [Inject] protected CameraManager cameraManager;
+    [Inject] public SignalBus signalBus;
+    [Inject] public Player player;
+    [Inject] public CanvasController canvasController;
+    [Inject] public CameraManager cameraManager;
     [Inject] public DiContainer _container;
     public Rigidbody rigidbody;
     public Transform hardpoints;
+    
     protected Mesh mesh;
 
     protected GameObject main = null;
@@ -25,6 +29,11 @@ public abstract class SpaceObject : MonoBehaviour
         hull = maxHull;
         shield = maxShield;
         Hide();
+    }
+
+    public virtual void Update()
+    {
+        
     }
 
     public virtual void InstallCamera()
@@ -52,7 +61,7 @@ public abstract class SpaceObject : MonoBehaviour
             rigidbody.mass = config.mass;
 
         GameObject gm = Resources.Load<GameObject>(config.pathToModel);
-        if (config.chinldName.Length > 0)
+        if (config != null && config.chinldName != null && config.chinldName.Length > 0)
         {
             var tr = gm.transform.Find(config.chinldName);
             if (tr != null)

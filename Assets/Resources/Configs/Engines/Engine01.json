@@ -1,7 +1,9 @@
 {
-    "max_speed": 1700,
-    "rotation_speed": 150,
-    "acceleration_speed": 100,
+    "maxSpeed": 1700,
+    "rotationSpeed": 150,
+    "accelerationSpeed": 100,
+
+    "soundIdle":"engine02_idle",
 
     "color01": {"r":100,"g":255,"b":100,"a":255},
     "color02": {"r":0,"g":255,"b":0,"a":255}

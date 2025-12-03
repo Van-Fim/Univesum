@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class Player
 {
-    private PlayerController currentController;
+    public PlayerController currentController;
+    public static Player singleton;
 
     public bool IsInShip { get; private set; }
 

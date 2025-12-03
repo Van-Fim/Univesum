@@ -1,12 +1,34 @@
+using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 public class Ship : SpaceObject
 {
-    public Engine engine;
+    public EngineConfig engine;
+    public PowerGenerator powerGenerator;
+    [Inject] private WeaponFactory _weaponFactory;
+    public List<Weapon> weapons = new List<Weapon>();
+    public bool IsPlayerShip()
+    {
+        return player.currentController != null && player.currentController.sp_object == this;
+    }
+    public override void Update()
+    {
+        if (IsPlayerShip())
+        {
+            float dt = Time.deltaTime;
+            if (powerGenerator != null)
+            {
+                powerGenerator.Update(dt);
+                canvasController.power.fillAmount = 0.3f * (powerGenerator.currentEnergy / powerGenerator.config.maxEnergy);
+            }
+        }
+    }
 
     public override void InstallLoadout(Loadout loadout)
     {
         base.InstallLoadout(loadout);
+
         if (loadout.hardpoints == null)
         {
             return;
@@ -16,7 +38,7 @@ public class Ship : SpaceObject
             LoadoutHP hp = loadout.hardpoints[i];
             if (hp.hardpoint == "Engine")
             {
-                engine = JsonConfigLoader.LoadFromResources<Engine>("Configs/Engines/" + hp.item);
+                engine = JsonConfigLoader.LoadFromResources<EngineConfig>("Configs/Engines/" + hp.item);
                 if (hardpoints != null && hardpoints.childCount > 0)
                 {
                     for (int j = 0; j < hardpoints.childCount; j++)
@@ -31,13 +53,46 @@ public class Ship : SpaceObject
 
                             GameObject JetEngineGameObject = _container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/JetEngine"));
                             JetEngineController JetEngine = JetEngineGameObject.GetComponent<JetEngineController>();
+                            JetEngine.sp_object = this;
                             JetEngine.transform.SetParent(tr);
                             JetEngine.transform.localPosition = Vector3.zero;
                             JetEngine.transform.localRotation = Quaternion.identity;
                             JetEngine.ApplyGradient(engine.color01, engine.color02);
+
+                            EngineSoundController engineSoundController = JetEngineGameObject.GetComponent<EngineSoundController>();
+                            engineSoundController.InstallSounds(engine);
+                            engineSoundController.sp_object = this;
                         }
                     }
                 }
+            }
+            else if (hp.hardpoint == "PowerGenerator")
+            {
+                PowerGeneratorConfig pw = JsonConfigLoader.LoadFromResources<PowerGeneratorConfig>("Configs/PowerGenerators/" + hp.item);
+                if (hardpoints != null && hardpoints.childCount > 0)
+                {
+                    powerGenerator = new PowerGenerator(pw);
+                }
+            }
+            else if (hp.hardpoint.StartsWith("HPWeapon"))
+            {
+                if (hardpoints != null && hardpoints.childCount > 0)
+                {
+                    for (int j = 0; j < hardpoints.childCount; j++)
+                    {
+                        Transform tr = hardpoints.GetChild(j);
+                        if (tr.name == hp.hardpoint)
+                        {
+                            WeaponConfig cfg = JsonConfigLoader.LoadFromResources<WeaponConfig>("Configs/Weapons/" + hp.item);
+                            Weapon weapon = _weaponFactory.Create(this, cfg);
+                            weapon.transform.SetParent(tr);
+                            weapon.transform.localPosition = Vector3.zero;
+                            weapon.transform.localRotation = Quaternion.identity;
+                            weapon.InstallConfig();
+                        }
+                    }
+                }
+
             }
         }
     }

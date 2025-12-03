@@ -857,9 +857,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasController: {fileID: 0}
   sp_object: {fileID: 6540795234197397917}
-  _maxSpeed: 3000
-  _rotationSpeed: 150
-  _accelerationSpeed: 100
   _targetSpeedFactor: 1
   _currentSpeedFactor: 1
   _rigidbody: {fileID: 732201866348936934}

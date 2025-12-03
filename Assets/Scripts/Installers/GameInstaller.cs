@@ -34,6 +34,7 @@ public class GameInstaller : MonoInstaller
 
         GameStartConfig startConfig = JsonConfigLoader.LoadFromResources<GameStartConfig>("Configs/Gamestarts/Default");
         PlayerController playerControllerVar = null;
+        Player player = Container.Resolve<Player>();
         if (startConfig.ship == null || startConfig.ship.Length == 0)
         {
             GameObject suitGO = Container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/SuitPrefab"));
@@ -43,10 +44,9 @@ public class GameInstaller : MonoInstaller
             suit.InstallCamera();
             playerControllerVar = suit.AddComponent<SuitController>();
             playerControllerVar._rigidbody = suit.rigidbody;
-            playerControllerVar.canvasController = Container.Resolve<CanvasController>();
-            playerControllerVar.cameraManager = Container.Resolve<CameraManager>();
             playerControllerVar.sp_object = suit;
             Container.Bind<PlayerController>().FromInstance(playerControllerVar).AsSingle();
+            player.currentController = playerControllerVar;
         }
         else
         {
@@ -65,11 +65,9 @@ public class GameInstaller : MonoInstaller
 
             playerControllerVar = ship.AddComponent<ShipController>();
             playerControllerVar._rigidbody = ship.rigidbody;
-            playerControllerVar.canvasController = Container.Resolve<CanvasController>();
-            playerControllerVar.cameraManager = Container.Resolve<CameraManager>();
-            playerControllerVar.signalBus = Container.Resolve<SignalBus>();
             playerControllerVar.sp_object = ship;
             Container.Bind<PlayerController>().FromInstance(playerControllerVar).AsSingle();
+            player.currentController = playerControllerVar;
         }
 
         WorldChunkManager worldChunkManagerVar = Container.InstantiatePrefab(worldChunkManager).GetComponent<WorldChunkManager>();

@@ -3,6 +3,18 @@
         {
             "hardpoint": "Engine",
             "item": "Engine01"
+        },
+        {
+            "hardpoint": "PowerGenerator",
+            "item": "Power01"
+        },
+        {
+            "hardpoint": "HPWeapon.001",
+            "item": "Weapon01"
+        },
+        {
+            "hardpoint": "HPWeapon.002",
+            "item": "Weapon01"
         }
     ]
 }

@@ -6,9 +6,12 @@ public class JetEngineController : MonoBehaviour
 {
     [Inject]
     SignalBus _signalBus;
+    [Inject]
+    Player player;
 
     public VisualEffect effect;
     public Gradient gradient;
+    public SpaceObject sp_object;
 
     [Inject]
     public void Construct(SignalBus signalBus)
@@ -24,6 +27,18 @@ public class JetEngineController : MonoBehaviour
 
     private void OnPlayerSpeedChanged(PlayerSpeedChangedSignal signal)
     {
+        if (player.GetCurrentController() != null)
+        {
+            PlayerController contr = player.GetCurrentController();
+            if (contr.sp_object != sp_object)
+            {
+                return;
+            }
+        }
+        else
+        {
+            return;
+        }
         effect.SetFloat("ConeHeight", Mathf.Abs(signal.SpeedFactor * 0.5f));
         effect.SetInt("Rate", (int)Mathf.Abs(100 + signal.SpeedFactor * 200));
     }
