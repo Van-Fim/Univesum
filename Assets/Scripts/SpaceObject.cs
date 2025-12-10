@@ -9,17 +9,19 @@ public abstract class SpaceObject : MonoBehaviour
     public int maxShield = 10000;
     public int shield;
     public SpaceObjectConfig spaceObjectConfig;
+    public SpaceObjectController spaceObjectController;
     protected MeshFilter meshFilter;
     protected MeshRenderer meshRenderer;
     protected MeshCollider meshCollider;
     [Inject] public SignalBus signalBus;
-    [Inject] public Player player;
+    [Inject] public Player localPlayer;
     [Inject] public CanvasController canvasController;
     [Inject] public CameraManager cameraManager;
     [Inject] public DiContainer _container;
+    [Inject] public CursorRaycaster cursorRaycaster;
     public Rigidbody rigidbody;
     public Transform hardpoints;
-    
+
     protected Mesh mesh;
 
     protected GameObject main = null;
@@ -33,9 +35,12 @@ public abstract class SpaceObject : MonoBehaviour
 
     public virtual void Update()
     {
-        
-    }
 
+    }
+    public virtual bool IsOwnedByLocalPlayer()
+    {
+        return spaceObjectController != null && spaceObjectController.IsOwnedByLocalPlayer(localPlayer);
+    }
     public virtual void InstallCamera()
     {
         Transform camHardpoint = hardpoints.Find("HPCamera");

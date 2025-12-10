@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Player
 {
-    public PlayerController currentController;
+    public SpaceObjectController currentController;
     public static Player singleton;
 
     public bool IsInShip { get; private set; }
@@ -23,7 +23,7 @@ public class Player
         return true;
     }
 
-    public PlayerController GetCurrentController()
+    public SpaceObjectController GetCurrentController()
     {
         return currentController;
     }

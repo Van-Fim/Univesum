@@ -1,8 +1,6 @@
 {
     "weaponName": "Weapon01Name",
     "pathToModel": "Models/Weapons/Weapon01",
-    "damage":25,
     "fireRate":2,
-    "fireSound":"fire01",
-    "energyCost":10
+    "fireSound":"fire01"
 }

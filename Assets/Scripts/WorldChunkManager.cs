@@ -6,8 +6,8 @@ using Zenject;
 public class WorldChunkManager : MonoBehaviour
 {
     List<Chunk> chunks = new List<Chunk>();
-    [Inject] public PlayerController playerController;
     [Inject] SignalBus signalBus;
+    [Inject] Player localPlayer;
     [Inject] private List<AsteroidFieldConfig> asteroidConfigs;
     public Vector3 worldPos = Vector3.zero;
 
@@ -58,7 +58,7 @@ public class WorldChunkManager : MonoBehaviour
     public void Start()
     {
         is_initialized = true;
-        playerTransform = playerController.transform;
+        playerTransform = localPlayer.GetCurrentController().transform;
         UpdateCurrentChunk();
         UpdateChunksAround(currentChunk);
         Tick();
@@ -85,8 +85,8 @@ public class WorldChunkManager : MonoBehaviour
         {
             return null;
         }
-
-        AsteroidFieldItemConfig astItem = cfg.asteroids[0];
+        int rand = Random.Range(0, cfg.asteroids.Count);
+        AsteroidFieldItemConfig astItem = cfg.asteroids[rand];
         if (astItem == null)
         {
             return null;
@@ -95,7 +95,7 @@ public class WorldChunkManager : MonoBehaviour
 
         if (cfg.speedThresholds != null && cfg.speedThresholds.Count > 0)
         {
-            float currentSpeed = playerController._rigidbody.linearVelocity.magnitude;
+            float currentSpeed = localPlayer.GetCurrentController()._rigidbody.linearVelocity.magnitude;
             cfg.speedThresholds.Sort((a, b) => a.speed.CompareTo(b.speed));
             int ascIndex = 0;
             AsteroidSpeedThresholdsConfig asc = null;

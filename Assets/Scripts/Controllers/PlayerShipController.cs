@@ -3,8 +3,51 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-public class ShipController : PlayerController
+public class PlayerShipController : SpaceObjectController
 {
+    public override void Start()
+    {
+        sp_object.canvasController.crosshair.sprite = Resources.Load<Sprite>("Textures/UI/center_crosshair01");
+        _screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+    }
+
+    public override void FixedUpdate()
+    {
+        if (_rigidbody == null)
+        {
+            return;
+        }
+
+        Turn();
+        Move();
+    }
+
+    public override void Update()
+    {
+        if (_rigidbody == null)
+        {
+            return;
+        }
+        if (Input.GetKey(KeyCode.X))
+        {
+            sp_object.cameraManager.GetMainCamera().transform.localPosition = new Vector3(0, 1, -20);
+        }
+        else
+        {
+            sp_object.cameraManager.GetMainCamera().transform.localPosition = Vector3.zero;
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            FireWeapon();
+        }
+    }
+
+    private void FireWeapon()
+    {
+        _signalBus.Fire(new WeaponFiredSignal());
+    }
+
     #region Rotation Logic
     public override void Turn()
     {

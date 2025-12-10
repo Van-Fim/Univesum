@@ -11,26 +11,37 @@ public class JetEngineController : MonoBehaviour
 
     public VisualEffect effect;
     public Gradient gradient;
-    public SpaceObject sp_object;
+    public SpaceObject _parent;
 
     [Inject]
     public void Construct(SignalBus signalBus)
     {
         _signalBus = signalBus;
-        _signalBus.Subscribe<PlayerSpeedChangedSignal>(OnPlayerSpeedChanged);
     }
 
     private void OnDestroy()
     {
-        _signalBus.Unsubscribe<PlayerSpeedChangedSignal>(OnPlayerSpeedChanged);
+        if (_parent.IsOwnedByLocalPlayer())
+        {
+            _signalBus.Unsubscribe<PlayerSpeedChangedSignal>(OnPlayerSpeedChanged);
+        }
+    }
+
+    public void Init()
+    {
+        Debug.Log(_parent.spaceObjectController);
+        if (_parent.IsOwnedByLocalPlayer())
+        {
+            _signalBus.Subscribe<PlayerSpeedChangedSignal>(OnPlayerSpeedChanged);
+        }
     }
 
     private void OnPlayerSpeedChanged(PlayerSpeedChangedSignal signal)
     {
-        if (player.GetCurrentController() != null)
+        if (_parent.IsOwnedByLocalPlayer())
         {
-            PlayerController contr = player.GetCurrentController();
-            if (contr.sp_object != sp_object)
+            SpaceObjectController contr = player.GetCurrentController();
+            if (contr.sp_object != _parent)
             {
                 return;
             }

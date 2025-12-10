@@ -7,14 +7,12 @@ public class Ship : SpaceObject
     public EngineConfig engine;
     public PowerGenerator powerGenerator;
     [Inject] private WeaponFactory _weaponFactory;
+    
     public List<Weapon> weapons = new List<Weapon>();
-    public bool IsPlayerShip()
-    {
-        return player.currentController != null && player.currentController.sp_object == this;
-    }
+
     public override void Update()
     {
-        if (IsPlayerShip())
+        if (IsOwnedByLocalPlayer())
         {
             float dt = Time.deltaTime;
             if (powerGenerator != null)
@@ -53,7 +51,8 @@ public class Ship : SpaceObject
 
                             GameObject JetEngineGameObject = _container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/JetEngine"));
                             JetEngineController JetEngine = JetEngineGameObject.GetComponent<JetEngineController>();
-                            JetEngine.sp_object = this;
+                            JetEngine._parent = this;
+                            JetEngine.Init();
                             JetEngine.transform.SetParent(tr);
                             JetEngine.transform.localPosition = Vector3.zero;
                             JetEngine.transform.localRotation = Quaternion.identity;
@@ -85,6 +84,7 @@ public class Ship : SpaceObject
                         {
                             WeaponConfig cfg = JsonConfigLoader.LoadFromResources<WeaponConfig>("Configs/Weapons/" + hp.item);
                             Weapon weapon = _weaponFactory.Create(this, cfg);
+
                             weapon.transform.SetParent(tr);
                             weapon.transform.localPosition = Vector3.zero;
                             weapon.transform.localRotation = Quaternion.identity;

@@ -2,7 +2,7 @@ using UnityEngine;
 using Zenject;
 
 [RequireComponent(typeof(Rigidbody))]
-public class SuitController : PlayerController
+public class SuitController : SpaceObjectController
 {
     public float moveSpeed = 6f;
     public float jumpForce = 8f;
