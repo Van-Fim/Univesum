@@ -45,7 +45,7 @@ public class Weapon : MonoBehaviour
         this.barrelTransform = baseTransform.transform.Find("BARREL");
         this.firePointTransform = new GameObject().transform;
         this.firePointTransform.SetParent(barrelTransform);
-        this.firePointTransform.localPosition = new Vector3(0, 0.039218f, 0.673041f);
+        this.firePointTransform.localPosition = new Vector3(0, 0.039218f, 0.773041f);
         this.firePointTransform.localRotation = Quaternion.identity;
     }
     public void InstallAS()

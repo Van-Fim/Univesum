@@ -10,7 +10,7 @@ public class Projectile : MonoBehaviour
     {
         this.config = config;
         Vector3 v1 = weapon._parent.rigidbody.linearVelocity;
-        rb.linearVelocity = direction * (this.config.speed);
+        rb.linearVelocity = direction * (this.config.speed) + v1;
     }
 
     void OnCollisionEnter(Collision col)
