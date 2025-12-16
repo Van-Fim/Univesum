@@ -19,7 +19,15 @@ public class PowerGenerator
         {
             currentEnergy -= amount;
             delayTimer = config.startRegenDelay; // сброс регена
+            if (currentEnergy <= 0)
+            {
+                delayTimer = config.startRegenDelay + config.delayPenalty;
+            }
             return true;
+        }
+        else if (currentEnergy < amount)
+        {
+            delayTimer = config.startRegenDelay + config.delayPenalty;
         }
         return false;
     }

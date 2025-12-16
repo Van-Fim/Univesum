@@ -13,7 +13,7 @@ public class EngineSoundController : MonoBehaviour
 
         // Idle звук: громкость и питч растут с ускорением
         idleSource.pitch = Mathf.Lerp(0.8f, 2.0f, speed / 3000f);
-        idleSource.volume = Mathf.Lerp(0.1f, 0.25f, speed / 3000f)/10;
+        idleSource.volume = Mathf.Lerp(0.1f, 0.25f, speed / 3000f)/20;
     }
 
     public void InstallSounds(EngineConfig engine)

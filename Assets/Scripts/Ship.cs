@@ -18,7 +18,10 @@ public class Ship : SpaceObject
             if (powerGenerator != null)
             {
                 powerGenerator.Update(dt);
-                canvasController.power.fillAmount = 0.3f * (powerGenerator.currentEnergy / powerGenerator.config.maxEnergy);
+                
+                float dv = ((float)powerGenerator.currentEnergy / (float)powerGenerator.config.maxEnergy);
+                Debug.Log(dv);
+                canvasController.power.fillAmount = 0.4f * dv;
             }
         }
     }
@@ -84,7 +87,7 @@ public class Ship : SpaceObject
                         {
                             WeaponConfig cfg = JsonConfigLoader.LoadFromResources<WeaponConfig>("Configs/Weapons/" + hp.item);
                             Weapon weapon = _weaponFactory.Create(this, cfg);
-
+                            weapon.Init();
                             weapon.transform.SetParent(tr);
                             weapon.transform.localPosition = Vector3.zero;
                             weapon.transform.localRotation = Quaternion.identity;

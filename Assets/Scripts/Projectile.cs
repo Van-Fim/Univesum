@@ -4,10 +4,13 @@ public class Projectile : MonoBehaviour
 {
     public ProjectileConfig config;
     public Rigidbody rb;
+    public Weapon weapon;
 
-    public void Launch(Vector3 direction)
+    public void Launch(ProjectileConfig config, Vector3 direction, Quaternion rotation)
     {
-        rb.linearVelocity = direction * config.speed;
+        this.config = config;
+        Vector3 v1 = weapon._parent.rigidbody.linearVelocity;
+        rb.linearVelocity = direction * (this.config.speed);
     }
 
     void OnCollisionEnter(Collision col)

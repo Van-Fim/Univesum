@@ -37,7 +37,7 @@ public class PlayerShipController : SpaceObjectController
             sp_object.cameraManager.GetMainCamera().transform.localPosition = Vector3.zero;
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             FireWeapon();
         }

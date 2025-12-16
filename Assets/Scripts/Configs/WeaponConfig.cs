@@ -4,7 +4,8 @@ public class WeaponConfig
 {
     public string weaponName;
     public float fireRate;
+    public int energyCost;
     public string pathToModel;
-    public GameObject projectilePrefab;
-    public AudioClip fireSound;
+    public string projectile;
+    public string fireSound;
 }

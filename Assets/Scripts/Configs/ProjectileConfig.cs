@@ -5,6 +5,6 @@ using UnityEngine;
 public class ProjectileConfig
 {
     public float damage;
-    public float energyCost;
     public float speed;
+    public string pathToModel;
 }
