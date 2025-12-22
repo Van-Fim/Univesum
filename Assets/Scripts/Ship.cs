@@ -20,7 +20,6 @@ public class Ship : SpaceObject
                 powerGenerator.Update(dt);
                 
                 float dv = ((float)powerGenerator.currentEnergy / (float)powerGenerator.config.maxEnergy);
-                Debug.Log(dv);
                 canvasController.power.fillAmount = 0.4f * dv;
             }
         }

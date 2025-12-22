@@ -6,18 +6,18 @@ public class Weapon : MonoBehaviour
     public ProjectileConfig projectileConfig;
     public AudioSource audioSource;
     public Ship _parent;
-    Transform baseTransform;
-    Transform barrelTransform;
+    public Transform baseTransform;
+    public Transform barrelTransform;
     public Transform firePointTransform;
-    float yAngLimit = 30f;
-    float xAngLimit = 30f;
+    float yAngLimit = 40f;
+    float xAngLimit = 40f;
     float rotationSpeed = 7f;
     protected GameObject main = null;
     protected float _nextFireTime;
     [Inject]
     SignalBus _signalBus;
     [Inject]
-    ProjectilePool _pool;
+    public ProjectilePool _pool;
     [Inject]
     public void Construct(Ship parent, WeaponConfig config, SignalBus signalBus, ProjectilePool pool)
     {
@@ -52,10 +52,11 @@ public class Weapon : MonoBehaviour
     {
         audioSource = firePointTransform.gameObject.AddComponent<AudioSource>();
         audioSource.clip = Resources.Load<AudioClip>("Sounds/Weapons/" + _config.fireSound);
-        audioSource.spatialBlend = 1.0f;
+        audioSource.spatialBlend = 1;
+        audioSource.dopplerLevel = 0;
         audioSource.minDistance = 2f;
         audioSource.maxDistance = 4f;
-        audioSource.volume = 0.3f;
+        audioSource.volume = 0.2f;
     }
     public void Update()
     {
@@ -86,7 +87,7 @@ public class Weapon : MonoBehaviour
     }
     public virtual void Fire()
     {
-        _pool.Spawn(this, projectileConfig, firePointTransform.position, firePointTransform.rotation);
+        _pool.Spawn(this, projectileConfig, firePointTransform.position, _parent.cursorRaycaster.AimPoint, firePointTransform.rotation);
         audioSource.Play();
     }
     private void TryFire()

@@ -1,5 +1,6 @@
 {
     "damage":25,
-    "speed":5,
+    "speed":70,
+    "lifetime":2.5,
     "pathToModel": "Models/Projectiles/Projectile01"
 }

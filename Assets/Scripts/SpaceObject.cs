@@ -12,7 +12,7 @@ public abstract class SpaceObject : MonoBehaviour
     public SpaceObjectController spaceObjectController;
     protected MeshFilter meshFilter;
     protected MeshRenderer meshRenderer;
-    protected MeshCollider meshCollider;
+    public MeshCollider meshCollider;
     [Inject] public SignalBus signalBus;
     [Inject] public Player localPlayer;
     [Inject] public CanvasController canvasController;

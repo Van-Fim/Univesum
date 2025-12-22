@@ -5,15 +5,16 @@ public class EngineSoundController : MonoBehaviour
     public AudioSource idleSource;
     public AudioSource boostSource;
     public AudioSource shutdownSource;
-    public SpaceObject sp_object;
+    public Ship sp_object;
 
     void Update()
     {
         float speed = sp_object.rigidbody.linearVelocity.magnitude;
+        float maxSpeed = sp_object.engine.maxSpeed;
 
-        // Idle звук: громкость и питч растут с ускорением
-        idleSource.pitch = Mathf.Lerp(0.8f, 2.0f, speed / 3000f);
-        idleSource.volume = Mathf.Lerp(0.1f, 0.25f, speed / 3000f)/20;
+        float sp = Mathf.Lerp(0.8f, 2.0f, speed / maxSpeed);
+        idleSource.pitch = sp;
+        idleSource.volume = sp / 20;
     }
 
     public void InstallSounds(EngineConfig engine)
@@ -23,6 +24,7 @@ public class EngineSoundController : MonoBehaviour
         idleSource.loop = true; // чтобы звук играл постоянно
         idleSource.playOnAwake = true; // можно включить автозапуск
         idleSource.spatialBlend = 1.0f;
+        idleSource.dopplerLevel = 0;
         idleSource.minDistance = 2f;
         idleSource.maxDistance = 4f;
         idleSource.Play();
