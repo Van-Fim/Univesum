@@ -5,11 +5,26 @@ public class Projectile : MonoBehaviour
     public ProjectileConfig config;
     public Rigidbody rb;
     public Weapon weapon;
+
+    public ParticleSystem beam;
+    public ParticleSystem body;
+
+    [Header("Optional tail")]
+    public ProjectileTailLineRenderer tail;
+
     private float destroyTime;
 
     public void Launch(ProjectileConfig config, Vector3 direction, Quaternion rotation)
     {
         this.config = config;
+
+        // Reset tail for pooling
+        if (tail != null)
+        {
+            tail.ApplyConfig(config);
+            tail.ResetTail();
+        }
+
         Vector3 v1 = weapon._parent.rigidbody.linearVelocity;
         rb.linearVelocity = direction * (this.config.speed) + v1;
 
@@ -38,6 +53,10 @@ public class Projectile : MonoBehaviour
     }
     void SelfDestruct()
     {
+        // Clean tail for pooling (avoid showing previous trail on next spawn)
+        if (tail != null)
+            tail.ResetTail();
+
         weapon._pool.Despawn(this);
     }
 }

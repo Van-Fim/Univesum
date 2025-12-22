@@ -47,9 +47,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   config:
     damage: 0
-    energyCost: 0
     speed: 0
+    lifetime: 0
+    pathToModel: 
+    tailEnabled: 0
+    tailMaxLength: 10
+    tailMinPointDistance: 0.25
+    tailMaxPoints: 128
+    tailStartWidth: 0.1
+    tailEndWidth: 0
   rb: {fileID: 4799416014511722508}
+  weapon: {fileID: 0}
+  tail: {fileID: 0}
 --- !u!54 &4799416014511722508
 Rigidbody:
   m_ObjectHideFlags: 0
