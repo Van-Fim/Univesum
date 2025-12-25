@@ -4,6 +4,7 @@ using Zenject;
 public class ObjectSelector : MonoBehaviour
 {
     ISelectable currentSelection;
+    [Inject] Player player;
     [Inject] CameraManager cameraManager;
     [Inject] CursorManager cursorManager;
     bool hoveredObject;
@@ -28,7 +29,11 @@ public class ObjectSelector : MonoBehaviour
                 cursorManager.SwitchCursor("Default");
             }
         }
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonUp(1) && player.IsSingleSelect)
+        {
+            player.IsSingleSelect = false;
+        }
+        if (Input.GetMouseButtonDown(1))
         {
             if (h)
             {
@@ -36,6 +41,7 @@ public class ObjectSelector : MonoBehaviour
                 if (selectable != null)
                 {
                     Select(selectable);
+                    player.IsSingleSelect = true;
                 }
                 else
                 {

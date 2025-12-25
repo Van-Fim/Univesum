@@ -6,6 +6,7 @@ using Zenject;
 public class SpaceObjectController : MonoBehaviour
 {
     [Inject] public SignalBus _signalBus;
+    [Inject] public Player player;
     public SpaceObject sp_object;
 
     // Текущие параметры скорости

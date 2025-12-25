@@ -27,6 +27,7 @@ public class PowerGenerator
         }
         else if (currentEnergy < amount)
         {
+            currentEnergy = 0;
             delayTimer = config.startRegenDelay + config.delayPenalty;
         }
         return false;

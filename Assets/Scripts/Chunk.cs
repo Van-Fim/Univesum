@@ -14,6 +14,7 @@ public class Chunk : MonoBehaviour
     public void OnChunkFloatingOriginFix(SignalChunkFloatingOriginFix signal)
     {
         transform.localPosition -= signal.offset;
+        Debug.Log(signal.offset);
     }
     public void Destroy()
     {

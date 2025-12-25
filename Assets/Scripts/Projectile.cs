@@ -8,22 +8,22 @@ public class Projectile : MonoBehaviour
 
     public ParticleSystem beam;
     public ParticleSystem body;
-
-    [Header("Optional tail")]
-    public ProjectileTailLineRenderer tail;
+    bool is_initialized;
 
     private float destroyTime;
-
+    public void Init()
+    {
+        if (is_initialized) return;
+        is_initialized = true;
+        weapon._signalBus.Subscribe<SignalChunkFloatingOriginFix>(OnChunkFloatingOriginFix);
+    }
+    public void OnChunkFloatingOriginFix(SignalChunkFloatingOriginFix signal)
+    {
+        transform.localPosition -= signal.offset;
+    }
     public void Launch(ProjectileConfig config, Vector3 direction, Quaternion rotation)
     {
         this.config = config;
-
-        // Reset tail for pooling
-        if (tail != null)
-        {
-            tail.ApplyConfig(config);
-            tail.ResetTail();
-        }
 
         Vector3 v1 = weapon._parent.rigidbody.linearVelocity;
         rb.linearVelocity = direction * (this.config.speed) + v1;
@@ -53,10 +53,6 @@ public class Projectile : MonoBehaviour
     }
     void SelfDestruct()
     {
-        // Clean tail for pooling (avoid showing previous trail on next spawn)
-        if (tail != null)
-            tail.ResetTail();
-
         weapon._pool.Despawn(this);
     }
 }

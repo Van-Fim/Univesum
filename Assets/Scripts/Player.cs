@@ -4,6 +4,7 @@ public class Player
 {
     public SpaceObjectController currentController;
     public static Player singleton;
+    public bool IsSingleSelect;
 
     public bool IsInShip { get; private set; }
 

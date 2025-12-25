@@ -1,14 +1,7 @@
 {
     "damage": 25,
-    "speed": 120,
+    "speed": 170,
     "lifetime": 2.5,
     "pathToModel": "Models/Projectiles/Projectile01",
-    "baseColor": {"r":255,"g":100,"b":100,"a":255},
-
-    "tailEnabled": true,
-    "tailMaxLength": 12.0,
-    "tailMinPointDistance": 0.35,
-    "tailMaxPoints": 128,
-    "tailStartWidth": 0.12,
-    "tailEndWidth": 0.0
+    "baseColor": {"r":255,"g":255,"b":100,"a":255}
 }

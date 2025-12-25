@@ -15,7 +15,7 @@ public class Weapon : MonoBehaviour
     protected GameObject main = null;
     protected float _nextFireTime;
     [Inject]
-    SignalBus _signalBus;
+    public SignalBus _signalBus;
     [Inject]
     public ProjectilePool _pool;
     [Inject]

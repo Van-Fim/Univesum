@@ -7,6 +7,7 @@ public class ProjectilePool : MonoMemoryPool<Weapon, ProjectileConfig, Vector3, 
     protected override void Reinitialize(Weapon weapon, ProjectileConfig config, Vector3 pos, Vector3 targetPos, Quaternion rot, Projectile item)
     {
         item.weapon = weapon;
+        item.Init();
         item.transform.position = pos;
         item.transform.rotation = rot;
 
@@ -27,18 +28,6 @@ public class ProjectilePool : MonoMemoryPool<Weapon, ProjectileConfig, Vector3, 
 
             var bodyMain = item.body.main;
             bodyMain.startColor = new ParticleSystem.MinMaxGradient(config.baseColor);
-        }
-        LineRenderer lineRenderer = null;
-        if (item.tail == null)
-        {
-            ProjectileTailLineRenderer prtr = item.AddComponent<ProjectileTailLineRenderer>();
-            lineRenderer = item.AddComponent<LineRenderer>();
-            prtr.line = lineRenderer;
-            item.tail = prtr;
-            lineRenderer.material.SetColor("_Color", (Color)config.baseColor);
-            lineRenderer.material.SetColor("_BaseColor", (Color)config.baseColor);
-            lineRenderer.startColor = (Color)config.baseColor;
-            lineRenderer.endColor = (Color)config.baseColor;
         }
         item.gameObject.SetActive(true);
         item.Launch(config, baseDir, rot);
