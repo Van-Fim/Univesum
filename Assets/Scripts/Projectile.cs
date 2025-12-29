@@ -7,8 +7,10 @@ public class Projectile : MonoBehaviour
     public Weapon weapon;
 
     public ParticleSystem beam;
+    public ParticleSystem explode;
     public ParticleSystem body;
     bool is_initialized;
+    bool is_collided;
 
     private float destroyTime;
     public void Init()
@@ -28,31 +30,43 @@ public class Projectile : MonoBehaviour
         Vector3 v1 = weapon._parent.rigidbody.linearVelocity;
         rb.linearVelocity = direction * (this.config.speed) + v1;
 
-        // Schedule self-destruction after lifetime
         destroyTime = Time.time + config.lifetime;
         Invoke("SelfDestruct", config.lifetime);
     }
 
     void OnCollisionEnter(Collision col)
     {
-        // урон
-        // col.gameObject.GetComponent<Health>()?.TakeDamage(damage);
-
-        // Cancel pending self-destruction
         if (weapon == null)
         {
             return;
+        }
+        SpaceObject sp = col.gameObject.GetComponent<SpaceObject>();
+        if (sp != null && !is_collided)
+        {
+            sp.InvokeTakeDamage(weapon._parent, (int)config.damage);
+            is_collided = true;
         }
         CancelInvoke("SelfDestruct");
         Explode();
     }
     void Explode()
     {
-        // какой нибудь эффект столкновения
-        SelfDestruct();
+        beam.Stop();
+        body.Stop();
+        if (!explode.isPlaying)
+        {
+            var expMain = explode.main;
+            expMain.duration = config.explodeTime;
+            explode.Play();
+        }
+        rb.isKinematic = true;
+
+        Invoke("SelfDestruct", config.explodeTime);
     }
     void SelfDestruct()
     {
+        rb.isKinematic = false;
+        is_collided = false;
         weapon._pool.Despawn(this);
     }
 }

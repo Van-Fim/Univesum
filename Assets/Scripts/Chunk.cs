@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -7,6 +8,7 @@ public class Chunk : MonoBehaviour
     public Coroutine coroutine;
     [Inject] SignalBus signalBus;
     [Inject] WorldChunkManager worldChunkManager;
+    public List<Asteroid> asteroids = new List<Asteroid>();
     void Start()
     {
         signalBus.Subscribe<SignalChunkFloatingOriginFix>(OnChunkFloatingOriginFix);
@@ -14,11 +16,11 @@ public class Chunk : MonoBehaviour
     public void OnChunkFloatingOriginFix(SignalChunkFloatingOriginFix signal)
     {
         transform.localPosition -= signal.offset;
-        Debug.Log(signal.offset);
     }
     public void Destroy()
     {
         isDestroyed = true;
         name = "Destroyed";
+        asteroids = new List<Asteroid>();
     }
 }

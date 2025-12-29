@@ -29,11 +29,7 @@ public class ObjectSelector : MonoBehaviour
                 cursorManager.SwitchCursor("Default");
             }
         }
-        if (Input.GetMouseButtonUp(1) && player.IsSingleSelect)
-        {
-            player.IsSingleSelect = false;
-        }
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(2))
         {
             if (h)
             {
@@ -41,7 +37,6 @@ public class ObjectSelector : MonoBehaviour
                 if (selectable != null)
                 {
                     Select(selectable);
-                    player.IsSingleSelect = true;
                 }
                 else
                 {

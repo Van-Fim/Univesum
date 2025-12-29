@@ -54,18 +54,7 @@ public class PlayerShipController : SpaceObjectController
         Ship ship = (Ship)sp_object;
         int _rotationSpeed = ship.engine.rotationSpeed;
         Ray ray = sp_object.cameraManager.GetMainCamera().ScreenPointToRay(Input.mousePosition);
-        bool h = Physics.Raycast(ray, out RaycastHit hit, 30000f);
-        if (h)
-        {
-            var selectable = hit.collider.GetComponent<ISelectable>();
-            if (Input.GetMouseButtonDown(1))
-            {
-                if (selectable != null)
-                {
-                    player.IsSingleSelect = true;
-                }
-            }
-        }
+
         if (!Input.GetMouseButton(1))
         {
             // Управление клавиатурой
@@ -83,44 +72,37 @@ public class PlayerShipController : SpaceObjectController
         }
         else
         {
-            if (!player.IsSingleSelect)
-            {
-                // Управление мышью
-                float speed = _rotationSpeed;
-                float rollInput = Input.GetAxis("Roll");
-                Vector3 mousePosition = Input.mousePosition;
+            // Управление мышью
+            float speed = _rotationSpeed;
+            float rollInput = Input.GetAxis("Roll");
+            Vector3 mousePosition = Input.mousePosition;
 
-                // Расчет отклонений мыши от центра экрана
-                float pitch = (mousePosition.y - _screenCenter.y) / _screenCenter.y;
-                float yaw = (mousePosition.x - _screenCenter.x) / _screenCenter.x;
+            // Расчет отклонений мыши от центра экрана
+            float pitch = (mousePosition.y - _screenCenter.y) / _screenCenter.y;
+            float yaw = (mousePosition.x - _screenCenter.x) / _screenCenter.x;
 
-                // Применение чувствительности
-                pitch *= MouseSensitivityMultiplier;
-                yaw *= MouseSensitivityMultiplier;
+            // Применение чувствительности
+            pitch *= MouseSensitivityMultiplier;
+            yaw *= MouseSensitivityMultiplier;
 
-                // Ограничение значений
-                pitch = -Mathf.Clamp(pitch, -1.0f, 1.0f);
-                yaw = Mathf.Clamp(yaw, -1.0f, 1.0f);
+            // Ограничение значений
+            pitch = -Mathf.Clamp(pitch, -1.0f, 1.0f);
+            yaw = Mathf.Clamp(yaw, -1.0f, 1.0f);
 
-                // Устранение "мертвой зоны"
-                pitch = ApplyDeadZone(pitch);
-                yaw = ApplyDeadZone(yaw);
+            // Устранение "мертвой зоны"
+            pitch = ApplyDeadZone(pitch);
+            yaw = ApplyDeadZone(yaw);
 
-                // Расчет вращения по крену (roll)
-                float roll = speed * Time.deltaTime * rollInput;
+            // Расчет вращения по крену (roll)
+            float roll = speed * Time.deltaTime * rollInput;
 
-                // Применение вращения
-                Vector3 rotationAngles = new Vector3(
-                    pitch * (speed / RotationSpeedDivisor),
-                    yaw * (speed / RotationSpeedDivisor),
-                    roll
-                );
-                _rigidbody.transform.Rotate(rotationAngles);
-            }
-        }
-        if (Input.GetMouseButtonUp(1) && player.IsSingleSelect)
-        {
-            player.IsSingleSelect = false;
+            // Применение вращения
+            Vector3 rotationAngles = new Vector3(
+                pitch * (speed / RotationSpeedDivisor),
+                yaw * (speed / RotationSpeedDivisor),
+                roll
+            );
+            _rigidbody.transform.Rotate(rotationAngles);
         }
     }
     #endregion

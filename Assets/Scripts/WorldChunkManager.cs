@@ -153,10 +153,14 @@ public class WorldChunkManager : MonoBehaviour
             {
                 break;
             }
+            if (chunk.asteroids.Count > i && chunk.asteroids[i] != null)
+            {
+                break;
+            }
             Random.InitState($"{chunkCoord}{i}".GetHashCode());
 
             Asteroid asteroid = SpawnAsteroid(chunk, chunkCoord);
-
+            chunk.asteroids.Add(asteroid);
         }
     }
     IEnumerator SpawnAsteroidsAsync(Chunk chunk, Vector3Int chunkCoord)
@@ -171,9 +175,13 @@ public class WorldChunkManager : MonoBehaviour
         {
             if (chunk == null)
                 yield break;
-
+            if (chunk.asteroids.Count > i && chunk.asteroids[i] != null)
+            {
+                yield break;
+            }
             Random.InitState($"{chunkCoord}{i}".GetHashCode());
             Asteroid asteroid = SpawnAsteroid(chunk, chunkCoord);
+            chunk.asteroids.Add(asteroid);
             yield return null; // вместо WaitForSeconds — быстрее и легче
         }
     }

@@ -22,6 +22,8 @@ public abstract class SpaceObject : MonoBehaviour
     public Rigidbody rigidbody;
     public Transform hardpoints;
 
+    bool is_initialized = false;
+
     protected Mesh mesh;
 
     protected GameObject main = null;
@@ -31,11 +33,34 @@ public abstract class SpaceObject : MonoBehaviour
         hull = maxHull;
         shield = maxShield;
         Hide();
+
+        if (!is_initialized)
+        {
+            signalBus.Subscribe<SpaceObjectOnTakeDamage>(OnTakeDamage);
+            is_initialized = true;
+        }
     }
 
     public virtual void Update()
     {
 
+    }
+    public virtual void OnTakeDamage(SpaceObjectOnTakeDamage signal)
+    {
+        if (signal.target == this)
+        {
+            shield -= signal.value;
+            if (shield < 0)
+            {
+                hull -= -shield;
+                shield = 0;
+            }
+            if (hull < 0)
+            {
+                hull = 0;
+            }
+            Debug.Log($"{this} {hull}");
+        }
     }
     public virtual bool IsOwnedByLocalPlayer()
     {
@@ -54,7 +79,10 @@ public abstract class SpaceObject : MonoBehaviour
     {
 
     }
-
+    public virtual void InvokeTakeDamage(SpaceObject attacker, int damage)
+    {
+        signalBus.Fire(new SpaceObjectOnTakeDamage(attacker, this, damage));
+    }
     public virtual void InstallConfig(SpaceObjectConfig config)
     {
         if (this.main != null)

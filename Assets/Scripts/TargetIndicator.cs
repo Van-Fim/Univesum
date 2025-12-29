@@ -28,7 +28,7 @@ public class TargetIndicator : MonoBehaviour
         if (spaceObject.maxShield > 0)
         {
             shieldImage.gameObject.SetActive(true);
-            shieldImage.fillAmount = spaceObject.shield / spaceObject.maxShield;
+            shieldImage.fillAmount = (float)spaceObject.shield / (float)spaceObject.maxShield;
         }
         else
         {
@@ -37,7 +37,7 @@ public class TargetIndicator : MonoBehaviour
         if (spaceObject.maxHull > 0)
         {
             hullImage.gameObject.SetActive(true);
-            hullImage.fillAmount = spaceObject.hull / spaceObject.maxHull;
+            hullImage.fillAmount = (float)spaceObject.hull / (float)spaceObject.maxHull;
         }
         else
         {
@@ -97,7 +97,12 @@ public class TargetIndicator : MonoBehaviour
             Vector3 dTextPos = distanceText.rectTransform.localPosition;
             dTextPos.y = -90 * scaleFactor;
             distanceText.rectTransform.localPosition = dTextPos;
-            distanceText.text = $"{(dist / 1000).ToString("F2", CultureInfo.InvariantCulture) } Km";
+            distanceText.text = $"{(dist / 1000).ToString("F2", CultureInfo.InvariantCulture)} Km";
+            if (target.maxShield > 0)
+            {
+                shieldImage.fillAmount = (float)target.shield / (float)target.maxShield;
+            }
+            hullImage.fillAmount = (float)target.hull / (float)target.maxHull;
         }
         else
         {
