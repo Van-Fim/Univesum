@@ -12,6 +12,7 @@ public class Universe
     public Transform galaxies;
     public Transform systems;
     public List<Galaxy> galaxiesList = new List<Galaxy>();
+    public List<StarSystem> systemsList = new List<StarSystem>();
     public void Init()
     {
         GameObject gm = new GameObject();
@@ -34,45 +35,56 @@ public class Universe
     }
     public void Build()
     {
+        int id = 0;
         for (int i = 0; i < config.list.Count; i++)
         {
             SpaceConfigListItem it = config.list[i];
-            Galaxy galaxy = _galaxyFactory.Create();
-            galaxy.transform.SetParent(galaxies);
-            galaxy.config = JsonConfigLoader.LoadFromResources<SpaceConfig>($"Configs/Universe/Galaxies/{it.name}");
             int tryes = 10;
             bool br = true;
-            for (int t = 0; t < tryes; t++)
+            int count = Random.Range(it.countMin, it.countMax + 1);
+            for (int c = 0; c < count; c++)
             {
-                int range = Random.Range(it.rangeMin, it.rangeMax + 1);
-                int y = Random.Range(it.YMin, it.YMax + 1);
-                Vector2 pos2D = Random.insideUnitCircle * range;
-                Vector3 pos = new Vector3(pos2D.x, y, pos2D.y);
-                
-                float dst = 0;
-                br = true;
-                for (int j = 0; j < galaxiesList.Count; j++)
+                Galaxy space = _galaxyFactory.Create();
+                space.transform.SetParent(galaxies);
+                space.config = JsonConfigLoader.LoadFromResources<SpaceConfig>($"Configs/Universe/Galaxies/{it.name}");
+                for (int t = 0; t < tryes; t++)
                 {
-                    Galaxy sp = galaxiesList[j];
-                    dst = Vector3.Distance(pos, sp.transform.localPosition);
-                    if (dst < sp.safeRange)
+                    int range = Random.Range(it.rangeMin, it.rangeMax + 1);
+                    int y = Random.Range(it.YMin, it.YMax + 1);
+                    Vector2 pos2D = Random.insideUnitCircle * range;
+                    Vector3 pos = new Vector3(pos2D.x, y, pos2D.y);
+
+                    float dst = 0;
+                    br = true;
+                    for (int j = 0; j < galaxiesList.Count; j++)
                     {
-                        br = false;
+                        Galaxy sp = galaxiesList[j];
+                        dst = Vector3.Distance(pos, sp.transform.localPosition);
+                        if (dst < sp.safeRange)
+                        {
+                            br = false;
+                            break;
+                        }
+                    }
+                    space.transform.localPosition = pos;
+                    if (br)
+                    {
                         break;
                     }
                 }
-                galaxy.transform.localPosition = pos;
-                if (br)
+                if (!br)
                 {
-                    break;
+                    space.Destroy();
+                    continue;
+                }
+                else
+                {
+                    space.id = id;
+                    galaxiesList.Add(space);
+                    space.Build();
+                    id++;
                 }
             }
-            if (!br)
-            {
-                galaxy.Destroy();
-                return;
-            }
-            galaxiesList.Add(galaxy);
         }
     }
 }
