@@ -7,6 +7,9 @@ public class AsteroidFieldConfig
     public string name;
     public List<AsteroidFieldItemConfig> asteroids;
     public List<AsteroidSpeedThresholdsConfig> speedThresholds;
+    public Vector3 position;
+    public Vector3 rotation;
+    public Vector3 shapeSize;
 }
 [System.Serializable]
 public class AsteroidFieldItemConfig

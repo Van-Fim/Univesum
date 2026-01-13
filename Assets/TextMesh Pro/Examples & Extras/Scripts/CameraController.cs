@@ -247,7 +247,7 @@ namespace TMPro.Examples
 
                     moveVector = cameraTransform.TransformDirection(mouseX, mouseY, 0);
 
-                    dummyTarget.Translate(-moveVector, Space.World);
+                    dummyTarget.Translate(-moveVector, UnityEngine.Space.World);
 
                 }
 

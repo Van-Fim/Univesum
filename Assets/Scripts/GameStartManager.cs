@@ -5,23 +5,34 @@ public class GameStartManager
 {
     private readonly DiContainer _container;
     private readonly Player _player;
+    private readonly Universe _universe;
     private readonly SpaceObjectFactory _factory;
+    private readonly SignalBus _signalBus;
     private readonly GameStartConfig _config;
 
     public GameStartManager(
         DiContainer container,
         Player player,
+        Universe universe,
         SpaceObjectFactory factory,
+        SignalBus signalBus,
         [Inject(Id = "GameStartConfig")] GameStartConfig config)
     {
         _container = container;
+        _universe = universe;
         _player = player;
         _factory = factory;
+        _signalBus = signalBus;
         _config = config;
     }
 
     public void Load()
     {
+        Random.InitState(_universe.seed);
+        _universe.config = JsonConfigLoader.LoadFromResources<SpaceConfig>($"Configs/Universe/{_config.univesrse}");
+        _universe.Init();
+        _universe.Build();
+
         if (string.IsNullOrEmpty(_config.ship))
         {
             CreateSuit();
@@ -56,8 +67,6 @@ public class GameStartManager
             "Prefabs/ShipPrefab",
             "Configs/SpaceObjects/Ships/" + _config.ship
         );
-
-
 
         var controller = ship.gameObject.AddComponent<PlayerShipController>();
         _container.Inject(controller); 

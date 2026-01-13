@@ -63,11 +63,11 @@ public class PlayerShipController : SpaceObjectController
 
             _rigidbody.transform.Rotate(
                 Vector3.up * horizontalInput * KeyboardRotationSpeed,
-                Space.World
+                UnityEngine.Space.World
             );
             _rigidbody.transform.Rotate(
                 Vector3.right * verticalInput * KeyboardRotationSpeed,
-                Space.Self
+                UnityEngine.Space.Self
             );
         }
         else

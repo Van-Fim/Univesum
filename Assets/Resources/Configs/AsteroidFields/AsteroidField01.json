@@ -1,5 +1,5 @@
 {
-    "name": "AsteroidField01",
+    "shapeSize":{"x":70000, "y":40000, "z":130000},
     "asteroids": [
         {
             "name": "Asteroid01",

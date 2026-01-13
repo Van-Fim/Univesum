@@ -1,0 +1,17 @@
+{
+    "rangeMin": 100,
+    "rangeMax": 100,
+    "YMin": 0,
+    "YMax": 0,
+    "list": [
+        {
+            "name": "System01",
+            "YMin": 0,
+            "YMax": 0,
+            "rangeMin": 100,
+            "rangeMax": 100,
+            "countMin": 1,
+            "countMax": 1
+        }
+    ]
+}

@@ -13,16 +13,28 @@ public class GameInstaller : MonoInstaller
         Application.targetFrameRate = 70;
         SignalBusInstaller.Install(Container);
 
+
         Container.DeclareSignal<SignalDestroyChunkAsteroids>();
         Container.DeclareSignal<SignalGameStarted>();
+        Container.DeclareSignal<SpaceShowSignal>();
         Container.DeclareSignal<SignalChunkManagerReady>();
         Container.DeclareSignal<SignalChunkFloatingOriginFix>();
         Container.DeclareSignal<PlayerSpeedChangedSignal>();
         Container.DeclareSignal<SpaceObjectOnTakeDamage>();
+        Container.DeclareSignal<SpaceObjectOnDestroy>();
         Container.DeclareSignal<WeaponFiredSignal>();
 
         Container.Bind<Player>().AsSingle();
         Container.Bind<PlayerService>().AsSingle();
+        Container.Bind<Universe>().AsSingle();
+        GameObject galaxyPrefab = Resources.Load<GameObject>("Prefabs/Galaxy");
+        Container.BindFactory<Galaxy, Galaxy.Factory>()
+                .FromComponentInNewPrefab(galaxyPrefab)
+                .AsSingle();
+        GameObject systemPrefab = Resources.Load<GameObject>("Prefabs/System");
+        Container.BindFactory<StarSystem, StarSystem.Factory>()
+                .FromComponentInNewPrefab(systemPrefab)
+                .AsSingle();
         Container.Bind<CameraManager>().AsSingle();
         Container.Bind<SpaceObjectFactory>().AsSingle();
         SpaceObjectFactory spaceObjectFactory = Container.Resolve<SpaceObjectFactory>();

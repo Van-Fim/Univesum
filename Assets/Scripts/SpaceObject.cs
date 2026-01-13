@@ -23,6 +23,7 @@ public abstract class SpaceObject : MonoBehaviour
     public Transform hardpoints;
 
     bool is_initialized = false;
+    bool is_destroyed = false;
 
     protected Mesh mesh;
 
@@ -37,6 +38,7 @@ public abstract class SpaceObject : MonoBehaviour
         if (!is_initialized)
         {
             signalBus.Subscribe<SpaceObjectOnTakeDamage>(OnTakeDamage);
+            signalBus.Subscribe<SpaceObjectOnDestroy>(OnSpDestroy);
             is_initialized = true;
         }
     }
@@ -44,6 +46,13 @@ public abstract class SpaceObject : MonoBehaviour
     public virtual void Update()
     {
 
+    }
+    public virtual void OnSpDestroy(SpaceObjectOnDestroy signal)
+    {
+        if (signal.target == this)
+        {
+            Destroy();
+        }
     }
     public virtual void OnTakeDamage(SpaceObjectOnTakeDamage signal)
     {
@@ -55,11 +64,11 @@ public abstract class SpaceObject : MonoBehaviour
                 hull -= -shield;
                 shield = 0;
             }
-            if (hull < 0)
+            if (hull <= 0)
             {
                 hull = 0;
+                InvokeDestroy(signal.attacker);
             }
-            Debug.Log($"{this} {hull}");
         }
     }
     public virtual bool IsOwnedByLocalPlayer()
@@ -82,6 +91,10 @@ public abstract class SpaceObject : MonoBehaviour
     public virtual void InvokeTakeDamage(SpaceObject attacker, int damage)
     {
         signalBus.Fire(new SpaceObjectOnTakeDamage(attacker, this, damage));
+    }
+    public virtual void InvokeDestroy(SpaceObject attacker)
+    {
+        signalBus.Fire(new SpaceObjectOnDestroy(attacker, this));
     }
     public virtual void InstallConfig(SpaceObjectConfig config)
     {
@@ -151,5 +164,18 @@ public abstract class SpaceObject : MonoBehaviour
     public virtual void Hide()
     {
         gameObject.SetActive(false);
+    }
+
+    public virtual void Destroy()
+    {
+        if (is_destroyed)
+        {
+            return;
+        }
+        gameObject.SetActive(false);
+        is_destroyed = true;
+        signalBus.Unsubscribe<SpaceObjectOnTakeDamage>(OnTakeDamage);
+        signalBus.Unsubscribe<SpaceObjectOnDestroy>(OnSpDestroy);
+        Destroy(gameObject);
     }
 }

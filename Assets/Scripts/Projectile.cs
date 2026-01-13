@@ -11,12 +11,15 @@ public class Projectile : MonoBehaviour
     public ParticleSystem body;
     bool is_initialized;
     bool is_collided;
+    Collider objCollider;
 
     private float destroyTime;
     public void Init()
     {
         if (is_initialized) return;
         is_initialized = true;
+        objCollider = GetComponent<Collider>();
+        objCollider.isTrigger = true;
         weapon._signalBus.Subscribe<SignalChunkFloatingOriginFix>(OnChunkFloatingOriginFix);
     }
     public void OnChunkFloatingOriginFix(SignalChunkFloatingOriginFix signal)
@@ -34,7 +37,7 @@ public class Projectile : MonoBehaviour
         Invoke("SelfDestruct", config.lifetime);
     }
 
-    void OnCollisionEnter(Collision col)
+    void OnTriggerEnter(Collider col)
     {
         if (weapon == null)
         {

@@ -54,6 +54,21 @@ public class WorldChunkManager : MonoBehaviour
 
         isSpawningChunks = false;
     }
+    bool IsInsideOval(Vector3 point, Vector3 center, float radiusX, float radiusZ, float height)
+    {
+        // переводим точку в локальные координаты относительно центра
+        float dx = point.x - center.x;
+        float dz = point.z - center.z;
+        float dy = point.y - center.y;
+
+        // проверка эллипса
+        float ellipse = (dx * dx) / (radiusX * radiusX) + (dz * dz) / (radiusZ * radiusZ);
+
+        bool insideEllipse = ellipse <= 1f;
+        bool insideHeight = Mathf.Abs(dy) <= height * 0.5f;
+
+        return insideEllipse && insideHeight;
+    }
 
     public void Start()
     {
@@ -77,14 +92,61 @@ public class WorldChunkManager : MonoBehaviour
         HandleFloatingOrigin();
         HandleChunks();
     }
+    bool CheckChunkOnAsteroidFieldOnPosition(Vector3 chunkPos,
+                                             Vector3 fieldCenter, float radiusX, float radiusZ, float height)
+    {
+        // переводим в локальные координаты относительно центра поля
+        Vector3 local = chunkPos - fieldCenter;
+
+        // проверка эллипса (по XZ)
+        float ellipse = (local.x * local.x) / (radiusX * radiusX)
+                      + (local.z * local.z) / (radiusZ * radiusZ);
+
+        bool insideEllipse = ellipse <= 1f;
+
+        // проверка высоты (по Y)
+        bool insideHeight = Mathf.Abs(local.y) <= height * 0.5f;
+
+        // если центр чанка внутри овала и по высоте — значит чанк пересекает поле
+        if (insideEllipse && insideHeight)
+            return true;
+
+        // 🔧 Дополнительно: можно проверить углы чанка
+        Vector3 half = new Vector3(chunkSize * 0.5f, 0, chunkSize * 0.5f);
+        Vector3[] corners =
+        {
+        chunkPos + new Vector3( half.x, 0,  half.z),
+        chunkPos + new Vector3(-half.x, 0,  half.z),
+        chunkPos + new Vector3( half.x, 0, -half.z),
+        chunkPos + new Vector3(-half.x, 0, -half.z),
+    };
+
+        foreach (var c in corners)
+        {
+            Vector3 lc = c - fieldCenter;
+            float e = (lc.x * lc.x) / (radiusX * radiusX) + (lc.z * lc.z) / (radiusZ * radiusZ);
+            if (e <= 1f && Mathf.Abs(lc.y) <= height * 0.5f)
+                return true; // хотя бы угол попал внутрь
+        }
+
+        return false;
+    }
+
     Asteroid SpawnAsteroid(Chunk chunk, Vector3Int chunkCoord)
     {
+        return null;
         string configName = "AsteroidField01";
         AsteroidFieldConfig cfg = asteroidConfigs.Find(x => x.name == configName);
         if (cfg == null)
         {
             return null;
         }
+        
+        // for (int i = 0; i < cfg.asteroids.Count; i++)
+        // {
+        //     AsteroidFieldItemConfig v = cfg.asteroids[i];
+        //     CheckChunkOnAsteroidFieldOnPosition((chunkCoord * chunkSize), v);
+        // }
         int rand = Random.Range(0, cfg.asteroids.Count);
         AsteroidFieldItemConfig astItem = cfg.asteroids[rand];
         if (astItem == null)
@@ -281,6 +343,7 @@ public class WorldChunkManager : MonoBehaviour
         chunk.name = "Chunk_" + chunkCoord;
         chunk.isDestroyed = false;
         chunk.transform.localPosition = worldPos + (chunkCoord * chunkSize);
+
         if (isFirstChunksReady)
         {
             EnqueueChunkSpawn(chunk, chunkCoord);

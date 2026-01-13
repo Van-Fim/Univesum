@@ -11,7 +11,7 @@ public class ObjectSelector : MonoBehaviour
     void Update()
     {
         Ray ray = cameraManager.GetMainCamera().ScreenPointToRay(Input.mousePosition);
-        bool h = Physics.Raycast(ray, out RaycastHit hit, 30000f);
+        bool h = Physics.Raycast(ray, out RaycastHit hit, 100000f);
         if (h)
         {
             var selectable = hit.collider.GetComponent<ISelectable>();

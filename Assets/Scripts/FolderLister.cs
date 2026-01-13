@@ -24,4 +24,24 @@ public class FolderLister : MonoBehaviour
         }
         return ret;
     }
+    public static List<string> GetDirFiles(string dir)
+    {
+        List<string> ret = new List<string>();
+        string path = Application.dataPath + "/Resources/" + dir;
+        DirectoryInfo dirInfo = new DirectoryInfo(path);
+
+        if (dirInfo.Exists)
+        {
+            FileInfo[] files = dirInfo.GetFiles("*.json");
+            foreach (FileInfo file in files)
+            {
+                ret.Add(Path.GetFileNameWithoutExtension(file.Name));
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Путь не найден: " + path);
+        }
+        return ret;
+    }
 }

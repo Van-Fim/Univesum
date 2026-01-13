@@ -1,3 +1,5 @@
+using System;
+using System.Reflection;
 using UnityEngine;
 
 public static class JsonConfigLoader
@@ -13,7 +15,17 @@ public static class JsonConfigLoader
 
         try
         {
-            return JsonUtility.FromJson<T>(jsonAsset.text);
+            var ret = JsonUtility.FromJson<T>(jsonAsset.text);
+            // Получаем тип объекта
+            Type type = ret.GetType();
+
+            // Проверяем наличие поля "name"
+            FieldInfo nameField = type.GetField("name", BindingFlags.Public | BindingFlags.Instance);
+            if (nameField != null && nameField.FieldType == typeof(string))
+            {
+                nameField.SetValue(ret, jsonAsset.name);
+            }
+            return ret;
         }
         catch (System.Exception e)
         {

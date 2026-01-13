@@ -10,16 +10,17 @@ public class AsteroidPoolInstaller : MonoInstaller
     public override void InstallBindings()
     {
         // Загружаем конфиги
-        List<string> list = FolderLister.GetDirDirs("Configs/AsteroidFields");
+        List<string> list = FolderLister.GetDirFiles("Configs/AsteroidFields");
         List<AsteroidFieldConfig> configs = new List<AsteroidFieldConfig>();
         for (int i = 0; i < list.Count; i++)
         {
-
-            AsteroidFieldConfig config = JsonConfigLoader.LoadFromResources<AsteroidFieldConfig>("Configs/AsteroidFields/" + list[i] + "/config");
+            AsteroidFieldConfig config = JsonConfigLoader.LoadFromResources<AsteroidFieldConfig>("Configs/AsteroidFields/" + list[i]);
+            
             if (config.asteroids == null)
             {
                 return;
             }
+            config.name = list[i];
             configs.Add(config);
         }
         Container.Bind<List<AsteroidFieldConfig>>().FromInstance(configs).AsSingle();

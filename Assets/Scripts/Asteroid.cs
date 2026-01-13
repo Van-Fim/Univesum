@@ -20,6 +20,13 @@ public class Asteroid : SpaceObject, ISelectable
     {
         return container.ResolveId<Asteroid.Pool>(id);
     }
+    public override void OnSpDestroy(SpaceObjectOnDestroy signal)
+    {
+        if (signal.target == this)
+        {
+            Despawn();
+        }
+    }
     public void OnSpawned()
     {
         _isDespawned = false;
