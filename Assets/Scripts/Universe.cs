@@ -44,6 +44,7 @@ public class Universe
             int count = Random.Range(it.countMin, it.countMax + 1);
             for (int c = 0; c < count; c++)
             {
+                Random.InitState(seed + id);
                 Galaxy space = _galaxyFactory.Create();
                 space.transform.SetParent(galaxies);
                 space.config = JsonConfigLoader.LoadFromResources<SpaceConfig>($"Configs/Universe/Galaxies/{it.name}");
@@ -86,5 +87,9 @@ public class Universe
                 }
             }
         }
+    }
+    public StarSystem FindSystem(int galaxyId, int systemId)
+    {
+        return systemsList.Find(x => x.galaxyId == galaxyId && x.id == systemId);
     }
 }

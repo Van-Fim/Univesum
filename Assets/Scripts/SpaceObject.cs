@@ -22,6 +22,9 @@ public abstract class SpaceObject : MonoBehaviour
     public Rigidbody rigidbody;
     public Transform hardpoints;
 
+    public int galaxyId;
+    public int systemId;
+
     bool is_initialized = false;
     bool is_destroyed = false;
 
@@ -46,6 +49,11 @@ public abstract class SpaceObject : MonoBehaviour
     public virtual void Update()
     {
 
+    }
+    public virtual void SetStarSystem(int galaxyId, int systemId)
+    {
+        this.galaxyId = galaxyId;
+        this.systemId = systemId;
     }
     public virtual void OnSpDestroy(SpaceObjectOnDestroy signal)
     {

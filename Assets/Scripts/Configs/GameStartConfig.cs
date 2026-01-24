@@ -12,4 +12,6 @@ public class GameStartConfig
     public string ship_loadout;
     public string suit;
     public string suit_loadout;
+    public Vector3 start_position;
+    public Vector3 start_rotation;
 }

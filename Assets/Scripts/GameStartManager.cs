@@ -41,6 +41,15 @@ public class GameStartManager
         {
             CreateShip();
         }
+        StarSystem sys = _universe.FindSystem(_config.galaxyId, _config.systemId);
+        if (sys.config.skyboxes.Count == 0)
+        {
+            return;
+        }
+        Random.InitState(_universe.seed+sys.galaxyId+sys.id);
+        int rndm = Random.Range(0, sys.config.skyboxes.Count);
+        sys.ChangeSkybox(sys.config.skyboxes[rndm]);
+        _signalBus.Fire(new SpaceShowSignal(sys));
     }
 
     private void CreateSuit()
@@ -59,6 +68,10 @@ public class GameStartManager
         suit.spaceObjectController = controller;
 
         _player.currentController = controller;
+
+        suit.transform.localPosition = _config.start_position;
+        suit.transform.localEulerAngles = _config.start_position;
+        suit.SetStarSystem(_config.galaxyId, _config.systemId);
     }
 
     private void CreateShip()
@@ -85,5 +98,9 @@ public class GameStartManager
             );
             ship.InstallLoadout(loadout);
         }
+        
+        ship.transform.localPosition = _config.start_position;
+        ship.transform.localEulerAngles = _config.start_position;
+        ship.SetStarSystem(_config.galaxyId, _config.systemId);
     }
 }

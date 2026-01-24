@@ -6,8 +6,9 @@ using Zenject;
 public class WorldChunkManager : MonoBehaviour
 {
     List<Chunk> chunks = new List<Chunk>();
+    [Inject] Universe _universe;
     [Inject] SignalBus signalBus;
-    [Inject] Player localPlayer;
+    [Inject] PlayerService playerService;
     [Inject] private List<AsteroidFieldConfig> asteroidConfigs;
     public Vector3 worldPos = Vector3.zero;
 
@@ -73,7 +74,7 @@ public class WorldChunkManager : MonoBehaviour
     public void Start()
     {
         is_initialized = true;
-        playerTransform = localPlayer.GetCurrentController().transform;
+        playerTransform = playerService._player.GetCurrentController().transform;
         UpdateCurrentChunk();
         UpdateChunksAround(currentChunk);
         Tick();
@@ -91,6 +92,22 @@ public class WorldChunkManager : MonoBehaviour
     {
         HandleFloatingOrigin();
         HandleChunks();
+    }
+    Vector3 GetRandomPointInEllipsoid(float radiusX, float radiusZ, float height, Vector3 center)
+    {
+        // Генерируем случайную точку в единичной сфере
+        Vector3 randomSpherePoint = Random.insideUnitSphere;
+
+        // Масштабируем координаты по осям в соответствии с радиусами эллипсоида
+        // Умножаем каждую компоненту на соответствующий радиус
+        randomSpherePoint.x *= radiusX;
+        randomSpherePoint.z *= radiusZ;
+        randomSpherePoint.y *= height;
+
+        // Смещаем точку в нужную позицию
+        randomSpherePoint += center;
+
+        return randomSpherePoint;
     }
     bool CheckChunkOnAsteroidFieldOnPosition(Vector3 chunkPos,
                                              Vector3 fieldCenter, float radiusX, float radiusZ, float height)
@@ -132,49 +149,42 @@ public class WorldChunkManager : MonoBehaviour
         return false;
     }
 
-    Asteroid SpawnAsteroid(Chunk chunk, Vector3Int chunkCoord)
+    Asteroid SpawnAsteroid(Chunk chunk, Vector3Int chunkCoord, AsteroidFieldConfig config)
     {
-        return null;
-        string configName = "AsteroidField01";
-        AsteroidFieldConfig cfg = asteroidConfigs.Find(x => x.name == configName);
-        if (cfg == null)
+        if (config == null)
         {
             return null;
         }
-        
-        // for (int i = 0; i < cfg.asteroids.Count; i++)
-        // {
-        //     AsteroidFieldItemConfig v = cfg.asteroids[i];
-        //     CheckChunkOnAsteroidFieldOnPosition((chunkCoord * chunkSize), v);
-        // }
-        int rand = Random.Range(0, cfg.asteroids.Count);
-        AsteroidFieldItemConfig astItem = cfg.asteroids[rand];
+
+        int rand = Random.Range(0, config.asteroids.Count);
+        AsteroidFieldItemConfig astItem = config.asteroids[rand];
         if (astItem == null)
         {
             return null;
         }
         float scale = Random.Range(astItem.scaleMin, astItem.scaleMax);
 
-        if (cfg.speedThresholds != null && cfg.speedThresholds.Count > 0)
+        if (config.speedThresholds != null && config.speedThresholds.Count > 0)
         {
-            float currentSpeed = localPlayer.GetCurrentController()._rigidbody.linearVelocity.magnitude;
-            cfg.speedThresholds.Sort((a, b) => a.speed.CompareTo(b.speed));
+            float currentSpeed = playerService._player.GetCurrentController()._rigidbody.linearVelocity.magnitude;
+            config.speedThresholds.Sort((a, b) => a.speed.CompareTo(b.speed));
             int ascIndex = 0;
             AsteroidSpeedThresholdsConfig asc = null;
-            for (int i = 0; i < cfg.speedThresholds.Count; i++)
+            for (int i = 0; i < config.speedThresholds.Count; i++)
             {
-                asc = cfg.speedThresholds[i];
+                asc = config.speedThresholds[i];
                 if (asc.speed <= currentSpeed)
                 {
                     ascIndex = i;
                 }
             }
-            asc = cfg.speedThresholds[ascIndex];
+            asc = config.speedThresholds[ascIndex];
             if (scale < asc.scale && currentSpeed >= asc.speed)
             {
                 return null;
             }
         }
+
         Vector3 localOffset = new Vector3(
     Random.Range(-chunkSize / 2f, chunkSize / 2f),
     Random.Range(-chunkSize / 2f, chunkSize / 2f),
@@ -184,7 +194,7 @@ public class WorldChunkManager : MonoBehaviour
         int rotX = Random.Range(0, 180 + 1);
         int rotY = Random.Range(0, 180 + 1);
         int rotZ = Random.Range(0, 180 + 1);
-        Asteroid.Pool pool = GetPool($"{configName}_{astItem.name}");
+        Asteroid.Pool pool = GetPool($"{config.name}_{astItem.name}");
         Asteroid asteroid = pool.Spawn();
         asteroid.maxShield = 0;
         asteroid.Init();
@@ -202,49 +212,62 @@ public class WorldChunkManager : MonoBehaviour
     }
     void SpawnAsteroids(Chunk chunk, Vector3Int chunkCoord)
     {
-        if (chunk.isDestroyed)
+        if (chunk.isDestroyed || chunk.asteroidFieldsIds.Count == 0)
         {
             return;
         }
-        Random.InitState($"{chunkCoord}".GetHashCode());
-        int count = Random.Range(7, 8);
-
-        for (int i = 0; i < count; i++)
+        StarSystem starSystem = playerService.GetStarSystem();
+        Random.InitState($"{_universe.seed}{starSystem.galaxyId}{starSystem.id}{chunkCoord}".GetHashCode());
+        
+        for (int i1 = 0; i1 < chunk.asteroidFieldsIds.Count; i1++)
         {
-            if (chunk == null)
+            int id = chunk.asteroidFieldsIds[i1];
+            AsteroidFieldConfig a = starSystem.asteroidFields[id];
+            int count = Random.Range(a.countMin, a.countMax + 1);
+            for (int i = 0; i < count; i++)
             {
-                break;
-            }
-            if (chunk.asteroids.Count > i && chunk.asteroids[i] != null)
-            {
-                break;
-            }
-            Random.InitState($"{chunkCoord}{i}".GetHashCode());
+                if (chunk == null)
+                {
+                    break;
+                }
+                if (chunk.asteroids.Count > i && chunk.asteroids[i] != null)
+                {
+                    break;
+                }
+                Random.InitState($"{_universe.seed}{starSystem.galaxyId}{starSystem.id}{chunkCoord}{i}".GetHashCode());
 
-            Asteroid asteroid = SpawnAsteroid(chunk, chunkCoord);
-            chunk.asteroids.Add(asteroid);
+                Asteroid asteroid = SpawnAsteroid(chunk, chunkCoord, a);
+                chunk.asteroids.Add(asteroid);
+            }
         }
     }
     IEnumerator SpawnAsteroidsAsync(Chunk chunk, Vector3Int chunkCoord)
     {
-        if (chunk.isDestroyed)
+        if (chunk.isDestroyed || chunk.asteroidFieldsIds.Count == 0)
         {
             yield return null;
         }
-        int count = Random.Range(7, 8);
-
-        for (int i = 0; i < count; i++)
+        StarSystem starSystem = playerService.GetStarSystem();
+        Random.InitState($"{_universe.seed}{starSystem.galaxyId}{starSystem.id}{chunkCoord}".GetHashCode());
+        for (int i1 = 0; i1 < chunk.asteroidFieldsIds.Count; i1++)
         {
-            if (chunk == null)
-                yield break;
-            if (chunk.asteroids.Count > i && chunk.asteroids[i] != null)
+            int id = chunk.asteroidFieldsIds[i1];
+            AsteroidFieldConfig a = starSystem.asteroidFields[id];
+            int count = Random.Range(a.countMin, a.countMax + 1);
+
+            for (int i = 0; i < count; i++)
             {
-                yield break;
+                if (chunk == null)
+                    yield break;
+                if (chunk.asteroids.Count > i && chunk.asteroids[i] != null)
+                {
+                    yield break;
+                }
+                Random.InitState($"{_universe.seed}{starSystem.galaxyId}{starSystem.id}{chunkCoord}{i}".GetHashCode());
+                Asteroid asteroid = SpawnAsteroid(chunk, chunkCoord, a);
+                chunk.asteroids.Add(asteroid);
+                yield return null; // вместо WaitForSeconds — быстрее и легче
             }
-            Random.InitState($"{chunkCoord}{i}".GetHashCode());
-            Asteroid asteroid = SpawnAsteroid(chunk, chunkCoord);
-            chunk.asteroids.Add(asteroid);
-            yield return null; // вместо WaitForSeconds — быстрее и легче
         }
     }
 
@@ -295,7 +318,7 @@ public class WorldChunkManager : MonoBehaviour
 
     void UpdateChunksAround(Vector3Int centerChunk)
     {
-        int loadRadius = 3; // сколько чанков вокруг загружать
+        int loadRadius = 5; // сколько чанков вокруг загружать
 
         HashSet<Vector3Int> requiredChunks = new();
 
@@ -343,7 +366,24 @@ public class WorldChunkManager : MonoBehaviour
         chunk.name = "Chunk_" + chunkCoord;
         chunk.isDestroyed = false;
         chunk.transform.localPosition = worldPos + (chunkCoord * chunkSize);
-
+        StarSystem sys = playerService.GetStarSystem();
+        if (sys == null)
+        {
+            return null;
+        }
+        chunk.asteroidFieldsIds = new List<int>();
+        for (int i = 0; i < sys.asteroidFields.Count; i++)
+        {
+            AsteroidFieldConfig asteroidField = sys.asteroidFields[i];
+            bool check = CheckChunkOnAsteroidFieldOnPosition(chunkCoord * chunkSize, asteroidField.position, asteroidField.shapeSize.x, asteroidField.shapeSize.z, asteroidField.shapeSize.y);
+            if (check)
+            {
+                if (!chunk.asteroidFieldsIds.Contains(i))
+                {
+                    chunk.asteroidFieldsIds.Add(i);
+                }
+            }
+        }
         if (isFirstChunksReady)
         {
             EnqueueChunkSpawn(chunk, chunkCoord);

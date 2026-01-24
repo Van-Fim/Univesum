@@ -1,6 +1,8 @@
 {
     "skyboxes": [
-        "Skybox01"
+        "Skybox02",
+        "Skybox03",
+        "Skybox04"
     ],
     "asteroidFields": [
         {

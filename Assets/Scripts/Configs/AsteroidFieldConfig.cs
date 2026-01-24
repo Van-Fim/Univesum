@@ -10,6 +10,12 @@ public class AsteroidFieldConfig
     public Vector3 position;
     public Vector3 rotation;
     public Vector3 shapeSize;
+    public int countMin;
+    public int countMax;
+    public object Clone()
+    {
+        return this.MemberwiseClone();
+    }
 }
 [System.Serializable]
 public class AsteroidFieldItemConfig

@@ -12,6 +12,15 @@
             "rangeMax": 100,
             "countMin": 10,
             "countMax": 10
+        },
+        {
+            "name": "System02",
+            "YMin": 0,
+            "YMax": 0,
+            "rangeMin": 100,
+            "rangeMax": 100,
+            "countMin": 10,
+            "countMax": 10
         }
     ]
 }

@@ -16,6 +16,7 @@ public class Galaxy : PSpace
             int count = Random.Range(it.countMin, it.countMax + 1);
             for (int c = 0; c < count; c++)
             {
+                Random.InitState(_universe.seed + this.id + id);
                 StarSystem space = _starSystemFactory.Create();
                 space.transform.SetParent(_universe.systems);
                 space.config = JsonConfigLoader.LoadFromResources<SpaceConfig>($"Configs/Universe/Systems/{it.name}");
@@ -54,6 +55,7 @@ public class Galaxy : PSpace
                 {
                     space.id = id;
                     space.galaxyId = this.id;
+                    space.LoadAsteroidFields();
                     _universe.systemsList.Add(space);
                     id++;
                 }

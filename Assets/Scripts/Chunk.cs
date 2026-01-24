@@ -9,6 +9,7 @@ public class Chunk : MonoBehaviour
     [Inject] SignalBus signalBus;
     [Inject] WorldChunkManager worldChunkManager;
     public List<Asteroid> asteroids = new List<Asteroid>();
+    public List<int> asteroidFieldsIds = new List<int>();
     void Start()
     {
         signalBus.Subscribe<SignalChunkFloatingOriginFix>(OnChunkFloatingOriginFix);

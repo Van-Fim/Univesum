@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -9,13 +10,15 @@ public class PSpace : MonoBehaviour
     public StarSystem.Factory _starSystemFactory;
     public int safeRange = 10;
     public SpaceConfig config;
+    public List<AsteroidFieldConfig> _asteroidConfigs;
     [Inject]
-    public virtual void Construct(SignalBus signalBus, Universe universe, StarSystem.Factory starSystemFactory)
+    public virtual void Construct(SignalBus signalBus, Universe universe, StarSystem.Factory starSystemFactory, List<AsteroidFieldConfig> asteroidFieldConfigs)
     {
         _signalBus = signalBus;
         _signalBus.Subscribe<SpaceShowSignal>(OnSpaceShow);
         _universe = universe;
         _starSystemFactory = starSystemFactory;
+        _asteroidConfigs = asteroidFieldConfigs;
     }
     public void Destroy()
     {
@@ -24,7 +27,7 @@ public class PSpace : MonoBehaviour
     }
     void OnSpaceShow(SpaceShowSignal signal)
     {
-        Debug.Log(signal.space);
+        
     }
     void Update()
     {

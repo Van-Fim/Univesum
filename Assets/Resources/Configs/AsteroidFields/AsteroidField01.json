@@ -1,5 +1,7 @@
 {
-    "shapeSize":{"x":70000, "y":40000, "z":130000},
+    "shapeSize":{"x":0, "y":0, "z":0},
+    "countMin":11,
+    "countMax":12,
     "asteroids": [
         {
             "name": "Asteroid01",
