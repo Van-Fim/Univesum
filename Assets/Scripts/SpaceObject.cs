@@ -26,7 +26,7 @@ public abstract class SpaceObject : MonoBehaviour
     public int systemId;
 
     bool is_initialized = false;
-    bool is_destroyed = false;
+    public bool is_destroyed = false;
 
     protected Mesh mesh;
 
@@ -34,6 +34,8 @@ public abstract class SpaceObject : MonoBehaviour
 
     public virtual void Init()
     {
+        if (is_destroyed)
+            return;
         hull = maxHull;
         shield = maxShield;
         Hide();
@@ -41,6 +43,7 @@ public abstract class SpaceObject : MonoBehaviour
         if (!is_initialized)
         {
             signalBus.Subscribe<SpaceObjectOnTakeDamage>(OnTakeDamage);
+            signalBus.Subscribe<SpaceObjectOnDestroyHide>(OnSpDestroyHide);
             signalBus.Subscribe<SpaceObjectOnDestroy>(OnSpDestroy);
             is_initialized = true;
         }
@@ -55,9 +58,16 @@ public abstract class SpaceObject : MonoBehaviour
         this.galaxyId = galaxyId;
         this.systemId = systemId;
     }
+    public virtual void OnSpDestroyHide(SpaceObjectOnDestroyHide signal)
+    {
+        if (signal.target == this || signal.target == null)
+        {
+
+        }
+    }
     public virtual void OnSpDestroy(SpaceObjectOnDestroy signal)
     {
-        if (signal.target == this)
+        if (signal.target == this || signal.target == null)
         {
             Destroy();
         }
@@ -75,16 +85,20 @@ public abstract class SpaceObject : MonoBehaviour
             if (hull <= 0)
             {
                 hull = 0;
-                InvokeDestroy(signal.attacker);
+                InvokeDestroyHide(signal.attacker);
             }
         }
     }
     public virtual bool IsOwnedByLocalPlayer()
     {
+        if (is_destroyed)
+            return false;
         return spaceObjectController != null && spaceObjectController.IsOwnedByLocalPlayer(localPlayer);
     }
     public virtual void InstallCamera()
     {
+        if (is_destroyed)
+            return;
         Transform camHardpoint = hardpoints.Find("HPCamera");
         Camera cam = cameraManager.GetMainCamera();
         cam.transform.SetParent(camHardpoint);
@@ -104,12 +118,18 @@ public abstract class SpaceObject : MonoBehaviour
     {
         signalBus.Fire(new SpaceObjectOnDestroy(attacker, this));
     }
+    public virtual void InvokeDestroyHide(SpaceObject attacker)
+    {
+        signalBus.Fire(new SpaceObjectOnDestroyHide(attacker, this));
+    }
     public virtual void InstallConfig(SpaceObjectConfig config)
     {
         if (this.main != null)
         {
             return;
         }
+        if (is_destroyed)
+            return;
         spaceObjectConfig = config;
         if (rigidbody != null)
             rigidbody.mass = config.mass;
@@ -166,11 +186,15 @@ public abstract class SpaceObject : MonoBehaviour
 
     public virtual void Show()
     {
+        if (is_destroyed)
+            return;
         gameObject.SetActive(true);
     }
 
     public virtual void Hide()
     {
+        if (is_destroyed)
+            return;
         gameObject.SetActive(false);
     }
 
@@ -183,6 +207,7 @@ public abstract class SpaceObject : MonoBehaviour
         gameObject.SetActive(false);
         is_destroyed = true;
         signalBus.Unsubscribe<SpaceObjectOnTakeDamage>(OnTakeDamage);
+        signalBus.Unsubscribe<SpaceObjectOnDestroyHide>(OnSpDestroyHide);
         signalBus.Unsubscribe<SpaceObjectOnDestroy>(OnSpDestroy);
         Destroy(gameObject);
     }

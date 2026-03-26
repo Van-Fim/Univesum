@@ -4,7 +4,7 @@ using Zenject;
 public class GameStartManager
 {
     private readonly DiContainer _container;
-    private readonly Player _player;
+    private readonly PlayerService _playerService;
     private readonly Universe _universe;
     private readonly SpaceObjectFactory _factory;
     private readonly SignalBus _signalBus;
@@ -12,7 +12,7 @@ public class GameStartManager
 
     public GameStartManager(
         DiContainer container,
-        Player player,
+        PlayerService playerService,
         Universe universe,
         SpaceObjectFactory factory,
         SignalBus signalBus,
@@ -20,7 +20,7 @@ public class GameStartManager
     {
         _container = container;
         _universe = universe;
-        _player = player;
+        _playerService = playerService;
         _factory = factory;
         _signalBus = signalBus;
         _config = config;
@@ -42,14 +42,7 @@ public class GameStartManager
             CreateShip();
         }
         StarSystem sys = _universe.FindSystem(_config.galaxyId, _config.systemId);
-        if (sys.config.skyboxes.Count == 0)
-        {
-            return;
-        }
-        Random.InitState(_universe.seed+sys.galaxyId+sys.id);
-        int rndm = Random.Range(0, sys.config.skyboxes.Count);
-        sys.ChangeSkybox(sys.config.skyboxes[rndm]);
-        _signalBus.Fire(new SpaceShowSignal(sys));
+        _playerService.Warp(sys, _config.start_position, _config.start_rotation);
     }
 
     private void CreateSuit()
@@ -67,7 +60,7 @@ public class GameStartManager
         controller.sp_object = suit;
         suit.spaceObjectController = controller;
 
-        _player.currentController = controller;
+        _playerService._player.currentController = controller;
 
         suit.transform.localPosition = _config.start_position;
         suit.transform.localEulerAngles = _config.start_position;
@@ -87,7 +80,7 @@ public class GameStartManager
         controller.sp_object = ship;
 
         ship.spaceObjectController = controller;
-        _player.currentController = controller;
+        _playerService._player.currentController = controller;
 
         ship.InstallCamera();
 

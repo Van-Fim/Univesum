@@ -2,7 +2,7 @@
     "name": "My start",
     "description": "My description",
     "icon": "Materials/Ships/Ship01",
-    "systemId":12,
+    "systemId":0,
     "galaxyId":0,
     "univesrse":"Default",
     "ship": "Ship01",

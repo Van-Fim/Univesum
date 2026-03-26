@@ -8,15 +8,6 @@ public class StarSystem : PSpace
     public List<AsteroidFieldConfig> asteroidFields = new List<AsteroidFieldConfig>();
     public class Factory : PlaceholderFactory<StarSystem> { }
 
-    public void ChangeSkybox(string skyboxName)
-    {
-        Material skyboxMaterial = Resources.Load<Material>($"Materials/Skybox/{skyboxName}");
-        if (skyboxMaterial != null)
-        {
-            RenderSettings.skybox = skyboxMaterial;
-            DynamicGI.UpdateEnvironment();
-        }
-    }
     public void LoadAsteroidFields()
     {
         if (config.asteroidFields.Count == 0)

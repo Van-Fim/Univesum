@@ -88,6 +88,10 @@ public class Universe
             }
         }
     }
+    public Galaxy FindGalaxy(int galaxyId)
+    {
+        return galaxiesList.Find(x => x.id == galaxyId);
+    }
     public StarSystem FindSystem(int galaxyId, int systemId)
     {
         return systemsList.Find(x => x.galaxyId == galaxyId && x.id == systemId);

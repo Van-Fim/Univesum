@@ -11,8 +11,8 @@
             "YMax": 0,
             "rangeMin": 300000,
             "rangeMax": 300000,
-            "countMin": 4,
-            "countMax": 5,
+            "countMin": 8,
+            "countMax": 9,
             "shapeSize":{"x":80000, "y":10000, "z":80000}
         }
     ]

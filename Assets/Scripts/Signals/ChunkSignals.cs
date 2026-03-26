@@ -1,5 +1,10 @@
 using UnityEngine;
-
+public class SignalChunkDestroy
+{
+    public SignalChunkDestroy()
+    {
+    }
+}
 public class SignalChunkFloatingOriginFix
 {
     public Vector3 offset { get; }

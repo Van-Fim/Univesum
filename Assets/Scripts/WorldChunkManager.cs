@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
 
@@ -9,7 +10,6 @@ public class WorldChunkManager : MonoBehaviour
     [Inject] Universe _universe;
     [Inject] SignalBus signalBus;
     [Inject] PlayerService playerService;
-    [Inject] private List<AsteroidFieldConfig> asteroidConfigs;
     public Vector3 worldPos = Vector3.zero;
 
     public Transform playerTransform;
@@ -21,8 +21,11 @@ public class WorldChunkManager : MonoBehaviour
     Queue<(Chunk, Vector3Int)> spawnQueue = new();
     bool isSpawningChunks = false;
     public bool isFirstChunksReady = false;
-    bool is_initialized;
+    public bool is_initialized;
+    public bool stopWorker;
     [Inject] DiContainer container;
+
+    public static WorldChunkManager singleton;
 
     Asteroid.Pool GetPool(string id)
     {
@@ -48,6 +51,10 @@ public class WorldChunkManager : MonoBehaviour
 
         while (spawnQueue.Count > 0)
         {
+            if (stopWorker)
+            {
+                break;
+            }
             var (chunk, chunkCoord) = spawnQueue.Dequeue();
             yield return SpawnAsteroidsAsync(chunk, chunkCoord);
             yield return null; // пауза между чанками
@@ -73,12 +80,24 @@ public class WorldChunkManager : MonoBehaviour
 
     public void Start()
     {
-        is_initialized = true;
+        Init();
+    }
+    public void Init()
+    {
+        is_initialized = false;
+        stopWorker = true;
+        StopAllCoroutines();
+        chunks = new List<Chunk>();
+        loadedChunks = new();
+        spawnQueue = new();
+        isSpawningChunks = false;
+        isFirstChunksReady = false;
         playerTransform = playerService._player.GetCurrentController().transform;
         UpdateCurrentChunk();
         UpdateChunksAround(currentChunk);
-        Tick();
+        is_initialized = true;
         signalBus.Fire(new SignalChunkManagerReady());
+        singleton = this;
     }
     void Update()
     {
@@ -212,13 +231,13 @@ public class WorldChunkManager : MonoBehaviour
     }
     void SpawnAsteroids(Chunk chunk, Vector3Int chunkCoord)
     {
-        if (chunk.isDestroyed || chunk.asteroidFieldsIds.Count == 0)
+        if (chunk.isHidden || chunk.asteroidFieldsIds.Count == 0)
         {
             return;
         }
         StarSystem starSystem = playerService.GetStarSystem();
         Random.InitState($"{_universe.seed}{starSystem.galaxyId}{starSystem.id}{chunkCoord}".GetHashCode());
-        
+
         for (int i1 = 0; i1 < chunk.asteroidFieldsIds.Count; i1++)
         {
             int id = chunk.asteroidFieldsIds[i1];
@@ -243,7 +262,7 @@ public class WorldChunkManager : MonoBehaviour
     }
     IEnumerator SpawnAsteroidsAsync(Chunk chunk, Vector3Int chunkCoord)
     {
-        if (chunk.isDestroyed || chunk.asteroidFieldsIds.Count == 0)
+        if (chunk.isHidden || chunk.asteroidFieldsIds.Count == 0)
         {
             yield return null;
         }
@@ -342,7 +361,7 @@ public class WorldChunkManager : MonoBehaviour
         {
             if (!requiredChunks.Contains(kvp.Key))
             {
-                kvp.Value.Destroy();
+                kvp.Value.Hide();
                 toRemove.Add(kvp.Key);
             }
         }
@@ -355,7 +374,7 @@ public class WorldChunkManager : MonoBehaviour
 
     Chunk GenerateChunk(Vector3Int chunkCoord)
     {
-        Chunk chunk = chunks.Find(x => x.isDestroyed == true);
+        Chunk chunk = chunks.Find(x => x.isHidden == true);
 
         if (chunk == null)
         {
@@ -364,7 +383,7 @@ public class WorldChunkManager : MonoBehaviour
             chunks.Add(chunk);
         }
         chunk.name = "Chunk_" + chunkCoord;
-        chunk.isDestroyed = false;
+        chunk.isHidden = false;
         chunk.transform.localPosition = worldPos + (chunkCoord * chunkSize);
         StarSystem sys = playerService.GetStarSystem();
         if (sys == null)
@@ -384,6 +403,7 @@ public class WorldChunkManager : MonoBehaviour
                 }
             }
         }
+
         if (isFirstChunksReady)
         {
             EnqueueChunkSpawn(chunk, chunkCoord);

@@ -6,7 +6,8 @@ using Zenject;
 public class SpaceObjectController : MonoBehaviour
 {
     [Inject] public SignalBus _signalBus;
-    [Inject] public Player player;
+    [Inject] public PlayerService _playerService;
+    [Inject] public Universe _universe;
     public SpaceObject sp_object;
 
     // Текущие параметры скорости
@@ -41,6 +42,11 @@ public class SpaceObjectController : MonoBehaviour
     }
 
     public virtual void Update()
+    {
+
+    }
+
+    public virtual void Warp(StarSystem starSystem, Vector3 position, Vector3 rotation)
     {
 
     }

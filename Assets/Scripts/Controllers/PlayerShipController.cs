@@ -37,10 +37,23 @@ public class PlayerShipController : SpaceObjectController
             sp_object.cameraManager.GetMainCamera().transform.localPosition = Vector3.zero;
         }
 
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            StarSystem sys = _playerService.GetStarSystem();
+            int rnd = Random.Range(0, _universe.systemsList.Count);
+            StarSystem fsys = _universe.systemsList.Find(x=>x.id == _universe.systemsList[rnd].id);
+            _playerService.Warp(fsys, Vector3.zero, Vector3.zero);
+        }
+
         if (Input.GetMouseButton(0))
         {
             FireWeapon();
         }
+    }
+
+    public override void Warp(StarSystem starSystem, Vector3 position, Vector3 rotation)
+    {
+
     }
 
     private void FireWeapon()

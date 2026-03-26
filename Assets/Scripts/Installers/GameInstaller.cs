@@ -18,9 +18,11 @@ public class GameInstaller : MonoInstaller
         Container.DeclareSignal<SignalGameStarted>();
         Container.DeclareSignal<SpaceShowSignal>();
         Container.DeclareSignal<SignalChunkManagerReady>();
+        Container.DeclareSignal<SignalChunkDestroy>();
         Container.DeclareSignal<SignalChunkFloatingOriginFix>();
         Container.DeclareSignal<PlayerSpeedChangedSignal>();
         Container.DeclareSignal<SpaceObjectOnTakeDamage>();
+        Container.DeclareSignal<SpaceObjectOnDestroyHide>();
         Container.DeclareSignal<SpaceObjectOnDestroy>();
         Container.DeclareSignal<WeaponFiredSignal>();
 

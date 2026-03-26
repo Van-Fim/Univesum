@@ -11,7 +11,7 @@ public class Asteroid : SpaceObject, ISelectable
     public Chunk chunk;
     [Inject] DiContainer container;
     [Inject] TargetIndicator targetIndicator;
-    
+
     public void SetPool(Asteroid.Pool pool)
     {
         _pool = pool;
@@ -20,13 +20,14 @@ public class Asteroid : SpaceObject, ISelectable
     {
         return container.ResolveId<Asteroid.Pool>(id);
     }
-    public override void OnSpDestroy(SpaceObjectOnDestroy signal)
+    public override void OnSpDestroyHide(SpaceObjectOnDestroyHide signal)
     {
-        if (signal.target == this)
+        if (signal.target == this || signal.target == null)
         {
             Despawn();
         }
     }
+    
     public void OnSpawned()
     {
         _isDespawned = false;
@@ -52,18 +53,22 @@ public class Asteroid : SpaceObject, ISelectable
         }
         protected override void OnDespawned(Asteroid item)
         {
+            if (item.is_destroyed)
+                return;
             item.transform.SetParent(null);
             item.Hide();
         }
 
         protected override void OnSpawned(Asteroid item)
         {
+            if (item.is_destroyed)
+                return;
             item.Show();
         }
     }
     public void OnDestroyChunkAsteroids(SignalDestroyChunkAsteroids signal)
     {
-        if (chunk != null && chunk.isDestroyed)
+        if (chunk != null && chunk.isHidden)
         {
             Despawn();
         }
@@ -81,11 +86,15 @@ public class Asteroid : SpaceObject, ISelectable
     }
     public void OnSelect()
     {
+        if (is_destroyed)
+            return;
         targetIndicator.SetTarget(this);
     }
 
     public void OnDeselect()
     {
+        if (is_destroyed)
+                return;
         targetIndicator.SetTarget(null);
     }
 
