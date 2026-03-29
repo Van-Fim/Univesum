@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Data;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using Zenject;
 
 public class PSpace : MonoBehaviour
@@ -8,26 +11,60 @@ public class PSpace : MonoBehaviour
     private SignalBus _signalBus;
     public Universe _universe;
     public StarSystem.Factory _starSystemFactory;
+    public CanvasController _canvas;
     public int safeRange = 10;
     public SpaceConfig config;
     public List<AsteroidFieldConfig> _asteroidConfigs;
+    public byte[] color = new byte[] { 255, 255, 255, 255 };
+
+    public MapSpaceUi MapSpaceUiPrefab;
+    public MapSpaceUi mapSpaceUi;
+
+    [Inject] public PlayerService _playerService;
+    [Inject] public CameraManager _cameraManager;
+    public void Start()
+    {
+        MapSpaceUiPrefab = Resources.Load<MapSpaceUi>("Prefabs/MapSpaceUi");
+        mapSpaceUi = Instantiate<MapSpaceUi>(MapSpaceUiPrefab);
+        mapSpaceUi.transform.SetParent(_canvas.transform);
+        mapSpaceUi.gameObject.SetActive(false);
+        mapSpaceUi.cam = _cameraManager.GetMapCamera();
+        mapSpaceUi.playerService = _playerService;
+        mapSpaceUi.space = this;
+    }
+    public virtual void OnMinimapRender()
+    {
+        Camera mapCam = _cameraManager.GetMapCamera();
+        bool v = mapCam.enabled;
+        if (v)
+        {
+            mapSpaceUi.gameObject.SetActive(true);
+        }
+        else
+        {
+            mapSpaceUi.gameObject.SetActive(false);
+        }
+    }
     [Inject]
-    public virtual void Construct(SignalBus signalBus, Universe universe, StarSystem.Factory starSystemFactory, List<AsteroidFieldConfig> asteroidFieldConfigs)
+    public virtual void Construct(SignalBus signalBus, Universe universe, StarSystem.Factory starSystemFactory, List<AsteroidFieldConfig> asteroidFieldConfigs, CanvasController canvas)
     {
         _signalBus = signalBus;
         _signalBus.Subscribe<SpaceShowSignal>(OnSpaceShow);
+        _signalBus.Subscribe<SpaceOnMinimapRenderSignal>(OnMinimapRender);
         _universe = universe;
         _starSystemFactory = starSystemFactory;
         _asteroidConfigs = asteroidFieldConfigs;
+        _canvas = canvas;
     }
     public void Destroy()
     {
         _signalBus.Unsubscribe<SpaceShowSignal>(OnSpaceShow);
+        _signalBus.Unsubscribe<SpaceOnMinimapRenderSignal>(OnMinimapRender);
         GameObject.Destroy(gameObject);
     }
     void OnSpaceShow(SpaceShowSignal signal)
     {
-        
+
     }
     void Update()
     {

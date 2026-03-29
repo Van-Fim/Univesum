@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class CanvasController : MonoBehaviour
 {
+    public GameObject main;
     public TextMeshProUGUI currentSpeed;
     public UnityEngine.UI.Image hud01;
     public UnityEngine.UI.Image hull;

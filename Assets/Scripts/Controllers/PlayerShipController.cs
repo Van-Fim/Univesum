@@ -1,4 +1,5 @@
 using TMPro.Examples;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -24,6 +25,7 @@ public class PlayerShipController : SpaceObjectController
 
     public override void Update()
     {
+        MapSpaceUi.InvokeTick();
         if (_rigidbody == null)
         {
             return;
@@ -36,13 +38,42 @@ public class PlayerShipController : SpaceObjectController
         {
             sp_object.cameraManager.GetMainCamera().transform.localPosition = Vector3.zero;
         }
-
         if (Input.GetKeyDown(KeyCode.J))
         {
-            StarSystem sys = _playerService.GetStarSystem();
+            if (MapSpaceUi.currentSelectedItem == null)
+            {
+                return;
+            }
+            if (MapSpaceUi.currentSelectedItem.space == null)
+            {
+                return;
+            }
+
+            Camera mainCam = _cameraManager.GetMainCamera();
+            Camera mapCam = _cameraManager.GetMapCamera();
+            StarSystem psys = _playerService.GetStarSystem();
             int rnd = Random.Range(0, _universe.systemsList.Count);
-            StarSystem fsys = _universe.systemsList.Find(x=>x.id == _universe.systemsList[rnd].id);
+            StarSystem fsys = (StarSystem) MapSpaceUi.currentSelectedItem.space;
             _playerService.Warp(fsys, Vector3.zero, Vector3.zero);
+
+            psys = _playerService.GetStarSystem();
+            mapCam.transform.localPosition = psys.transform.localPosition + new Vector3(0, 200, 0);
+            mapCam.transform.localEulerAngles = new Vector3(90, 0, 0);
+        }
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            Camera mainCam = _cameraManager.GetMainCamera();
+            Camera mapCam = _cameraManager.GetMapCamera();
+            StarSystem psys = _playerService.GetStarSystem();
+            bool st1 = mainCam.enabled;
+
+            mainCam.enabled = !st1;
+            mapCam.enabled = st1;
+            _canvasController.main.SetActive(!st1);
+            mapCam.transform.localPosition = psys.transform.localPosition + new Vector3(0, 200, 0);
+            mapCam.transform.localEulerAngles = new Vector3(90, 0, 0);
+
+            _signalBus.Fire(new SpaceOnMinimapRenderSignal());
         }
 
         if (Input.GetMouseButton(0))

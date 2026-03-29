@@ -8,6 +8,7 @@ public class SpaceObjectController : MonoBehaviour
     [Inject] public SignalBus _signalBus;
     [Inject] public PlayerService _playerService;
     [Inject] public Universe _universe;
+    [Inject] public CanvasController _canvasController;
     public SpaceObject sp_object;
 
     // Текущие параметры скорости
@@ -24,6 +25,8 @@ public class SpaceObjectController : MonoBehaviour
     public const float KeyboardRotationSpeed = 5f;
     public const float MinSpeedFactor = -0.25f;
     public const float MaxSpeedFactor = 1f;
+
+    [Inject] public CameraManager _cameraManager;
 
     public Vector2 _screenCenter;
     public bool IsOwnedByLocalPlayer(Player player)

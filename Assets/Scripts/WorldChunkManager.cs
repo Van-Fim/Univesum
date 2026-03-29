@@ -53,6 +53,7 @@ public class WorldChunkManager : MonoBehaviour
         {
             if (stopWorker)
             {
+                stopWorker = false;
                 break;
             }
             var (chunk, chunkCoord) = spawnQueue.Dequeue();
