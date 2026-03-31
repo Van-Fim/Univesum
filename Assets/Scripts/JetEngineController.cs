@@ -29,7 +29,6 @@ public class JetEngineController : MonoBehaviour
 
     public void Init()
     {
-        Debug.Log(_parent.spaceObjectController);
         if (_parent.IsOwnedByLocalPlayer())
         {
             _signalBus.Subscribe<PlayerSpeedChangedSignal>(OnPlayerSpeedChanged);

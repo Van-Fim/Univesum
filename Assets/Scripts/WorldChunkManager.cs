@@ -7,6 +7,7 @@ using Zenject;
 public class WorldChunkManager : MonoBehaviour
 {
     List<Chunk> chunks = new List<Chunk>();
+    [Inject] NpcJobManager _npcJobManager;
     [Inject] Universe _universe;
     [Inject] SignalBus signalBus;
     [Inject] PlayerService playerService;
@@ -107,6 +108,7 @@ public class WorldChunkManager : MonoBehaviour
             return;
         }
         Tick();
+        _npcJobManager.Tick();
     }
     void Tick()
     {
@@ -218,6 +220,7 @@ public class WorldChunkManager : MonoBehaviour
         Asteroid asteroid = pool.Spawn();
         asteroid.maxShield = 0;
         asteroid.Init();
+        asteroid.Hide();
         SpaceObjectConfig asteroidSp = JsonConfigLoader.LoadFromFile<SpaceObjectConfig>(astItem.spaceObjectPath);
         asteroid.InstallConfig(asteroidSp);
         asteroid.OnSpawned();

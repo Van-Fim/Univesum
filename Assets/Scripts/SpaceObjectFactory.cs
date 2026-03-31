@@ -3,9 +3,11 @@ using Zenject;
 
 public class SpaceObjectFactory {
     private readonly DiContainer _container;
+    private readonly Universe _universe;
 
-    public SpaceObjectFactory(DiContainer container) {
+    public SpaceObjectFactory(DiContainer container, Universe universe) {
         _container = container;
+        _universe = universe;
     }
 
     public T Create<T>(string prefabPath, string configPath) where T : SpaceObject {
@@ -19,6 +21,8 @@ public class SpaceObjectFactory {
         // Загружаем конфиг
         SpaceObjectConfig cfg = JsonConfigLoader.LoadFromFile<SpaceObjectConfig>(configPath);
         obj.InstallConfig(cfg);
+
+        _universe.allSpaceObjects.Add(obj);
 
         return obj;
     }

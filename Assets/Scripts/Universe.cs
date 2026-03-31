@@ -13,6 +13,7 @@ public class Universe
     public Transform systems;
     public List<Galaxy> galaxiesList = new List<Galaxy>();
     public List<StarSystem> systemsList = new List<StarSystem>();
+    public List<SpaceObject> allSpaceObjects = new List<SpaceObject>();
     public void Init()
     {
         GameObject gm = new GameObject();

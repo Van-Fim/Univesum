@@ -17,6 +17,8 @@ public class PSpace : MonoBehaviour
     public List<AsteroidFieldConfig> _asteroidConfigs;
     public byte[] color = new byte[] { 255, 255, 255, 255 };
 
+    public string owner;
+
     public MapSpaceUi MapSpaceUiPrefab;
     public MapSpaceUi mapSpaceUi;
 

@@ -57,6 +57,7 @@ public class GameInstaller : MonoInstaller
 
         var startConfig = JsonConfigLoader.LoadFromFile<GameStartConfig>("Gamestarts/Default");
         Container.Bind<GameStartConfig>().WithId("GameStartConfig").FromInstance(startConfig).AsSingle();
+        Container.Bind<NpcJobManager>().AsSingle().NonLazy();
         Container.Bind<GameStartManager>().AsSingle();
         Container.Resolve<GameStartManager>().Load();
 

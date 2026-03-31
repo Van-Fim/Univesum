@@ -69,7 +69,6 @@ public static class JsonConfigLoader
                 nameField.SetValue(result, fileNameWithoutExt);
             }
             
-            Debug.Log($"Успешно загружен конфиг: {fullPath}");
             return result;
         }
         catch (Exception e)

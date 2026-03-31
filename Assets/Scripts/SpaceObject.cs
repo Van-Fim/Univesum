@@ -38,7 +38,6 @@ public abstract class SpaceObject : MonoBehaviour
             return;
         hull = maxHull;
         shield = maxShield;
-        Hide();
 
         if (!is_initialized)
         {

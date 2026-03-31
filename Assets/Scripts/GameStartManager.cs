@@ -9,6 +9,7 @@ public class GameStartManager
     private readonly SpaceObjectFactory _factory;
     private readonly SignalBus _signalBus;
     private readonly GameStartConfig _config;
+    private NpcJobManager _npcJobManager;
 
     public GameStartManager(
         DiContainer container,
@@ -16,6 +17,7 @@ public class GameStartManager
         Universe universe,
         SpaceObjectFactory factory,
         SignalBus signalBus,
+        NpcJobManager npcJobManager,
         [Inject(Id = "GameStartConfig")] GameStartConfig config)
     {
         _container = container;
@@ -24,6 +26,7 @@ public class GameStartManager
         _factory = factory;
         _signalBus = signalBus;
         _config = config;
+        _npcJobManager = npcJobManager;
     }
 
     public void Load()
@@ -32,6 +35,8 @@ public class GameStartManager
         _universe.config = JsonConfigLoader.LoadFromFile<SpaceConfig>($"Universe/{_config.univesrse}");
         _universe.Init();
         _universe.Build();
+
+        _npcJobManager.Initialize();
 
         if (string.IsNullOrEmpty(_config.ship))
         {
@@ -95,5 +100,6 @@ public class GameStartManager
         ship.transform.localPosition = _config.start_position;
         ship.transform.localEulerAngles = _config.start_position;
         ship.SetStarSystem(_config.galaxyId, _config.systemId);
+        ship.Init();
     }
 }
