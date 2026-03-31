@@ -19,7 +19,7 @@ public class Galaxy : PSpace
                 Random.InitState(_universe.seed + this.id + id);
                 StarSystem space = _starSystemFactory.Create();
                 space.transform.SetParent(_universe.systems);
-                space.config = JsonConfigLoader.LoadFromResources<SpaceConfig>($"Configs/Universe/Systems/{it.name}");
+                space.config = JsonConfigLoader.LoadFromFile<SpaceConfig>($"Universe/Systems/{it.name}");
 
                 for (int t = 0; t < tryes; t++)
                 {

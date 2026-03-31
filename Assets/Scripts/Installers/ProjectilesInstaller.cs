@@ -6,16 +6,15 @@ public class ProjectilesInstaller : MonoInstaller
     public Transform spaceContainer;
     public override void InstallBindings()
     {
-        TextAsset[] configs = Resources.LoadAll<TextAsset>("Configs/Projectiles");
+        ProjectileConfig[] configs = JsonConfigLoader.LoadAllFromFolder<ProjectileConfig>("Projectiles");
 
         foreach (var config in configs)
         {
-            ProjectileConfig projConf = JsonUtility.FromJson<ProjectileConfig>(config.text);
             GameObject projFX = Resources.Load<GameObject>("Prefabs/ProjectileFx");
-            GameObject prefab = Resources.Load<GameObject>(projConf.pathToModel);
+            GameObject prefab = Resources.Load<GameObject>(config.pathToModel);
             if (prefab == null)
             {
-                Debug.LogError($"Не найден префаб по пути {projConf.pathToModel}");
+                Debug.LogError($"Не найден префаб по пути {config.pathToModel}");
                 continue;
             }
             GameObject _modelInstance = GameObject.Instantiate(projFX);
@@ -29,21 +28,21 @@ public class ProjectilesInstaller : MonoInstaller
                 proj.beam = proj.transform.Find("Beam").GetComponent<ParticleSystem>();
 
                 var beamMain = proj.beam.main;
-                beamMain.startColor = new ParticleSystem.MinMaxGradient(projConf.baseColor);
+                beamMain.startColor = new ParticleSystem.MinMaxGradient(config.baseColor);
             }
             if (proj.body == null)
             {
                 proj.body = proj.transform.Find("Body").GetComponent<ParticleSystem>();
 
                 var bodyMain = proj.body.main;
-                bodyMain.startColor = new ParticleSystem.MinMaxGradient(projConf.baseColor);
+                bodyMain.startColor = new ParticleSystem.MinMaxGradient(config.baseColor);
             }
             if (proj.explode == null)
             {
                 proj.explode = proj.transform.Find("Explode").GetComponent<ParticleSystem>();
 
                 var expMain = proj.explode.main;
-                expMain.startColor = new ParticleSystem.MinMaxGradient(projConf.baseColor);
+                expMain.startColor = new ParticleSystem.MinMaxGradient(config.baseColor);
             }
             MeshFilter mf = prefab.GetComponent<MeshFilter>();
             if (mf != null)

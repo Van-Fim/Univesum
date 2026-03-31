@@ -29,7 +29,7 @@ public class GameStartManager
     public void Load()
     {
         Random.InitState(_universe.seed);
-        _universe.config = JsonConfigLoader.LoadFromResources<SpaceConfig>($"Configs/Universe/{_config.univesrse}");
+        _universe.config = JsonConfigLoader.LoadFromFile<SpaceConfig>($"Universe/{_config.univesrse}");
         _universe.Init();
         _universe.Build();
 
@@ -49,7 +49,7 @@ public class GameStartManager
     {
         Suit suit = _factory.Create<Suit>(
             "Prefabs/SuitPrefab",
-            "Configs/SpaceObjects/Suit/Suit01"
+            "SpaceObjects/Suit/Suit01"
         );
 
         suit.InstallCamera();
@@ -71,7 +71,7 @@ public class GameStartManager
     {
         Ship ship = _factory.Create<Ship>(
             "Prefabs/ShipPrefab",
-            "Configs/SpaceObjects/Ships/" + _config.ship
+            "SpaceObjects/Ships/" + _config.ship
         );
 
         var controller = ship.gameObject.AddComponent<PlayerShipController>();
@@ -86,8 +86,8 @@ public class GameStartManager
 
         if (!string.IsNullOrEmpty(_config.ship_loadout))
         {
-            var loadout = JsonConfigLoader.LoadFromResources<Loadout>(
-                "Configs/Loadouts/" + _config.ship_loadout
+            var loadout = JsonConfigLoader.LoadFromFile<Loadout>(
+                "Loadouts/" + _config.ship_loadout
             );
             ship.InstallLoadout(loadout);
         }

@@ -47,7 +47,7 @@ public class Universe
                 Random.InitState(seed + id);
                 Galaxy space = _galaxyFactory.Create();
                 space.transform.SetParent(galaxies);
-                space.config = JsonConfigLoader.LoadFromResources<SpaceConfig>($"Configs/Universe/Galaxies/{it.name}");
+                space.config = JsonConfigLoader.LoadFromFile<SpaceConfig>($"Universe/Galaxies/{it.name}");
                 for (int t = 0; t < tryes; t++)
                 {
                     int range = Random.Range(it.rangeMin, it.rangeMax + 1);

@@ -55,7 +55,7 @@ public class GameInstaller : MonoInstaller
         TargetIndicator targetIndicator = canvasControllerVar.gameObject.GetComponent<TargetIndicator>();
         Container.Bind<TargetIndicator>().FromInstance(targetIndicator).AsSingle();
 
-        var startConfig = JsonConfigLoader.LoadFromResources<GameStartConfig>("Configs/Gamestarts/Default");
+        var startConfig = JsonConfigLoader.LoadFromFile<GameStartConfig>("Gamestarts/Default");
         Container.Bind<GameStartConfig>().WithId("GameStartConfig").FromInstance(startConfig).AsSingle();
         Container.Bind<GameStartManager>().AsSingle();
         Container.Resolve<GameStartManager>().Load();
@@ -77,7 +77,7 @@ public class GameInstaller : MonoInstaller
         //     {
         //         GameObject suitGO = Container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/SuitPrefab"));
         //         Suit suit = suitGO.GetComponent<Suit>();
-        //         SpaceObjectConfig suitConfig = JsonConfigLoader.LoadFromResources<SpaceObjectConfig>("Configs/SpaceObjects/Suit/Suit01");
+        //         SpaceObjectConfig suitConfig = JsonConfigLoader.LoadFromFile<SpaceObjectConfig>("SpaceObjects/Suit/Suit01");
         //         suit.InstallConfig(suitConfig);
         //         suit.InstallCamera();
         //         playerControllerVar = suit.AddComponent<SuitController>();
@@ -90,14 +90,14 @@ public class GameInstaller : MonoInstaller
         //     {
         //         GameObject shipGO = Container.InstantiatePrefab(Resources.Load<GameObject>("Prefabs/ShipPrefab"));
         //         Ship ship = shipGO.GetComponent<Ship>();
-        //         SpaceObjectConfig shipConfig = JsonConfigLoader.LoadFromResources<SpaceObjectConfig>("Configs/SpaceObjects/Ships/" + startConfig.ship);
+        //         SpaceObjectConfig shipConfig = JsonConfigLoader.LoadFromFile<SpaceObjectConfig>("SpaceObjects/Ships/" + startConfig.ship);
 
         //         ship.InstallConfig(shipConfig);
         //         ship.InstallCamera();
 
         //         if (startConfig.ship_loadout != null && startConfig.ship_loadout.Length > 0)
         //         {
-        //             Loadout loadout = JsonConfigLoader.LoadFromResources<Loadout>("Configs/Loadouts/" + startConfig.ship_loadout);
+        //             Loadout loadout = JsonConfigLoader.LoadFromFile<Loadout>("Loadouts/" + startConfig.ship_loadout);
         //             ship.InstallLoadout(loadout);
         //         }
 

@@ -30,7 +30,7 @@ public class Weapon : MonoBehaviour
     }
     public void Init()
     {
-        projectileConfig = JsonConfigLoader.LoadFromResources<ProjectileConfig>("Configs/Projectiles/" + _config.projectile);
+        projectileConfig = JsonConfigLoader.LoadFromFile<ProjectileConfig>("Projectiles/" + _config.projectile);
     }
     private void OnDestroy()
     {

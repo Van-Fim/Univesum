@@ -218,7 +218,7 @@ public class WorldChunkManager : MonoBehaviour
         Asteroid asteroid = pool.Spawn();
         asteroid.maxShield = 0;
         asteroid.Init();
-        SpaceObjectConfig asteroidSp = JsonConfigLoader.LoadFromResources<SpaceObjectConfig>(astItem.spaceObjectPath);
+        SpaceObjectConfig asteroidSp = JsonConfigLoader.LoadFromFile<SpaceObjectConfig>(astItem.spaceObjectPath);
         asteroid.InstallConfig(asteroidSp);
         asteroid.OnSpawned();
         asteroid.SetPool(pool);

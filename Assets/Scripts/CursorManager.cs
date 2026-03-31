@@ -7,7 +7,7 @@ public class CursorManager : MonoBehaviour
     public CursorMode cursorMode = CursorMode.Auto;
     public void SwitchCursor(string cursorName)
     {
-        CursorConfig config = Resources.Load<CursorConfig>($"Configs/Cursors/{cursorName}");
+        CursorConfig config = Resources.Load<CursorConfig>($"Cursors/{cursorName}");
         if (config != null)
         {
             customCursor = config.customCursor;

@@ -38,7 +38,7 @@ public class Ship : SpaceObject
             LoadoutHP hp = loadout.hardpoints[i];
             if (hp.hardpoint == "Engine")
             {
-                engine = JsonConfigLoader.LoadFromResources<EngineConfig>("Configs/Engines/" + hp.item);
+                engine = JsonConfigLoader.LoadFromFile<EngineConfig>("Engines/" + hp.item);
                 if (hardpoints != null && hardpoints.childCount > 0)
                 {
                     for (int j = 0; j < hardpoints.childCount; j++)
@@ -69,7 +69,7 @@ public class Ship : SpaceObject
             }
             else if (hp.hardpoint == "PowerGenerator")
             {
-                PowerGeneratorConfig pw = JsonConfigLoader.LoadFromResources<PowerGeneratorConfig>("Configs/PowerGenerators/" + hp.item);
+                PowerGeneratorConfig pw = JsonConfigLoader.LoadFromFile<PowerGeneratorConfig>("PowerGenerators/" + hp.item);
                 if (hardpoints != null && hardpoints.childCount > 0)
                 {
                     powerGenerator = new PowerGenerator(pw);
@@ -84,7 +84,7 @@ public class Ship : SpaceObject
                         Transform tr = hardpoints.GetChild(j);
                         if (tr.name == hp.hardpoint)
                         {
-                            WeaponConfig cfg = JsonConfigLoader.LoadFromResources<WeaponConfig>("Configs/Weapons/" + hp.item);
+                            WeaponConfig cfg = JsonConfigLoader.LoadFromFile<WeaponConfig>("Weapons/" + hp.item);
                             Weapon weapon = _weaponFactory.Create(this, cfg);
                             weapon.Init();
                             weapon.transform.SetParent(tr);
