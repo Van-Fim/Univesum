@@ -28,6 +28,7 @@ public class PSpace : MonoBehaviour
     {
         MapSpaceUiPrefab = Resources.Load<MapSpaceUi>("Prefabs/MapSpaceUi");
         mapSpaceUi = Instantiate<MapSpaceUi>(MapSpaceUiPrefab);
+        mapSpaceUi._signalBus = _signalBus;
         mapSpaceUi.transform.SetParent(_canvas.transform);
         mapSpaceUi.gameObject.SetActive(false);
         mapSpaceUi.cam = _cameraManager.GetMapCamera();

@@ -19,8 +19,7 @@ public class SpaceObjectFactory {
         T obj = go.GetComponent<T>();
 
         // Загружаем конфиг
-        SpaceObjectConfig cfg = JsonConfigLoader.LoadFromFile<SpaceObjectConfig>(configPath);
-        obj.InstallConfig(cfg);
+        obj.spaceObjectConfig = JsonConfigLoader.LoadFromFile<SpaceObjectConfig>(configPath);
 
         _universe.allSpaceObjects.Add(obj);
 

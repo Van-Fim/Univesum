@@ -36,8 +36,10 @@ public class Weapon : MonoBehaviour
     {
         _signalBus.Unsubscribe<WeaponFiredSignal>(OnFire);
     }
-    public void OnFire()
+    public void OnFire(WeaponFiredSignal signal)
     {
+        if (signal.spaceObject != _parent)
+            return;
         TryFire();
     }
     public void SetTransforms()

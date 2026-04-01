@@ -9,7 +9,7 @@ public class SpaceObjectController : MonoBehaviour
     [Inject] public PlayerService _playerService;
     [Inject] public Universe _universe;
     [Inject] public CanvasController _canvasController;
-    public SpaceObject sp_object;
+    private SpaceObject sp_object;
 
     // Текущие параметры скорости
     public float _targetSpeedFactor = 0f;
@@ -29,10 +29,32 @@ public class SpaceObjectController : MonoBehaviour
     [Inject] public CameraManager _cameraManager;
 
     public Vector2 _screenCenter;
+
+    public SpaceObject Sp_object
+    {
+        get
+        {
+            if (_playerService._player.currentController == this)
+            {
+                _playerService._player_sp_object = sp_object;
+            }
+            return sp_object;
+        }
+        set
+        {
+            sp_object = value;
+            if (_playerService._player.currentController == this)
+            {
+                _playerService._player_sp_object = sp_object;
+            }
+        }
+    }
+
+
     public bool IsOwnedByLocalPlayer(Player player)
     {
         return player.GetCurrentController() != null &&
-               player.GetCurrentController().sp_object == sp_object;
+               player.GetCurrentController().Sp_object == Sp_object;
     }
     public virtual void Start()
     {

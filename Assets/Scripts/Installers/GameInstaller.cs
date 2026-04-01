@@ -26,6 +26,8 @@ public class GameInstaller : MonoInstaller
         Container.DeclareSignal<SpaceObjectOnDestroyHide>();
         Container.DeclareSignal<SpaceObjectOnDestroy>();
         Container.DeclareSignal<WeaponFiredSignal>();
+        Container.DeclareSignal<SignalOnUpdateTick>();
+        Container.DeclareSignal<SignalOnPlayerChangedSystem>();
 
         Container.Bind<Player>().AsSingle();
         Container.Bind<PlayerService>().AsSingle();
@@ -50,10 +52,18 @@ public class GameInstaller : MonoInstaller
         Container.Bind<CursorManager>().FromInstance(cursorManagerVar).AsSingle();
         Container.Bind<CursorRaycaster>().FromInstance(cursorRaycaster).AsSingle();
 
-        CanvasController canvasControllerVar = Container.InstantiatePrefab(canvasController).GetComponent<CanvasController>();
+        GameObject gmObj = Container.InstantiatePrefab(canvasController);
+        CanvasController canvasControllerVar = gmObj.GetComponent<CanvasController>();
         Container.Bind<CanvasController>().FromInstance(canvasControllerVar).AsSingle();
-        TargetIndicator targetIndicator = canvasControllerVar.gameObject.GetComponent<TargetIndicator>();
+
+        UpdateManager updateManagerVar = gmObj.GetComponent<UpdateManager>();
+        Container.Bind<UpdateManager>().FromInstance(updateManagerVar).AsSingle();
+        
+        TargetIndicator targetIndicator = gmObj.GetComponent<TargetIndicator>();
         Container.Bind<TargetIndicator>().FromInstance(targetIndicator).AsSingle();
+
+        SpaceContainer spaceContainer = GameObject.Find("SpaceContainer").GetComponent<SpaceContainer>();
+        Container.Bind<SpaceContainer>().FromInstance(spaceContainer).AsSingle();
 
         var startConfig = JsonConfigLoader.LoadFromFile<GameStartConfig>("Gamestarts/Default");
         Container.Bind<GameStartConfig>().WithId("GameStartConfig").FromInstance(startConfig).AsSingle();

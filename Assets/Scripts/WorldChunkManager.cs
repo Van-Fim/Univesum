@@ -13,6 +13,8 @@ public class WorldChunkManager : MonoBehaviour
     [Inject] PlayerService playerService;
     public Vector3 worldPos = Vector3.zero;
 
+    [Inject] SpaceContainer spaceContainer;
+
     public Transform playerTransform;
     public float originThreshold = 25000f;
     public int chunkSize = 20000;
@@ -82,6 +84,7 @@ public class WorldChunkManager : MonoBehaviour
 
     public void Start()
     {
+        signalBus.Subscribe<SignalOnUpdateTick>(OnUpdateTick);
         Init();
     }
     public void Init()
@@ -101,14 +104,13 @@ public class WorldChunkManager : MonoBehaviour
         signalBus.Fire(new SignalChunkManagerReady());
         singleton = this;
     }
-    void Update()
+    void OnUpdateTick()
     {
         if (!is_initialized)
         {
             return;
         }
         Tick();
-        _npcJobManager.Tick();
     }
     void Tick()
     {
@@ -221,8 +223,8 @@ public class WorldChunkManager : MonoBehaviour
         asteroid.maxShield = 0;
         asteroid.Init();
         asteroid.Hide();
-        SpaceObjectConfig asteroidSp = JsonConfigLoader.LoadFromFile<SpaceObjectConfig>(astItem.spaceObjectPath);
-        asteroid.InstallConfig(asteroidSp);
+        asteroid.spaceObjectConfig = JsonConfigLoader.LoadFromFile<SpaceObjectConfig>(astItem.spaceObjectPath);
+        asteroid.InstallConfig();
         asteroid.OnSpawned();
         asteroid.SetPool(pool);
         asteroid.worldChunkManager = this;
@@ -320,6 +322,7 @@ public class WorldChunkManager : MonoBehaviour
             Mathf.FloorToInt(globalPosition.y / chunkSize),
             Mathf.FloorToInt(globalPosition.z / chunkSize)
         );
+        spaceContainer.transform.localPosition = -globalPosition;
     }
 
     void HandleChunks()

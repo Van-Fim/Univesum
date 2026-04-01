@@ -22,10 +22,10 @@ public class SuitController : SpaceObjectController
     public override void Start()
     {
         _rigidbody.freezeRotation = true;
-        sp_object.canvasController.hud01.gameObject.SetActive(false);
-        sp_object.canvasController.hud02.gameObject.SetActive(false);
-        sp_object.canvasController.currentSpeed.gameObject.SetActive(false);
-        sp_object.canvasController.crosshair.sprite = Resources.Load<Sprite>("Textures/UI/center_crosshair02");
+        Sp_object.canvasController.hud01.gameObject.SetActive(false);
+        Sp_object.canvasController.hud02.gameObject.SetActive(false);
+        Sp_object.canvasController.currentSpeed.gameObject.SetActive(false);
+        Sp_object.canvasController.crosshair.sprite = Resources.Load<Sprite>("Textures/UI/center_crosshair02");
         isGravityActive = false;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -33,7 +33,7 @@ public class SuitController : SpaceObjectController
 
     void Update()
     {
-        Camera camera = sp_object.cameraManager.GetMainCamera();
+        Camera camera = Sp_object.cameraManager.GetMainCamera();
         transform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * mouseSensitivityX);
         verticalLookRotation += Input.GetAxis("Mouse Y") * mouseSensitivityY;
         verticalLookRotation = Mathf.Clamp(verticalLookRotation, -60, 60);

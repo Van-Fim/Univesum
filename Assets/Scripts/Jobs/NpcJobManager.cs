@@ -36,11 +36,12 @@ public class JobInstance
     public int systemId;
     public DateTime spawnTime;
 }
-public class NpcJobManager : ITickable, IInitializable
+public class NpcJobManager : IInitializable
 {
     [Inject] private Universe _universe;
     [Inject] private DiContainer _container;
     [Inject] private SpaceObjectFactory _shipFactory;
+    [Inject] private SignalBus _signalBus;
 
     private List<Job> _jobs = new List<Job>();
     private Dictionary<int, List<JobInstance>> _activeJobs = new Dictionary<int, List<JobInstance>>();
@@ -56,18 +57,20 @@ public class NpcJobManager : ITickable, IInitializable
 
     public void Initialize()
     {
+        _signalBus.Subscribe<SignalOnUpdateTick>(OnUpdateTick);
+
         LoadJobs();
         _lastSpawnCheck = Time.time;
     }
 
-    public void Tick()
+    public void OnUpdateTick()
     {
-        if (Time.time - _lastSpawnCheck >= _spawnCheckInterval)
-        {
-            UpdateJobCounters();
-            ProcessJobSpawning();
-            _lastSpawnCheck = Time.time;
-        }
+        // if (Time.time - _lastSpawnCheck >= _spawnCheckInterval)
+        // {
+        //     _lastSpawnCheck = Time.time;
+        // }
+        UpdateJobCounters();
+        ProcessJobSpawning();
 
         CleanupDestroyedShips();
     }
@@ -102,7 +105,7 @@ public class NpcJobManager : ITickable, IInitializable
         // Подсчет активных кораблей
         foreach (var jobInstance in _activeJobs.Values.SelectMany(v => v))
         {
-            if (jobInstance.ship != null && jobInstance.ship.gameObject.activeInHierarchy)
+            if (jobInstance.ship != null)
             {
                 var job = jobInstance.job;
                 job.currentUniverseCount++;
@@ -229,15 +232,12 @@ public class NpcJobManager : ITickable, IInitializable
             "Prefabs/ShipPrefab",
             "SpaceObjects/Ships/" + job.ship
         );
-        var loadout = JsonConfigLoader.LoadFromFile<Loadout>(
-                        "Loadouts/Ship01_Loadout01"
-                    );
-        ship.InstallLoadout(loadout);
+        ship.loadoutName = "Ship01_Loadout01";
         ship.transform.localPosition = Vector3.zero;
         ship.transform.localEulerAngles = Vector3.zero;
         ship.SetStarSystem(location.galaxy.id, location.system.id);
         ship.Init();
-        Debug.Log($"{ship} {location.galaxy.id} {location.system.id}");
+        bool inst = ship.TryInstallConfig(ship.StarSystem);
         // Создание экземпляра джоба
         var jobInstance = new JobInstance
         {
@@ -268,7 +268,7 @@ public class NpcJobManager : ITickable, IInitializable
         foreach (var jobId in _activeJobs.Keys.ToList())
         {
             _activeJobs[jobId].RemoveAll(instance =>
-                instance.ship == null || !instance.ship.gameObject.activeInHierarchy);
+                instance.ship == null);
         }
     }
 
@@ -284,14 +284,6 @@ public class NpcJobManager : ITickable, IInitializable
                 break;
             }
         }
-    }
-
-    public List<Ship> GetActiveShipsForJob(string jobName)
-    {
-        var job = _jobs.FirstOrDefault(j => j.name == jobName);
-        if (job == null) return new List<Ship>();
-
-        return _activeJobs[job.id].Select(ji => ji.ship).Where(s => s != null).ToList();
     }
 
     public int GetJobCountInSystem(int jobId, int systemId)

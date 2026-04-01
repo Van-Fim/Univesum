@@ -18,6 +18,7 @@ public class MapSpaceUi : MonoBehaviour, IPointerClickHandler
     public static Color32 selectedColor = new Color32(255, 255, 255, 255);
     public static Color32 defaultColor = new Color32(50, 50, 50, 255);
     public PlayerService playerService;
+    public SignalBus _signalBus;
     public void OnPointerClick(PointerEventData eventData)
     {
         currentSelectedItem = this;
@@ -25,7 +26,7 @@ public class MapSpaceUi : MonoBehaviour, IPointerClickHandler
     }
     public void Start()
     {
-        OnTickAction += Tick;
+        _signalBus.Subscribe<SignalOnUpdateTick>(OnUpdateTick);
         OnSelectAction += OnSelect;
 
         image = GetComponent<Image>();
@@ -34,7 +35,6 @@ public class MapSpaceUi : MonoBehaviour, IPointerClickHandler
     }
     public virtual void Destroy()
     {
-        OnTickAction -= Tick;
         OnSelectAction -= OnSelect;
     }
     public void OnSelect()
@@ -59,7 +59,7 @@ public class MapSpaceUi : MonoBehaviour, IPointerClickHandler
             image.color = selectedColor;
         }
     }
-    public void Tick()
+    public void OnUpdateTick()
     {
         ChangeColor();
         if (!gameObject.activeSelf)

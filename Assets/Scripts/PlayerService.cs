@@ -4,12 +4,14 @@ using Zenject;
 public class PlayerService
 {
     public Player _player;
+    public SpaceObject _player_sp_object;
     private readonly SignalBus _signalBus;
     private readonly Universe _universe;
 
     private Galaxy _galaxy;
     private StarSystem _starSystem;
     [Inject] DiContainer container;
+    [Inject] SpaceContainer _spaceContainer;
     [Inject]
     public PlayerService(Player player, SignalBus signalBus, Universe universe)
     {
@@ -21,18 +23,21 @@ public class PlayerService
     {
         Random.InitState(_universe.seed + starSystem.galaxyId + starSystem.id);
         int rndm = Random.Range(0, starSystem.config.skyboxes.Count);
+        
         ChangeSkybox(starSystem.config.skyboxes[rndm]);
         _signalBus.Fire(new SpaceShowSignal(starSystem));
         _signalBus.Fire(new SpaceObjectOnDestroyHide(null, null));
         _signalBus.Fire(new SignalChunkDestroy());
         SpaceObjectController sp = _player.currentController;
-        sp.sp_object.galaxyId = starSystem.galaxyId;
-        sp.sp_object.systemId = starSystem.id;
+        sp.Sp_object.galaxyId = starSystem.galaxyId;
+        sp.Sp_object.systemId = starSystem.id;
         WorldChunkManager wcm = WorldChunkManager.singleton;
         if (wcm)
         {
            wcm.Init();
         }
+        _spaceContainer.transform.localPosition = Vector3.zero;
+        _signalBus.Fire(new SignalOnPlayerChangedSystem(sp.Sp_object, starSystem));
     }
 
     public void ChangeSkybox(string skyboxName)
@@ -47,8 +52,8 @@ public class PlayerService
     public Galaxy GetGalaxy()
     {
         SpaceObjectController sp = _player.currentController;
-        int gId = sp.sp_object.galaxyId;
-        int sId = sp.sp_object.systemId;
+        int gId = sp.Sp_object.galaxyId;
+        int sId = sp.Sp_object.systemId;
         if (sp == null)
         {
             return null;
@@ -64,8 +69,8 @@ public class PlayerService
     public StarSystem GetStarSystem()
     {
         SpaceObjectController sp = _player.currentController;
-        int gId = sp.sp_object.galaxyId;
-        int sId = sp.sp_object.systemId;
+        int gId = sp.Sp_object.galaxyId;
+        int sId = sp.Sp_object.systemId;
         if (sp == null)
         {
             return null;

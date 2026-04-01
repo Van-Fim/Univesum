@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
@@ -14,13 +15,18 @@ public abstract class SpaceObject : MonoBehaviour
     protected MeshRenderer meshRenderer;
     public MeshCollider meshCollider;
     [Inject] public SignalBus signalBus;
-    [Inject] public Player localPlayer;
+    [Inject] public PlayerService playerService;
     [Inject] public CanvasController canvasController;
     [Inject] public CameraManager cameraManager;
     [Inject] public DiContainer _container;
     [Inject] public CursorRaycaster cursorRaycaster;
+    [Inject] public Universe _universe;
+    [Inject] SpaceContainer spaceContainer;
+
     public Rigidbody rigidbody;
     public Transform hardpoints;
+
+    public string loadoutName;
 
     public int galaxyId;
     public int systemId;
@@ -31,7 +37,55 @@ public abstract class SpaceObject : MonoBehaviour
     protected Mesh mesh;
 
     protected GameObject main = null;
+    public StarSystem StarSystem;
+    public StarSystem GetStarSystem()
+    {
+        return _universe.FindSystem(galaxyId, systemId);
+    }
+    public bool TryInstallConfig(StarSystem starSystem)
+    {
+        bool ret = false;
+        if (starSystem == null || StarSystem == null)
+            return ret;
 
+        if (playerService._player_sp_object == this || GetType() == typeof(Asteroid))
+            return ret;
+
+        transform.SetParent(spaceContainer.transform);
+
+        if (playerService.GetStarSystem() == starSystem)
+        {
+            if (starSystem == StarSystem)
+            {
+                ret = true;
+                InstallConfig();
+                var loadout = JsonConfigLoader.LoadFromFile<Loadout>(
+                    "Loadouts/" + loadoutName
+                );
+                InstallLoadout(loadout);
+            }
+            else
+            {
+                ret = false;
+                DestroyConfig();
+                if (hardpoints)
+                {
+                    Destroy(hardpoints.gameObject);
+                }
+            }
+        }
+        else
+        {
+            ret = false;
+            DestroyConfig();
+            if (hardpoints)
+            {
+                Destroy(hardpoints.gameObject);
+            }
+        }
+
+        return ret;
+    }
     public virtual void Init()
     {
         if (is_destroyed)
@@ -44,6 +98,7 @@ public abstract class SpaceObject : MonoBehaviour
             signalBus.Subscribe<SpaceObjectOnTakeDamage>(OnTakeDamage);
             signalBus.Subscribe<SpaceObjectOnDestroyHide>(OnSpDestroyHide);
             signalBus.Subscribe<SpaceObjectOnDestroy>(OnSpDestroy);
+            signalBus.Subscribe<SignalOnPlayerChangedSystem>(OnPlayerChangedSystem);
             is_initialized = true;
         }
     }
@@ -56,6 +111,7 @@ public abstract class SpaceObject : MonoBehaviour
     {
         this.galaxyId = galaxyId;
         this.systemId = systemId;
+        StarSystem = GetStarSystem();
     }
     public virtual void OnSpDestroyHide(SpaceObjectOnDestroyHide signal)
     {
@@ -63,6 +119,10 @@ public abstract class SpaceObject : MonoBehaviour
         {
 
         }
+    }
+    public virtual void OnPlayerChangedSystem(SignalOnPlayerChangedSystem signal)
+    {
+        TryInstallConfig(signal.starSystem);
     }
     public virtual void OnSpDestroy(SpaceObjectOnDestroy signal)
     {
@@ -92,7 +152,7 @@ public abstract class SpaceObject : MonoBehaviour
     {
         if (is_destroyed)
             return false;
-        return spaceObjectController != null && spaceObjectController.IsOwnedByLocalPlayer(localPlayer);
+        return spaceObjectController != null && spaceObjectController.IsOwnedByLocalPlayer(playerService._player);
     }
     public virtual void InstallCamera()
     {
@@ -121,7 +181,7 @@ public abstract class SpaceObject : MonoBehaviour
     {
         signalBus.Fire(new SpaceObjectOnDestroyHide(attacker, this));
     }
-    public virtual void InstallConfig(SpaceObjectConfig config)
+    public virtual void InstallConfig()
     {
         if (this.main != null)
         {
@@ -129,14 +189,14 @@ public abstract class SpaceObject : MonoBehaviour
         }
         if (is_destroyed)
             return;
-        spaceObjectConfig = config;
-        if (rigidbody != null)
-            rigidbody.mass = config.mass;
 
-        GameObject gm = Resources.Load<GameObject>(config.pathToModel);
-        if (config != null && config.chinldName != null && config.chinldName.Length > 0)
+        if (rigidbody != null)
+            rigidbody.mass = spaceObjectConfig.mass;
+
+        GameObject gm = Resources.Load<GameObject>(spaceObjectConfig.pathToModel);
+        if (spaceObjectConfig != null && spaceObjectConfig.chinldName != null && spaceObjectConfig.chinldName.Length > 0)
         {
-            var tr = gm.transform.Find(config.chinldName);
+            var tr = gm.transform.Find(spaceObjectConfig.chinldName);
             if (tr != null)
             {
                 gm = tr.gameObject;
@@ -158,7 +218,7 @@ public abstract class SpaceObject : MonoBehaviour
         gameObject.AddComponent<MeshCollider>();
         gameObject.AddComponent<Rigidbody>();
         meshRenderer = main.GetComponent<MeshRenderer>();
-        main.transform.localScale = new Vector3(config.scale, config.scale, config.scale);
+        main.transform.localScale = new Vector3(spaceObjectConfig.scale, spaceObjectConfig.scale, spaceObjectConfig.scale);
         if (meshRenderer == null)
         {
             meshRenderer = main.AddComponent<MeshRenderer>();
@@ -170,16 +230,45 @@ public abstract class SpaceObject : MonoBehaviour
             meshCollider.sharedMesh = meshFilter.sharedMesh;
         }
         rigidbody = GetComponent<Rigidbody>();
-        rigidbody.mass = config.mass;
-        rigidbody.linearDamping = config.linearDrag;
-        rigidbody.angularDamping = config.angularDrag;
+        rigidbody.mass = spaceObjectConfig.mass;
+        rigidbody.linearDamping = spaceObjectConfig.linearDrag;
+        rigidbody.angularDamping = spaceObjectConfig.angularDrag;
         meshCollider.convex = true;
         rigidbody.useGravity = false;
 
-        if (config.pathToMaterial != null && config.pathToMaterial.Length > 0)
+        if (spaceObjectConfig.pathToMaterial != null && spaceObjectConfig.pathToMaterial.Length > 0)
         {
-            Material mat = Resources.Load<Material>(config.pathToMaterial);
+            Material mat = Resources.Load<Material>(spaceObjectConfig.pathToMaterial);
             meshRenderer.material = mat;
+        }
+    }
+
+    public virtual void DestroyConfig()
+    {
+        if (this.main == null)
+        {
+            return;
+        }
+        if (is_destroyed)
+            return;
+
+        GameObject gm = Resources.Load<GameObject>(spaceObjectConfig.pathToModel);
+        if (spaceObjectConfig != null && spaceObjectConfig.chinldName != null && spaceObjectConfig.chinldName.Length > 0)
+        {
+            var tr = gm.transform.Find(spaceObjectConfig.chinldName);
+            if (tr != null)
+            {
+                gm = tr.gameObject;
+            }
+        }
+        Destroy(main);
+        if (meshCollider)
+        {
+            Destroy(meshCollider);
+        }
+        if (rigidbody)
+        {
+            Destroy(rigidbody);
         }
     }
 
@@ -208,6 +297,7 @@ public abstract class SpaceObject : MonoBehaviour
         signalBus.Unsubscribe<SpaceObjectOnTakeDamage>(OnTakeDamage);
         signalBus.Unsubscribe<SpaceObjectOnDestroyHide>(OnSpDestroyHide);
         signalBus.Unsubscribe<SpaceObjectOnDestroy>(OnSpDestroy);
+        signalBus.Unsubscribe<SignalOnPlayerChangedSystem>(OnPlayerChangedSystem);
         Destroy(gameObject);
     }
 }

@@ -40,7 +40,7 @@ public class JetEngineController : MonoBehaviour
         if (_parent.IsOwnedByLocalPlayer())
         {
             SpaceObjectController contr = player.GetCurrentController();
-            if (contr.sp_object != _parent)
+            if (contr.Sp_object != _parent)
             {
                 return;
             }

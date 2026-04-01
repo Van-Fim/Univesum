@@ -62,7 +62,7 @@ public class GameStartManager
         var controller = suit.gameObject.AddComponent<SuitController>();
         _container.Inject(controller); 
         controller._rigidbody = suit.rigidbody;
-        controller.sp_object = suit;
+        controller.Sp_object = suit;
         suit.spaceObjectController = controller;
 
         _playerService._player.currentController = controller;
@@ -78,11 +78,11 @@ public class GameStartManager
             "Prefabs/ShipPrefab",
             "SpaceObjects/Ships/" + _config.ship
         );
-
+        ship.InstallConfig();
         var controller = ship.gameObject.AddComponent<PlayerShipController>();
         _container.Inject(controller); 
         controller._rigidbody = ship.rigidbody;
-        controller.sp_object = ship;
+        controller.Sp_object = ship;
 
         ship.spaceObjectController = controller;
         _playerService._player.currentController = controller;
@@ -91,8 +91,9 @@ public class GameStartManager
 
         if (!string.IsNullOrEmpty(_config.ship_loadout))
         {
+            ship.loadoutName = _config.ship_loadout;
             var loadout = JsonConfigLoader.LoadFromFile<Loadout>(
-                "Loadouts/" + _config.ship_loadout
+                "Loadouts/" + ship.loadoutName
             );
             ship.InstallLoadout(loadout);
         }

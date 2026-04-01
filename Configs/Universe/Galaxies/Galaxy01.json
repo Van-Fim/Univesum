@@ -5,22 +5,22 @@
     "YMax": 0,
     "list": [
         {
-            "name": "System01",
-            "YMin": 0,
-            "YMax": 0,
-            "rangeMin": 100,
-            "rangeMax": 100,
-            "countMin": 10,
-            "countMax": 10
-        },
-        {
             "name": "System02",
             "YMin": 0,
             "YMax": 0,
             "rangeMin": 100,
             "rangeMax": 100,
-            "countMin": 10,
-            "countMax": 10
+            "countMin": 2,
+            "countMax": 2
+        },
+        {
+            "name": "System01",
+            "YMin": 0,
+            "YMax": 0,
+            "rangeMin": 100,
+            "rangeMax": 100,
+            "countMin": 1,
+            "countMax": 1
         }
     ]
 }

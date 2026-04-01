@@ -8,7 +8,7 @@ public class PlayerShipController : SpaceObjectController
 {
     public override void Start()
     {
-        sp_object.canvasController.crosshair.sprite = Resources.Load<Sprite>("Textures/UI/center_crosshair01");
+        Sp_object.canvasController.crosshair.sprite = Resources.Load<Sprite>("Textures/UI/center_crosshair01");
         _screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
     }
 
@@ -25,18 +25,17 @@ public class PlayerShipController : SpaceObjectController
 
     public override void Update()
     {
-        MapSpaceUi.InvokeTick();
         if (_rigidbody == null)
         {
             return;
         }
         if (Input.GetKey(KeyCode.X))
         {
-            sp_object.cameraManager.GetMainCamera().transform.localPosition = new Vector3(0, 1, -20);
+            Sp_object.cameraManager.GetMainCamera().transform.localPosition = new Vector3(0, 1, -20);
         }
         else
         {
-            sp_object.cameraManager.GetMainCamera().transform.localPosition = Vector3.zero;
+            Sp_object.cameraManager.GetMainCamera().transform.localPosition = Vector3.zero;
         }
         if (Input.GetKeyDown(KeyCode.J))
         {
@@ -89,15 +88,15 @@ public class PlayerShipController : SpaceObjectController
 
     private void FireWeapon()
     {
-        _signalBus.Fire(new WeaponFiredSignal());
+        _signalBus.Fire(new WeaponFiredSignal(Sp_object));
     }
 
     #region Rotation Logic
     public override void Turn()
     {
-        Ship ship = (Ship)sp_object;
+        Ship ship = (Ship)Sp_object;
         int _rotationSpeed = ship.engine.rotationSpeed;
-        Ray ray = sp_object.cameraManager.GetMainCamera().ScreenPointToRay(Input.mousePosition);
+        Ray ray = Sp_object.cameraManager.GetMainCamera().ScreenPointToRay(Input.mousePosition);
 
         if (!Input.GetMouseButton(1))
         {
@@ -154,7 +153,7 @@ public class PlayerShipController : SpaceObjectController
     #region Movement Logic
     public override void Move()
     {
-        Ship ship = (Ship)sp_object;
+        Ship ship = (Ship)Sp_object;
         int _accelerationSpeed = ship.engine.accelerationSpeed;
         int _maxSpeed = ship.engine.maxSpeed;
         if (Input.GetKey(KeyCode.Space) && _rigidbody != null)
@@ -194,8 +193,8 @@ public class PlayerShipController : SpaceObjectController
 
         // Применение силы движения
         _rigidbody.linearVelocity = (transform.forward * _maxSpeed * _currentSpeedFactor);
-        sp_object.canvasController.currentSpeed.text = $"{Mathf.Round(_rigidbody.linearVelocity.magnitude)}/{_maxSpeed}";
-        sp_object.signalBus.Fire(new PlayerSpeedChangedSignal(_currentSpeedFactor));
+        Sp_object.canvasController.currentSpeed.text = $"{Mathf.Round(_rigidbody.linearVelocity.magnitude)}/{_maxSpeed}";
+        Sp_object.signalBus.Fire(new PlayerSpeedChangedSignal(_currentSpeedFactor));
     }
     #endregion
 }
