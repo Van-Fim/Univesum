@@ -18,6 +18,7 @@ public class SpaceConfigListItem
 public class SpaceConfig
 {
     public int safeRange = 10;
+    public string faction;
     public string name;
     public int rangeMin;
     public int rangeMax;

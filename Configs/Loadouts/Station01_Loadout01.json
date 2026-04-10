@@ -1,0 +1,12 @@
+{
+    "hardpoints":[
+        {
+            "hardpoint": "HPLight.001",
+            "item": "Light01"
+        },
+        {
+            "hardpoint": "HPWeapon.002",
+            "item": "Light01"
+        }
+    ]
+}

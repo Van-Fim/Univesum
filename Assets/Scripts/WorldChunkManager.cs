@@ -90,6 +90,8 @@ public class WorldChunkManager : MonoBehaviour
     public void Init()
     {
         is_initialized = false;
+        worldPos = Vector3.zero;
+        currentChunk = Vector3Int.zero;
         stopWorker = true;
         StopAllCoroutines();
         chunks = new List<Chunk>();

@@ -55,6 +55,8 @@ public class Galaxy : PSpace
                 {
                     space.id = id;
                     space.galaxyId = this.id;
+                    space.faction = _factionsManager.GetFaction(space.config.faction);
+                    Debug.Log($"{space.config.name} {space.config.faction} = {space.faction}");
                     space.LoadAsteroidFields();
                     _universe.systemsList.Add(space);
                     id++;

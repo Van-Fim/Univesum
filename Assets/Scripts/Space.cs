@@ -17,13 +17,15 @@ public class PSpace : MonoBehaviour
     public List<AsteroidFieldConfig> _asteroidConfigs;
     public byte[] color = new byte[] { 255, 255, 255, 255 };
 
-    public string owner;
+    public Faction faction;
 
     public MapSpaceUi MapSpaceUiPrefab;
     public MapSpaceUi mapSpaceUi;
 
     [Inject] public PlayerService _playerService;
     [Inject] public CameraManager _cameraManager;
+    [Inject] public FactionsManager _factionsManager;
+
     public void Start()
     {
         MapSpaceUiPrefab = Resources.Load<MapSpaceUi>("Prefabs/MapSpaceUi");

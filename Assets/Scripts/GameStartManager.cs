@@ -9,6 +9,7 @@ public class GameStartManager
     private readonly SpaceObjectFactory _factory;
     private readonly SignalBus _signalBus;
     private readonly GameStartConfig _config;
+    [Inject] private readonly FactionsManager _factionsManager;
     private NpcJobManager _npcJobManager;
 
     public GameStartManager(
@@ -32,6 +33,8 @@ public class GameStartManager
     public void Load()
     {
         Random.InitState(_universe.seed);
+        _factionsManager.Initialize();
+        
         _universe.config = JsonConfigLoader.LoadFromFile<SpaceConfig>($"Universe/{_config.univesrse}");
         _universe.Init();
         _universe.Build();
@@ -60,7 +63,7 @@ public class GameStartManager
         suit.InstallCamera();
 
         var controller = suit.gameObject.AddComponent<SuitController>();
-        _container.Inject(controller); 
+        _container.Inject(controller);
         controller._rigidbody = suit.rigidbody;
         controller.Sp_object = suit;
         suit.spaceObjectController = controller;
@@ -80,7 +83,7 @@ public class GameStartManager
         );
         ship.InstallConfig();
         var controller = ship.gameObject.AddComponent<PlayerShipController>();
-        _container.Inject(controller); 
+        _container.Inject(controller);
         controller._rigidbody = ship.rigidbody;
         controller.Sp_object = ship;
 
@@ -97,7 +100,7 @@ public class GameStartManager
             );
             ship.InstallLoadout(loadout);
         }
-        
+
         ship.transform.localPosition = _config.start_position;
         ship.transform.localEulerAngles = _config.start_position;
         ship.SetStarSystem(_config.galaxyId, _config.systemId);

@@ -1,0 +1,9 @@
+{
+    "pathToModel": "Models/Stations/Station01",
+    "chinldName": "",
+    "pathToMaterial": "Materials/Stations/Station01",
+    "scale": 1,
+    "mass": 100000,
+    "linearDrag": 0,
+    "angularDrag": 2
+}

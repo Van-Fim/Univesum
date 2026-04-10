@@ -718,6 +718,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultWeapon: {fileID: 811315806289429921, guid: 448ecfae593e09c478e666d136f84467, type: 3}
+  defaultTurret: {fileID: 811315806289429921, guid: a4ba1f51281e7e24281a94ebc7881bc0, type: 3}
 --- !u!4 &1906463404
 Transform:
   m_ObjectHideFlags: 0

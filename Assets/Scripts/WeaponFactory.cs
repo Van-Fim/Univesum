@@ -1,3 +1,3 @@
 using Zenject;
 
-public class WeaponFactory : PlaceholderFactory<Ship, WeaponConfig, Weapon> { }
+public class WeaponFactory : PlaceholderFactory<SpaceObject, WeaponConfig, Weapon> { }

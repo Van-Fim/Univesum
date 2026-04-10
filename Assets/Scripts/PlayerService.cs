@@ -23,7 +23,7 @@ public class PlayerService
     {
         Random.InitState(_universe.seed + starSystem.galaxyId + starSystem.id);
         int rndm = Random.Range(0, starSystem.config.skyboxes.Count);
-        
+
         ChangeSkybox(starSystem.config.skyboxes[rndm]);
         _signalBus.Fire(new SpaceShowSignal(starSystem));
         _signalBus.Fire(new SpaceObjectOnDestroyHide(null, null));
@@ -34,7 +34,7 @@ public class PlayerService
         WorldChunkManager wcm = WorldChunkManager.singleton;
         if (wcm)
         {
-           wcm.Init();
+            wcm.Init();
         }
         _spaceContainer.transform.localPosition = Vector3.zero;
         _signalBus.Fire(new SignalOnPlayerChangedSystem(sp.Sp_object, starSystem));

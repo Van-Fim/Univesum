@@ -5,7 +5,7 @@ public class Weapon : MonoBehaviour
     public WeaponConfig _config;
     public ProjectileConfig projectileConfig;
     public AudioSource audioSource;
-    public Ship _parent;
+    public SpaceObject _parent;
     public Transform baseTransform;
     public Transform barrelTransform;
     public Transform firePointTransform;
@@ -19,7 +19,7 @@ public class Weapon : MonoBehaviour
     [Inject]
     public ProjectilePool _pool;
     [Inject]
-    public void Construct(Ship parent, WeaponConfig config, SignalBus signalBus, ProjectilePool pool)
+    public virtual void Construct(SpaceObject parent, WeaponConfig config, SignalBus signalBus, ProjectilePool pool)
     {
         _parent = parent;
         _config = config;
@@ -28,7 +28,7 @@ public class Weapon : MonoBehaviour
         _signalBus.Subscribe<WeaponFiredSignal>(OnFire);
         _pool = pool;
     }
-    public void Init()
+    public virtual void Init()
     {
         projectileConfig = JsonConfigLoader.LoadFromFile<ProjectileConfig>("Projectiles/" + _config.projectile);
     }
@@ -36,13 +36,13 @@ public class Weapon : MonoBehaviour
     {
         _signalBus.Unsubscribe<WeaponFiredSignal>(OnFire);
     }
-    public void OnFire(WeaponFiredSignal signal)
+    public virtual void OnFire(WeaponFiredSignal signal)
     {
         if (signal.spaceObject != _parent)
             return;
         TryFire();
     }
-    public void SetTransforms()
+    public virtual void SetTransforms()
     {
         this.barrelTransform = baseTransform.transform.Find("BARREL");
         this.firePointTransform = new GameObject().transform;
@@ -50,7 +50,7 @@ public class Weapon : MonoBehaviour
         this.firePointTransform.localPosition = new Vector3(0, 0.039218f, 0.773041f);
         this.firePointTransform.localRotation = Quaternion.identity;
     }
-    public void InstallAS()
+    public virtual void InstallAS()
     {
         audioSource = firePointTransform.gameObject.AddComponent<AudioSource>();
         audioSource.clip = Resources.Load<AudioClip>("Sounds/Weapons/" + _config.fireSound);
@@ -60,7 +60,7 @@ public class Weapon : MonoBehaviour
         audioSource.maxDistance = 4f;
         audioSource.volume = 0.2f;
     }
-    public void Update()
+    public virtual void Update()
     {
         if (_parent != null && baseTransform != null && barrelTransform != null && _parent.IsOwnedByLocalPlayer())
         {
@@ -94,9 +94,10 @@ public class Weapon : MonoBehaviour
     }
     private void TryFire()
     {
-        if (Time.time >= _nextFireTime)
+        if (Time.time >= _nextFireTime && _parent is Ship)
         {
-            PowerGenerator powerGenerator = _parent.powerGenerator;
+            Ship pship = (Ship)_parent;
+            PowerGenerator powerGenerator = pship.powerGenerator;
             if (powerGenerator.TryConsume(_config.energyCost))
             {
                 powerGenerator.currentEnergy -= _config.energyCost;

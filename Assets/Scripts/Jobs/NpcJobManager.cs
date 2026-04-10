@@ -8,15 +8,20 @@ using Zenject;
 public class Job
 {
     public int id;
-    public string ship = "ship01";
+    public string space_object = "ship01";
     public string name = "police_patrol01";
     public string task = "patrol_sector";
+    public string type;
     public int maxUniverseCount = 60;
     public int maxGalaxyCount = 30;
     public int maxStarSystemCount = 10;
-    public string owner = "paranid";
+    public string faction;
     public bool onOwnerSystem = false;
     public bool onOwnerStation = false;
+    public int spawnRangeMin = 100;
+    public int spawnRangeMax = 100;
+    public int heigthMin = 100;
+    public int heigthMax = 100;
 
     // Текущие счетчики
     [NonSerialized] public int currentUniverseCount = 0;
@@ -31,7 +36,7 @@ public class Job
 public class JobInstance
 {
     public Job job;
-    public Ship ship;
+    public SpaceObject spaceObject;
     public int galaxyId;
     public int systemId;
     public DateTime spawnTime;
@@ -40,7 +45,7 @@ public class NpcJobManager : IInitializable
 {
     [Inject] private Universe _universe;
     [Inject] private DiContainer _container;
-    [Inject] private SpaceObjectFactory _shipFactory;
+    [Inject] private SpaceObjectFactory _spFactory;
     [Inject] private SignalBus _signalBus;
 
     private List<Job> _jobs = new List<Job>();
@@ -105,7 +110,7 @@ public class NpcJobManager : IInitializable
         // Подсчет активных кораблей
         foreach (var jobInstance in _activeJobs.Values.SelectMany(v => v))
         {
-            if (jobInstance.ship != null)
+            if (jobInstance.spaceObject != null)
             {
                 var job = jobInstance.job;
                 job.currentUniverseCount++;
@@ -136,7 +141,14 @@ public class NpcJobManager : IInitializable
                 var spawnLocation = GetSpawnLocation(job);
                 if (spawnLocation.HasValue)
                 {
-                    SpawnShipForJob(job, spawnLocation.Value);
+                    if (job.type == "station" || job.type == null)
+                    {
+                        SpawnStationForJob(job, spawnLocation.Value);
+                    }
+                    else if (job.type == "ship")
+                    {
+                        SpawnShipForJob(job, spawnLocation.Value);
+                    }
                     spawnedThisFrame++;
                 }
             }
@@ -167,8 +179,8 @@ public class NpcJobManager : IInitializable
                 return false;
 
             // Проверка принадлежности рассы
-            if (job.onOwnerSystem && galaxy.owner != job.owner)
-                return false;
+            // if (job.onOwnerSystem && galaxy.owner != job.faction)
+            //     return false;
 
             return true;
         }).ToList();
@@ -176,11 +188,14 @@ public class NpcJobManager : IInitializable
 
     private List<StarSystem> GetAvailableSystems(Job job, int galaxyId)
     {
-        return _universe.systemsList.Where(system =>
+        List<StarSystem> ret = new List<StarSystem>();
+
+        ret = _universe.systemsList.Where(system =>
             system.galaxyId == galaxyId &&
-            (!job.onOwnerSystem || system.owner == job.owner) &&
+            (!job.onOwnerSystem || (system.faction != null && system.faction.name == job.faction)) &&
             job.starSystemCounts.GetValueOrDefault(system.id, 0) < job.maxStarSystemCount
         ).ToList();
+        return ret;
     }
 
     private (Galaxy galaxy, StarSystem system)? GetSpawnLocation(Job job)
@@ -224,25 +239,29 @@ public class NpcJobManager : IInitializable
 
         return items[0];
     }
-
-    private void SpawnShipForJob(Job job, (Galaxy galaxy, StarSystem system) location)
+    private void SpawnStationForJob(Job job, (Galaxy galaxy, StarSystem system) location)
     {
         // Создание корабля через фабрику
-        Ship ship = _shipFactory.Create<Ship>(
-            "Prefabs/ShipPrefab",
-            "SpaceObjects/Ships/" + job.ship
+        Station station = _spFactory.Create<Station>(
+            "Prefabs/StationPrefab",
+            "SpaceObjects/Stations/" + job.space_object
         );
-        ship.loadoutName = "Ship01_Loadout01";
-        ship.transform.localPosition = Vector3.zero;
-        ship.transform.localEulerAngles = Vector3.zero;
-        ship.SetStarSystem(location.galaxy.id, location.system.id);
-        ship.Init();
-        bool inst = ship.TryInstallConfig(ship.StarSystem);
+        int radius = UnityEngine.Random.Range(job.spawnRangeMin, job.spawnRangeMax + 1);
+        Vector2 randomPoint2D = UnityEngine.Random.insideUnitCircle * radius;
+        int hr = UnityEngine.Random.Range(job.heigthMin, job.heigthMax + 1);
+        int y = UnityEngine.Random.Range(-hr, hr + 1);
+        Vector3 newPos = new Vector3(randomPoint2D.x, y, randomPoint2D.y);
+        station.loadoutName = "Station01_Loadout01";
+        station.transform.localPosition = newPos;
+        station.transform.localEulerAngles = Vector3.zero;
+        station.SetStarSystem(location.galaxy.id, location.system.id);
+        station.Init();
+        bool inst = station.TryInstallConfig(station.StarSystem);
         // Создание экземпляра джоба
         var jobInstance = new JobInstance
         {
             job = job,
-            ship = ship,
+            spaceObject = station,
             galaxyId = location.galaxy.id,
             systemId = location.system.id,
             spawnTime = DateTime.Now
@@ -260,7 +279,49 @@ public class NpcJobManager : IInitializable
             job.starSystemCounts[location.system.id] = 0;
         job.starSystemCounts[location.system.id]++;
 
-        Debug.Log($"Spawned {job.name} for {job.owner} in galaxy {location.galaxy.id}, system {location.system.id}");
+        Debug.Log($"Spawned {job.name} for {job.faction} in galaxy {location.galaxy.id}, system {location.system.id}");
+    }
+    private void SpawnShipForJob(Job job, (Galaxy galaxy, StarSystem system) location)
+    {
+        // Создание корабля через фабрику
+        Ship ship = _spFactory.Create<Ship>(
+            "Prefabs/ShipPrefab",
+            "SpaceObjects/Ships/" + job.space_object
+        );
+        int radius = UnityEngine.Random.Range(job.spawnRangeMin, job.spawnRangeMax + 1);
+        Vector2 randomPoint2D = UnityEngine.Random.insideUnitCircle * radius;
+        int hr = UnityEngine.Random.Range(job.heigthMin, job.heigthMax + 1);
+        int y = UnityEngine.Random.Range(-hr, hr + 1);
+        Vector3 newPos = new Vector3(randomPoint2D.x, y, randomPoint2D.y);
+        ship.loadoutName = "Ship01_Loadout01";
+        ship.transform.localPosition = newPos;
+        ship.transform.localEulerAngles = Vector3.zero;
+        ship.SetStarSystem(location.galaxy.id, location.system.id);
+        ship.Init();
+        bool inst = ship.TryInstallConfig(ship.StarSystem);
+        // Создание экземпляра джоба
+        var jobInstance = new JobInstance
+        {
+            job = job,
+            spaceObject = ship,
+            galaxyId = location.galaxy.id,
+            systemId = location.system.id,
+            spawnTime = DateTime.Now
+        };
+
+        _activeJobs[job.id].Add(jobInstance);
+
+        // Обновление счетчиков
+        job.currentUniverseCount++;
+        if (!job.galaxyCounts.ContainsKey(location.galaxy.id))
+            job.galaxyCounts[location.galaxy.id] = 0;
+        job.galaxyCounts[location.galaxy.id]++;
+
+        if (!job.starSystemCounts.ContainsKey(location.system.id))
+            job.starSystemCounts[location.system.id] = 0;
+        job.starSystemCounts[location.system.id]++;
+
+        Debug.Log($"Spawned {job.name} for {job.faction} in galaxy {location.galaxy.id}, system {location.system.id}");
     }
 
     private void CleanupDestroyedShips()
@@ -268,7 +329,7 @@ public class NpcJobManager : IInitializable
         foreach (var jobId in _activeJobs.Keys.ToList())
         {
             _activeJobs[jobId].RemoveAll(instance =>
-                instance.ship == null);
+                instance.spaceObject == null);
         }
     }
 
@@ -277,7 +338,7 @@ public class NpcJobManager : IInitializable
         // Поиск и удаление джоба
         foreach (var jobInstance in _activeJobs.Values.SelectMany(v => v))
         {
-            if (jobInstance.ship == ship)
+            if (jobInstance.spaceObject == ship)
             {
                 _activeJobs[jobInstance.job.id].Remove(jobInstance);
                 UpdateJobCounters(); // Обновление счетчиков после удаления
