@@ -37,6 +37,8 @@ public class PlayerService
             wcm.Init();
         }
         _spaceContainer.transform.localPosition = Vector3.zero;
+        TargetSelect.currentSelectedItem = null;
+        TargetSelect.InvokeSelect();
         _signalBus.Fire(new SignalOnPlayerChangedSystem(sp.Sp_object, starSystem));
     }
 

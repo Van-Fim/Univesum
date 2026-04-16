@@ -1,7 +1,9 @@
 using UnityEngine;
 using Zenject;
+[System.Serializable]
 public class SpaceObjectConfig
 {
+    public string name;
     public string pathToModel;
     public string chinldName;
     public string pathToHardpoints;

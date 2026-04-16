@@ -403,7 +403,8 @@ public class WorldChunkManager : MonoBehaviour
         for (int i = 0; i < sys.asteroidFields.Count; i++)
         {
             AsteroidFieldConfig asteroidField = sys.asteroidFields[i];
-            bool check = CheckChunkOnAsteroidFieldOnPosition(chunkCoord * chunkSize, asteroidField.position, asteroidField.shapeSize.x, asteroidField.shapeSize.z, asteroidField.shapeSize.y);
+            bool check = true;
+            check = CheckChunkOnAsteroidFieldOnPosition(chunkCoord * chunkSize, asteroidField.position, asteroidField.shapeSize.x, asteroidField.shapeSize.z, asteroidField.shapeSize.y);
             if (check)
             {
                 if (!chunk.asteroidFieldsIds.Contains(i))

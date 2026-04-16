@@ -1,8 +1,6 @@
 {
     "faction":"Faction01",
     "skyboxes": [
-        "Skybox02",
-        "Skybox03",
         "Skybox04"
     ],
     "asteroidFields": [
@@ -10,11 +8,11 @@
             "name": "AsteroidField01",
             "YMin": 0,
             "YMax": 0,
-            "rangeMin": 300000,
-            "rangeMax": 300000,
+            "rangeMin": 600000,
+            "rangeMax": 600000,
             "countMin": 8,
             "countMax": 9,
-            "shapeSize":{"x":80000, "y":10000, "z":80000}
+            "shapeSize":{"x":180000, "y":110000, "z":180000}
         }
     ]
 }

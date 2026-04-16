@@ -121,6 +121,7 @@ public static class JsonConfigLoader
     {
         try
         {
+            fileName = fileName.Replace('/', Path.DirectorySeparatorChar);
             if (!fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
                 fileName += ".json";
             

@@ -10,7 +10,6 @@ public class Asteroid : SpaceObject, ISelectable
     private bool _isDespawned;
     public Chunk chunk;
     [Inject] DiContainer container;
-    [Inject] TargetIndicator targetIndicator;
 
     public void SetPool(Asteroid.Pool pool)
     {
@@ -20,6 +19,23 @@ public class Asteroid : SpaceObject, ISelectable
     {
         return container.ResolveId<Asteroid.Pool>(id);
     }
+    public override void OnTakeDamage(SpaceObjectOnTakeDamage signal)
+    {
+        if (signal.target == this)
+        {
+            shield -= signal.value;
+            if (shield < 0)
+            {
+                hull -= -shield;
+                shield = 0;
+            }
+            if (hull <= 0)
+            {
+                hull = 0;
+                InvokeDestroyHide(signal.attacker);
+            }
+        }
+    }
     public override void OnSpDestroyHide(SpaceObjectOnDestroyHide signal)
     {
         if (signal.target == this || signal.target == null)
@@ -27,7 +43,7 @@ public class Asteroid : SpaceObject, ISelectable
             Despawn();
         }
     }
-    
+
     public void OnSpawned()
     {
         _isDespawned = false;
@@ -37,10 +53,6 @@ public class Asteroid : SpaceObject, ISelectable
     public void OnDespawned()
     {
         Hide();
-        if (targetIndicator.target == this)
-        {
-            targetIndicator.SetTarget(null);
-        }
         _signalBus.Unsubscribe<SignalDestroyChunkAsteroids>(OnDestroyChunkAsteroids);
     }
     public class Pool : MonoMemoryPool<Asteroid>
@@ -81,6 +93,10 @@ public class Asteroid : SpaceObject, ISelectable
     {
         if (_isDespawned) return;
         _isDespawned = true;
+        if (TargetSelect.currentSelectedItem == this)
+        {
+            TargetSelect.currentSelectedItem.SetSpObject(null);
+        }
         OnDespawned();
         _pool.Despawn(this);
     }
@@ -88,14 +104,18 @@ public class Asteroid : SpaceObject, ISelectable
     {
         if (is_destroyed)
             return;
-        targetIndicator.SetTarget(this);
+        canvasController.targetSelect.SetSpObject(this);
+        TargetSelect.currentSelectedItem = canvasController.targetSelect;
+        TargetSelect.InvokeSelect();
     }
 
     public void OnDeselect()
     {
         if (is_destroyed)
-                return;
-        targetIndicator.SetTarget(null);
+            return;
+        canvasController.targetSelect.SetSpObject(null);
+        TargetSelect.currentSelectedItem = null;
+        TargetSelect.InvokeSelect();
     }
 
     public string GetLabel()

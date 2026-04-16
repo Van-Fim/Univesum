@@ -12,6 +12,7 @@ public class AsteroidFieldConfig
     public Vector3 shapeSize;
     public int countMin;
     public int countMax;
+    public bool is_infinity;
     public object Clone()
     {
         return this.MemberwiseClone();

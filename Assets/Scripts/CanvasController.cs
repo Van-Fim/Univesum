@@ -1,10 +1,12 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class CanvasController : MonoBehaviour
 {
     public GameObject main;
+    public TextMeshProUGUI infoName;
     public TextMeshProUGUI currentSpeed;
     public UnityEngine.UI.Image hud01;
     public UnityEngine.UI.Image hull;
@@ -13,9 +15,18 @@ public class CanvasController : MonoBehaviour
     public UnityEngine.UI.Image hud03;
     public UnityEngine.UI.Image power;
     public UnityEngine.UI.Image crosshair;
+    public TargetSelect targetSelect;
+    [Inject] private readonly CameraManager cameraManager;
+    [Inject] private readonly SignalBus _signalBus;
 
-    public void Start()
+    public void Init()
     {
         UnityEngine.UI.Image img01 = hud01.GetComponent<UnityEngine.UI.Image>();
+        AsteroidSelect pr = Resources.Load<AsteroidSelect>("Prefabs/AsteroidSelect");
+        targetSelect = Instantiate(pr);
+        targetSelect.transform.SetParent(transform);
+        targetSelect.cameraManager = cameraManager;
+        targetSelect.canvasController = this;
+        targetSelect._signalBus = _signalBus;
     }
 }

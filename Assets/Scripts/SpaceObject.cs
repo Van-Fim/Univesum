@@ -3,17 +3,71 @@ using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 using Zenject;
-public abstract class SpaceObject : MonoBehaviour
+[System.Serializable]
+public class SpaceObjectData
 {
+    public int id;
+    public string loadoutName;
+
+    public int galaxyId;
+    public int systemId;
     public int maxHull = 10000;
     public int hull;
     public int maxShield = 10000;
     public int shield;
+    public float rotationX = 0;
+    public float rotationY = 0;
+    public float rotationZ = 0;
+    public float positionX = 0;
+    public float positionY = 0;
+    public float positionZ = 0;
+    public SpaceObjectConfig spaceObjectConfig;
+    public List<LoadoutHP> loadoutHPs;
+
+    public virtual bool ReadData(SpaceObject spaceObject)
+    {
+        bool ret = false;
+        if (!spaceObject)
+        {
+            return ret;
+        }
+        Vector3 pos = spaceObject.transform.localPosition;
+        Vector3 rot = spaceObject.transform.localEulerAngles;
+        positionX = pos.x;
+        positionY = pos.y;
+        positionZ = pos.z;
+        
+        rotationX = rot.x;
+        rotationY = rot.y;
+        rotationZ = rot.z;
+
+        id = spaceObject.id;
+        loadoutName = spaceObject.loadoutName;
+        maxHull = spaceObject.maxHull;
+        hull = spaceObject.hull;
+        maxShield = spaceObject.maxShield;
+        shield = spaceObject.shield;
+        spaceObjectConfig = spaceObject.spaceObjectConfig;
+        loadoutHPs = spaceObject.loadoutHPs;
+        ret = true;
+        return ret;
+    }
+}
+public abstract class SpaceObject : MonoBehaviour
+{
+    public int id;
+    public int maxHull = 10000;
+    public int hull;
+    public int maxShield = 10000;
+    public int shield;
+    public List<LoadoutHP> loadoutHPs;
     public SpaceObjectConfig spaceObjectConfig;
     public SpaceObjectController spaceObjectController;
     protected MeshFilter meshFilter;
     protected MeshRenderer meshRenderer;
     public MeshCollider meshCollider;
+    public TargetSelect targetSelect;
+    [Inject] public LangManager _langManager;
     [Inject] public SignalBus signalBus;
     [Inject] public PlayerService playerService;
     [Inject] public CanvasController canvasController;
@@ -22,6 +76,8 @@ public abstract class SpaceObject : MonoBehaviour
     [Inject] public CursorRaycaster cursorRaycaster;
     [Inject] public Universe _universe;
     [Inject] SpaceContainer spaceContainer;
+
+    TargetSelect targetSelectPrefab;
 
     public Rigidbody rigidbody;
     public Transform hardpoints;
@@ -38,6 +94,12 @@ public abstract class SpaceObject : MonoBehaviour
 
     protected GameObject main = null;
     public StarSystem StarSystem;
+    public virtual SpaceObjectData Save()
+    {
+        SpaceObjectData spaceObjectData = new SpaceObjectData();
+        spaceObjectData.ReadData(this);
+        return spaceObjectData;
+    }
     public StarSystem GetStarSystem()
     {
         return _universe.FindSystem(galaxyId, systemId);
@@ -102,7 +164,10 @@ public abstract class SpaceObject : MonoBehaviour
             is_initialized = true;
         }
     }
-
+    public virtual void Start()
+    {
+        SetTargetSelect();
+    }
     public virtual void Update()
     {
 
@@ -122,6 +187,7 @@ public abstract class SpaceObject : MonoBehaviour
     }
     public virtual void OnPlayerChangedSystem(SignalOnPlayerChangedSystem signal)
     {
+        SetTargetSelect();
         TryInstallConfig(signal.starSystem);
     }
     public virtual void OnSpDestroy(SpaceObjectOnDestroy signal)
@@ -144,7 +210,7 @@ public abstract class SpaceObject : MonoBehaviour
             if (hull <= 0)
             {
                 hull = 0;
-                InvokeDestroyHide(signal.attacker);
+                InvokeDestroy(signal.attacker);
             }
         }
     }
@@ -278,7 +344,21 @@ public abstract class SpaceObject : MonoBehaviour
             return;
         gameObject.SetActive(true);
     }
-
+    public virtual void SetTargetSelect()
+    {
+        if (targetSelect == null && playerService.GetStarSystem() == StarSystem)
+        {
+            targetSelectPrefab = Resources.Load<TargetSelect>("Prefabs/TargetSelect");
+            targetSelect = GameObject.Instantiate<TargetSelect>(targetSelectPrefab);
+            targetSelect._signalBus = signalBus;
+            targetSelect.langManager = _langManager;
+            targetSelect.canvasController = canvasController;
+            targetSelect.playerService = playerService;
+            targetSelect.cameraManager = cameraManager;
+            targetSelect.SetSpObject(this);
+            targetSelect.transform.SetParent(canvasController.transform);
+        }
+    }
     public virtual void Hide()
     {
         if (is_destroyed)
@@ -298,6 +378,10 @@ public abstract class SpaceObject : MonoBehaviour
         signalBus.Unsubscribe<SpaceObjectOnDestroyHide>(OnSpDestroyHide);
         signalBus.Unsubscribe<SpaceObjectOnDestroy>(OnSpDestroy);
         signalBus.Unsubscribe<SignalOnPlayerChangedSystem>(OnPlayerChangedSystem);
+        if (targetSelect)
+        {
+            targetSelect.Destroy();
+        }
         Destroy(gameObject);
     }
 }

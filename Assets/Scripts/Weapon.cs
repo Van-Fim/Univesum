@@ -15,6 +15,10 @@ public class Weapon : MonoBehaviour
     protected GameObject main = null;
     protected float _nextFireTime;
     [Inject]
+    public CameraManager _cameraManager;
+    [Inject]
+    public PlayerService _playerService;
+    [Inject]
     public SignalBus _signalBus;
     [Inject]
     public ProjectilePool _pool;
@@ -94,6 +98,13 @@ public class Weapon : MonoBehaviour
     }
     private void TryFire()
     {
+        if (_playerService._player_sp_object == _parent && _parent)
+        {
+            if (_cameraManager.GetMapCamera().enabled)
+            {
+                return;
+            }
+        }
         if (Time.time >= _nextFireTime && _parent is Ship)
         {
             Ship pship = (Ship)_parent;

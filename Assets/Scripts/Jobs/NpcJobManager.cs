@@ -279,7 +279,7 @@ public class NpcJobManager : IInitializable
             job.starSystemCounts[location.system.id] = 0;
         job.starSystemCounts[location.system.id]++;
 
-        Debug.Log($"Spawned {job.name} for {job.faction} in galaxy {location.galaxy.id}, system {location.system.id}");
+        // Debug.Log($"Spawned {job.name} for {job.faction} in galaxy {location.galaxy.id}, system {location.system.id}");
     }
     private void SpawnShipForJob(Job job, (Galaxy galaxy, StarSystem system) location)
     {

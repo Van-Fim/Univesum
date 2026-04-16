@@ -10,6 +10,8 @@ public class GameStartManager
     private readonly SignalBus _signalBus;
     private readonly GameStartConfig _config;
     [Inject] private readonly FactionsManager _factionsManager;
+    [Inject] private readonly LangManager _langManager;
+    [Inject] private readonly CanvasController _canvasController;
     private NpcJobManager _npcJobManager;
 
     public GameStartManager(
@@ -33,6 +35,8 @@ public class GameStartManager
     public void Load()
     {
         Random.InitState(_universe.seed);
+        _canvasController.Init();
+        _langManager.Init();
         _factionsManager.Initialize();
         
         _universe.config = JsonConfigLoader.LoadFromFile<SpaceConfig>($"Universe/{_config.univesrse}");

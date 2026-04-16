@@ -9,6 +9,7 @@ public class SpaceObjectController : MonoBehaviour
     [Inject] public PlayerService _playerService;
     [Inject] public Universe _universe;
     [Inject] public CanvasController _canvasController;
+    [Inject] public SaveManager _saveManager;
     private SpaceObject sp_object;
 
     // Текущие параметры скорости

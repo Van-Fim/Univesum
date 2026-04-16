@@ -52,7 +52,7 @@ public class PlayerShipController : SpaceObjectController
             Camera mapCam = _cameraManager.GetMapCamera();
             StarSystem psys = _playerService.GetStarSystem();
             int rnd = Random.Range(0, _universe.systemsList.Count);
-            StarSystem fsys = (StarSystem) MapSpaceUi.currentSelectedItem.space;
+            StarSystem fsys = (StarSystem)MapSpaceUi.currentSelectedItem.space;
             _playerService.Warp(fsys, Vector3.zero, Vector3.zero);
 
             psys = _playerService.GetStarSystem();
@@ -74,7 +74,10 @@ public class PlayerShipController : SpaceObjectController
 
             _signalBus.Fire(new SpaceOnMinimapRenderSignal());
         }
-
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            _saveManager.SaveGame();
+        }
         if (Input.GetMouseButton(0))
         {
             FireWeapon();
@@ -94,6 +97,10 @@ public class PlayerShipController : SpaceObjectController
     #region Rotation Logic
     public override void Turn()
     {
+        if (_cameraManager.GetMapCamera().enabled)
+        {
+            return;
+        }
         Ship ship = (Ship)Sp_object;
         int _rotationSpeed = ship.engine.rotationSpeed;
         Ray ray = Sp_object.cameraManager.GetMainCamera().ScreenPointToRay(Input.mousePosition);
@@ -115,6 +122,10 @@ public class PlayerShipController : SpaceObjectController
         }
         else
         {
+            if (_cameraManager.GetMapCamera().enabled)
+            {
+                return;
+            }
             // Управление мышью
             float speed = _rotationSpeed;
             float rollInput = Input.GetAxis("Roll");

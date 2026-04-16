@@ -40,8 +40,10 @@ public class GameInstaller : MonoInstaller
         Container.BindFactory<StarSystem, StarSystem.Factory>()
                 .FromComponentInNewPrefab(systemPrefab)
                 .AsSingle();
+        Container.Bind<LangManager>().AsSingle();
         Container.Bind<CameraManager>().AsSingle();
         Container.Bind<SpaceObjectFactory>().AsSingle();
+        Container.Bind<SaveManager>().AsSingle();
         SpaceObjectFactory spaceObjectFactory = Container.Resolve<SpaceObjectFactory>();
         CursorManager cursorManagerVar = Container.InstantiateComponent<CursorManager>(new GameObject());
         cursorManagerVar.gameObject.name = "CursorManager";
@@ -58,9 +60,6 @@ public class GameInstaller : MonoInstaller
 
         UpdateManager updateManagerVar = gmObj.GetComponent<UpdateManager>();
         Container.Bind<UpdateManager>().FromInstance(updateManagerVar).AsSingle();
-        
-        TargetIndicator targetIndicator = gmObj.GetComponent<TargetIndicator>();
-        Container.Bind<TargetIndicator>().FromInstance(targetIndicator).AsSingle();
 
         SpaceContainer spaceContainer = GameObject.Find("SpaceContainer").GetComponent<SpaceContainer>();
         Container.Bind<SpaceContainer>().FromInstance(spaceContainer).AsSingle();

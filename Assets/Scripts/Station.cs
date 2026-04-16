@@ -1,12 +1,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
-
-public class Station : SpaceObject
+[System.Serializable]
+public class StationData : SpaceObjectData
+{
+    public override bool ReadData(SpaceObject spaceObject)
+    {
+        bool ret = false;
+        if (!spaceObject)
+        {
+            return ret;
+        }
+        bool defret = base.ReadData(spaceObject);
+        ret = true && defret;
+        return ret;
+    }
+}
+public class Station : SpaceObject, ISelectable
 {
     [Inject] private TurretFactory _turretFactory;
-    
+
     public List<Turret> turrets = new List<Turret>();
+    public override SpaceObjectData Save()
+    {
+        StationData stationData = new StationData();
+        stationData.ReadData(this);
+        return stationData;
+    }
 
     public override void Update()
     {
@@ -50,5 +70,27 @@ public class Station : SpaceObject
 
             }
         }
+    }
+
+    public void OnSelect()
+    {
+        if (targetSelect)
+        {
+            TargetSelect.currentSelectedItem = targetSelect;
+            TargetSelect.InvokeSelect();
+        }
+    }
+
+    public void OnDeselect()
+    {
+        return;
+    }
+
+    public string GetLabel()
+    {
+        string ret = null;
+
+        canvasController.infoName.text = ret;
+        return ret;
     }
 }

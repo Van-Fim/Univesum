@@ -20,11 +20,12 @@ public class StarSystem : PSpace
             int count = Random.Range(a.countMin, a.countMax + 1);
             for (int j = 0; j < count; j++)
             {
+                AsteroidFieldConfig cfg = null;
                 int range = Random.Range(a.rangeMin, a.rangeMax + 1);
                 int y = Random.Range(a.YMin, a.YMax + 1);
                 Vector2 pos2d = Random.insideUnitSphere * range;
                 Vector3 position = new Vector3(pos2d.x, y, pos2d.y);
-                AsteroidFieldConfig cfg = (AsteroidFieldConfig)_asteroidConfigs.Find(x => x.name == a.name).Clone();
+                cfg = (AsteroidFieldConfig)_asteroidConfigs.Find(x => x.name == a.name).Clone();
                 cfg.countMin = a.countMin;
                 cfg.countMax = a.countMax;
                 cfg.shapeSize = a.shapeSize;
