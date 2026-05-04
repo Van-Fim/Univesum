@@ -2,6 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 [System.Serializable]
+public class SpaceConfigSkybox
+{
+    public string name;
+    public Color32 color;
+}
+[System.Serializable]
 public class SpaceConfigListItem
 {
     public List<string> skyboxNames;
@@ -26,7 +32,7 @@ public class SpaceConfig
     public int YMax;
     public List<SpaceAsteroidFieldListItem> asteroidFields;
     public List<SpaceConfigListItem> list;
-    public List<string> skyboxes;
+    public List<SpaceConfigSkybox> skyboxes;
 }
 [System.Serializable]
 public class SpaceAsteroidFieldListItem

@@ -1,3 +1,4 @@
+using System;
 using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
@@ -42,6 +43,10 @@ public class Asteroid : SpaceObject, ISelectable
         {
             Despawn();
         }
+    }
+    public override void OnDestroyAll(Type type)
+    {
+        Despawn();
     }
 
     public void OnSpawned()
@@ -93,7 +98,7 @@ public class Asteroid : SpaceObject, ISelectable
     {
         if (_isDespawned) return;
         _isDespawned = true;
-        if (TargetSelect.currentSelectedItem == this)
+        if (TargetSelect.currentSelectedItem != null && TargetSelect.currentSelectedItem == this)
         {
             TargetSelect.currentSelectedItem.SetSpObject(null);
         }

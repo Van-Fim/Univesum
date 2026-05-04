@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using Zenject;
 [System.Serializable]
 public class SpaceObjectData
@@ -15,12 +17,15 @@ public class SpaceObjectData
     public int hull;
     public int maxShield = 10000;
     public int shield;
-    public float rotationX = 0;
-    public float rotationY = 0;
-    public float rotationZ = 0;
-    public float positionX = 0;
-    public float positionY = 0;
-    public float positionZ = 0;
+    public int jobId;
+
+    public Vector3 position = new Vector3();
+    public Vector3 rotation = new Vector3();
+
+    public bool is_destroyed;
+    public bool is_initialized;
+    public bool is_subscribed;
+    public bool is_player;
     public SpaceObjectConfig spaceObjectConfig;
     public List<LoadoutHP> loadoutHPs;
 
@@ -31,17 +36,12 @@ public class SpaceObjectData
         {
             return ret;
         }
-        Vector3 pos = spaceObject.transform.localPosition;
-        Vector3 rot = spaceObject.transform.localEulerAngles;
-        positionX = pos.x;
-        positionY = pos.y;
-        positionZ = pos.z;
-        
-        rotationX = rot.x;
-        rotationY = rot.y;
-        rotationZ = rot.z;
-
+        position = spaceObject.transform.localPosition;
+        rotation = spaceObject.transform.localEulerAngles;
         id = spaceObject.id;
+        galaxyId = spaceObject.galaxyId;
+        systemId = spaceObject.systemId;
+        jobId = spaceObject.jobId;
         loadoutName = spaceObject.loadoutName;
         maxHull = spaceObject.maxHull;
         hull = spaceObject.hull;
@@ -49,6 +49,38 @@ public class SpaceObjectData
         shield = spaceObject.shield;
         spaceObjectConfig = spaceObject.spaceObjectConfig;
         loadoutHPs = spaceObject.loadoutHPs;
+        is_destroyed = spaceObject.is_destroyed;
+        is_initialized = spaceObject.is_initialized;
+        is_subscribed = spaceObject.is_subscribed;
+        is_player = spaceObject.is_player;
+        ret = true;
+        return ret;
+    }
+    public virtual bool InstallData(SpaceObject spaceObject)
+    {
+        bool ret = false;
+        if (!spaceObject)
+        {
+            return ret;
+        }
+        spaceObject.transform.localPosition = position;
+        spaceObject.transform.localEulerAngles = rotation;
+
+        spaceObject.id = id;
+        spaceObject.galaxyId = galaxyId;
+        spaceObject.systemId = systemId;
+        spaceObject.jobId = jobId;
+        spaceObject.loadoutName = loadoutName;
+        spaceObject.maxHull = maxHull;
+        spaceObject.hull = hull;
+        spaceObject.maxShield = maxShield;
+        spaceObject.shield = shield;
+        spaceObject.spaceObjectConfig = spaceObjectConfig;
+        spaceObject.loadoutHPs = loadoutHPs;
+        spaceObject.is_destroyed = is_destroyed;
+        spaceObject.is_initialized = is_initialized;
+        spaceObject.is_player = is_player;
+
         ret = true;
         return ret;
     }
@@ -56,10 +88,12 @@ public class SpaceObjectData
 public abstract class SpaceObject : MonoBehaviour
 {
     public int id;
+    public string spawnId;
     public int maxHull = 10000;
     public int hull;
     public int maxShield = 10000;
     public int shield;
+    public int jobId = -1;
     public List<LoadoutHP> loadoutHPs;
     public SpaceObjectConfig spaceObjectConfig;
     public SpaceObjectController spaceObjectController;
@@ -75,7 +109,16 @@ public abstract class SpaceObject : MonoBehaviour
     [Inject] public DiContainer _container;
     [Inject] public CursorRaycaster cursorRaycaster;
     [Inject] public Universe _universe;
+    [Inject] public SpaceObjectFactory _spaceObjectFactory;
     [Inject] SpaceContainer spaceContainer;
+
+    public EngineConfig engine;
+    public PowerGenerator powerGenerator;
+    [Inject] public WeaponFactory _weaponFactory;
+
+    public List<Weapon> weapons = new List<Weapon>();
+
+    public static UnityAction<Type> OnDestroyAllAction;
 
     TargetSelect targetSelectPrefab;
 
@@ -87,33 +130,73 @@ public abstract class SpaceObject : MonoBehaviour
     public int galaxyId;
     public int systemId;
 
-    bool is_initialized = false;
+    public bool is_initialized = false;
     public bool is_destroyed = false;
+    public bool is_subscribed = false;
+    public bool is_player;
 
     protected Mesh mesh;
 
     protected GameObject main = null;
     public StarSystem StarSystem;
+    public virtual void OnChunkFloatingOriginFixStart(SignalChunkFloatingOriginFixStart signal)
+    {
+        if (is_player || this is Asteroid)
+        {
+            return;
+        }
+        // transform.SetParent(spaceContainer.transform);
+    }
+    public virtual void OnChunkFloatingOriginFixEnd(SignalChunkFloatingOriginFixEnd signal)
+    {
+        if (is_player || this is Asteroid)
+        {
+            return;
+        }
+        // transform.SetParent(null);
+    }
     public virtual SpaceObjectData Save()
     {
         SpaceObjectData spaceObjectData = new SpaceObjectData();
         spaceObjectData.ReadData(this);
         return spaceObjectData;
     }
+    public virtual SpaceObject LoadData(SpaceObjectData spaceObjectData)
+    {
+        return null;
+    }
     public StarSystem GetStarSystem()
     {
         return _universe.FindSystem(galaxyId, systemId);
     }
-    public bool TryInstallConfig(StarSystem starSystem)
+    public void InstallLoadout()
+    {
+        if (!hardpoints)
+        {
+            return;
+        }
+        var loadout = JsonConfigLoader.LoadFromFile<Loadout>(
+                    "Loadouts/" + loadoutName
+                );
+        InstallLoadout(loadout);
+    }
+    public bool TryInstallConfig(StarSystem starSystem = null)
     {
         bool ret = false;
+        if (starSystem == null)
+        {
+            starSystem = SetStarSystem(galaxyId, systemId);
+        }
         if (starSystem == null || StarSystem == null)
             return ret;
 
-        if (playerService._player_sp_object == this || GetType() == typeof(Asteroid))
+        if (playerService._player_sp_object && (playerService._player_sp_object == this || GetType() == typeof(Asteroid)))
             return ret;
 
-        transform.SetParent(spaceContainer.transform);
+        if (!is_player)
+        {
+            transform.SetParent(spaceContainer.transform);
+        }
 
         if (playerService.GetStarSystem() == starSystem)
         {
@@ -121,10 +204,11 @@ public abstract class SpaceObject : MonoBehaviour
             {
                 ret = true;
                 InstallConfig();
-                var loadout = JsonConfigLoader.LoadFromFile<Loadout>(
-                    "Loadouts/" + loadoutName
-                );
-                InstallLoadout(loadout);
+
+                // var loadout = JsonConfigLoader.LoadFromFile<Loadout>(
+                //     "Loadouts/" + loadoutName
+                // );
+                // InstallLoadout(loadout);
             }
             else
             {
@@ -152,31 +236,60 @@ public abstract class SpaceObject : MonoBehaviour
     {
         if (is_destroyed)
             return;
-        hull = maxHull;
-        shield = maxShield;
 
         if (!is_initialized)
+        {
+            hull = maxHull;
+            shield = maxShield;
+            is_initialized = true;
+        }
+        if (!is_subscribed)
         {
             signalBus.Subscribe<SpaceObjectOnTakeDamage>(OnTakeDamage);
             signalBus.Subscribe<SpaceObjectOnDestroyHide>(OnSpDestroyHide);
             signalBus.Subscribe<SpaceObjectOnDestroy>(OnSpDestroy);
             signalBus.Subscribe<SignalOnPlayerChangedSystem>(OnPlayerChangedSystem);
-            is_initialized = true;
+            signalBus.Subscribe<SignalChunkFloatingOriginFixStart>(OnChunkFloatingOriginFixStart);
+            signalBus.Subscribe<SignalChunkFloatingOriginFixEnd>(OnChunkFloatingOriginFixEnd);
+            OnDestroyAllAction += OnDestroyAll;
+            is_subscribed = true;
         }
     }
     public virtual void Start()
     {
         SetTargetSelect();
     }
+    public virtual void OnDestroyAll(Type type)
+    {
+        if (type == null)
+        {
+            if (playerService._player_sp_object == this)
+            {
+                cameraManager.GetMainCamera().transform.SetParent(null);
+            }
+
+            Destroy();
+        }
+        else if (type == typeof(Asteroid) && this is Asteroid)
+        {
+            if (playerService._player_sp_object == this)
+            {
+                cameraManager.GetMainCamera().transform.SetParent(null);
+            }
+
+            Destroy();
+        }
+    }
     public virtual void Update()
     {
 
     }
-    public virtual void SetStarSystem(int galaxyId, int systemId)
+    public virtual StarSystem SetStarSystem(int galaxyId, int systemId)
     {
         this.galaxyId = galaxyId;
         this.systemId = systemId;
         StarSystem = GetStarSystem();
+        return StarSystem;
     }
     public virtual void OnSpDestroyHide(SpaceObjectOnDestroyHide signal)
     {
@@ -228,12 +341,36 @@ public abstract class SpaceObject : MonoBehaviour
         Camera cam = cameraManager.GetMainCamera();
         cam.transform.SetParent(camHardpoint);
         cam.transform.localPosition = Vector3.zero;
-        cam.transform.rotation = Quaternion.identity;
+        cam.transform.localEulerAngles = Vector3.zero;
     }
 
     public virtual void InstallLoadout(Loadout loadout)
     {
-
+        if (loadout.hardpoints == null)
+        {
+            return;
+        }
+        for (int i = 0; i < loadout.hardpoints.Count; i++)
+        {
+            LoadoutHP hp = loadout.hardpoints[i];
+            Transform checkHP = hardpoints.Find(hp.hardpoint);
+            if (checkHP || hp.hardpoint == "Engine" || hp.hardpoint == "PowerGenerator")
+            {
+                loadoutHPs.Add(hp);
+            }
+        }
+    }
+    public virtual void BuildLoadouts()
+    {
+        if (hardpoints == null)
+        {
+            return;
+        }
+        for (int i = 0; i < loadoutHPs.Count; i++)
+        {
+            LoadoutHP hp = loadoutHPs[i];
+            Debug.Log($"{hp.hardpoint} {hp.item}");
+        }
     }
     public virtual void InvokeTakeDamage(SpaceObject attacker, int damage)
     {
@@ -268,11 +405,29 @@ public abstract class SpaceObject : MonoBehaviour
                 gm = tr.gameObject;
             }
         }
-        main = GameObject.Instantiate<GameObject>(gm, transform);
+
+        if (gm)
+        {
+            main = GameObject.Instantiate<GameObject>(gm, transform);
+        }
+        else
+        {
+            main = new GameObject();
+            main.transform.SetParent(transform);
+        }
         main.transform.localPosition = Vector3.zero;
         main.transform.localEulerAngles = Vector3.zero;
         main.name = "MAIN";
         hardpoints = main.transform.Find("HARDPOINTS");
+        if (!hardpoints)
+        {
+            hardpoints = new GameObject().transform;
+            hardpoints.transform.SetParent(main.transform);
+            hardpoints.name = "HARDPOINTS";
+            Transform cam = new GameObject().transform;
+            cam.transform.SetParent(hardpoints);
+            cam.name = "HPCamera";
+        }
         Transform fmain = main.transform.Find("MAIN");
         if (fmain != null)
         {
@@ -346,6 +501,10 @@ public abstract class SpaceObject : MonoBehaviour
     }
     public virtual void SetTargetSelect()
     {
+        if (is_player)
+        {
+            return;
+        }
         if (targetSelect == null && playerService.GetStarSystem() == StarSystem)
         {
             targetSelectPrefab = Resources.Load<TargetSelect>("Prefabs/TargetSelect");
@@ -378,10 +537,17 @@ public abstract class SpaceObject : MonoBehaviour
         signalBus.Unsubscribe<SpaceObjectOnDestroyHide>(OnSpDestroyHide);
         signalBus.Unsubscribe<SpaceObjectOnDestroy>(OnSpDestroy);
         signalBus.Unsubscribe<SignalOnPlayerChangedSystem>(OnPlayerChangedSystem);
+        signalBus.Unsubscribe<SignalChunkFloatingOriginFixStart>(OnChunkFloatingOriginFixStart);
+        signalBus.Unsubscribe<SignalChunkFloatingOriginFixEnd>(OnChunkFloatingOriginFixEnd);
+        OnDestroyAllAction -= OnDestroyAll;
         if (targetSelect)
         {
             targetSelect.Destroy();
         }
         Destroy(gameObject);
+    }
+    public static void InvokeDestroyAll(Type type = null)
+    {
+        OnDestroyAllAction?.Invoke(type);
     }
 }

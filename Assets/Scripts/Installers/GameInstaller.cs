@@ -21,6 +21,8 @@ public class GameInstaller : MonoInstaller
         Container.DeclareSignal<SignalChunkManagerReady>();
         Container.DeclareSignal<SignalChunkDestroy>();
         Container.DeclareSignal<SignalChunkFloatingOriginFix>();
+        Container.DeclareSignal<SignalChunkFloatingOriginFixStart>();
+        Container.DeclareSignal<SignalChunkFloatingOriginFixEnd>();
         Container.DeclareSignal<PlayerSpeedChangedSignal>();
         Container.DeclareSignal<SpaceObjectOnTakeDamage>();
         Container.DeclareSignal<SpaceObjectOnDestroyHide>();
@@ -64,7 +66,7 @@ public class GameInstaller : MonoInstaller
         SpaceContainer spaceContainer = GameObject.Find("SpaceContainer").GetComponent<SpaceContainer>();
         Container.Bind<SpaceContainer>().FromInstance(spaceContainer).AsSingle();
 
-        var startConfig = JsonConfigLoader.LoadFromFile<GameStartConfig>("Gamestarts/Default");
+        var startConfig = JsonConfigLoader.LoadFromFile<GameStartConfig>("Gamestarts/MainMenu");
         Container.Bind<GameStartConfig>().WithId("GameStartConfig").FromInstance(startConfig).AsSingle();
         Container.Bind<FactionsManager>().AsSingle().NonLazy();
         Container.Bind<NpcJobManager>().AsSingle().NonLazy();

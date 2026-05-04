@@ -1,0 +1,24 @@
+{
+    "data":[
+        {
+            "codename": "NewGame",
+            "text": "Новая игра"
+        },
+        {
+            "codename": "LoadGame",
+            "text": "Загрузить игру"
+        },
+        {
+            "codename": "SaveGame",
+            "text": "Сохранить игру"
+        },
+        {
+            "codename": "Settings",
+            "text": "Настройки"
+        },
+        {
+            "codename": "QuitGame",
+            "text": "Выйти"
+        }
+    ]
+}

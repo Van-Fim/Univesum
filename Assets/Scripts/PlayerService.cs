@@ -19,6 +19,14 @@ public class PlayerService
         _signalBus = signalBus;
         _universe = universe;
     }
+    public bool IsInMenu()
+    {
+        return _player.isInMenu;
+    }
+    public void SetIsInMenu(bool value)
+    {
+        _player.isInMenu = value;
+    }
     public void Warp(StarSystem starSystem, Vector3 position, Vector3 rotation)
     {
         Random.InitState(_universe.seed + starSystem.galaxyId + starSystem.id);
@@ -29,12 +37,20 @@ public class PlayerService
         _signalBus.Fire(new SpaceObjectOnDestroyHide(null, null));
         _signalBus.Fire(new SignalChunkDestroy());
         SpaceObjectController sp = _player.currentController;
+        if (sp == null)
+        {
+            return;
+        }
         sp.Sp_object.galaxyId = starSystem.galaxyId;
         sp.Sp_object.systemId = starSystem.id;
         WorldChunkManager wcm = WorldChunkManager.singleton;
         if (wcm)
         {
             wcm.Init();
+            wcm.isFirstChunksReady = false;
+            wcm.UpdateCurrentChunk();
+            wcm.UpdateChunksAround(wcm.currentChunk);
+            wcm.isFirstChunksReady = true;
         }
         _spaceContainer.transform.localPosition = Vector3.zero;
         TargetSelect.currentSelectedItem = null;
@@ -42,11 +58,12 @@ public class PlayerService
         _signalBus.Fire(new SignalOnPlayerChangedSystem(sp.Sp_object, starSystem));
     }
 
-    public void ChangeSkybox(string skyboxName)
+    public void ChangeSkybox(SpaceConfigSkybox skyboxConfig)
     {
-        Material skyboxMaterial = Resources.Load<Material>($"Materials/Skybox/{skyboxName}");
+        Material skyboxMaterial = Resources.Load<Material>($"Materials/Skybox/{skyboxConfig.name}");
         if (skyboxMaterial != null)
         {
+            skyboxMaterial.SetColor("_Tint", skyboxConfig.color);
             RenderSettings.skybox = skyboxMaterial;
             DynamicGI.UpdateEnvironment();
         }
@@ -71,12 +88,13 @@ public class PlayerService
     public StarSystem GetStarSystem()
     {
         SpaceObjectController sp = _player.currentController;
-        int gId = sp.Sp_object.galaxyId;
-        int sId = sp.Sp_object.systemId;
-        if (sp == null)
+        if (!sp)
         {
             return null;
         }
+        int gId = sp.Sp_object.galaxyId;
+        int sId = sp.Sp_object.systemId;
+
         if (_starSystem != null && _starSystem.galaxyId == gId && _starSystem.id == sId)
         {
             return _starSystem;

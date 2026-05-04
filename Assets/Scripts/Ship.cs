@@ -4,7 +4,6 @@ using Zenject;
 [System.Serializable]
 public class ShipData : SpaceObjectData
 {
-    public bool isPlayerShip;
     public override bool ReadData(SpaceObject spaceObject)
     {
         bool ret = false;
@@ -16,49 +15,37 @@ public class ShipData : SpaceObjectData
         ret = true && defret;
         return ret;
     }
+    public override bool InstallData(SpaceObject spaceObject)
+    {
+        bool ret = false;
+        if (!spaceObject)
+        {
+            return ret;
+        }
+        bool defret = base.InstallData(spaceObject);
+
+        ret = true && defret;
+        return ret;
+    }
 }
 public class Ship : SpaceObject
 {
-    public EngineConfig engine;
-    public PowerGenerator powerGenerator;
-    [Inject] private WeaponFactory _weaponFactory;
-
-    public List<Weapon> weapons = new List<Weapon>();
-
     public override SpaceObjectData Save()
     {
         ShipData shipData = new ShipData();
-        shipData.isPlayerShip = playerService._player_sp_object == this;
         shipData.ReadData(this);
         return shipData;
     }
 
-    public override void Update()
+    public override void BuildLoadouts()
     {
-        if (IsOwnedByLocalPlayer())
-        {
-            float dt = Time.deltaTime;
-            if (powerGenerator != null)
-            {
-                powerGenerator.Update(dt);
-
-                float dv = ((float)powerGenerator.currentEnergy / (float)powerGenerator.config.maxEnergy);
-                canvasController.power.fillAmount = 0.4f * dv;
-            }
-        }
-    }
-
-    public override void InstallLoadout(Loadout loadout)
-    {
-        base.InstallLoadout(loadout);
-
-        if (loadout.hardpoints == null)
+        if (hardpoints == null)
         {
             return;
         }
-        for (int i = 0; i < loadout.hardpoints.Count; i++)
+        for (int i = 0; i < loadoutHPs.Count; i++)
         {
-            LoadoutHP hp = loadout.hardpoints[i];
+            LoadoutHP hp = loadoutHPs[i];
             if (hp.hardpoint == "Engine")
             {
                 engine = JsonConfigLoader.LoadFromFile<EngineConfig>("Engines/" + hp.item);
@@ -119,7 +106,42 @@ public class Ship : SpaceObject
                 }
 
             }
-            loadoutHPs.Add(hp);
+            else if (hp.hardpoint.StartsWith("HPTurret"))
+            {
+                if (hardpoints != null && hardpoints.childCount > 0)
+                {
+                    for (int j = 0; j < hardpoints.childCount; j++)
+                    {
+                        Transform tr = hardpoints.GetChild(j);
+                        if (tr.name == hp.hardpoint)
+                        {
+                            WeaponConfig cfg = JsonConfigLoader.LoadFromFile<WeaponConfig>("Weapons/" + hp.item);
+                            Weapon turret = _weaponFactory.Create(this, cfg);
+                            turret.Init();
+                            turret.transform.SetParent(tr);
+                            turret.transform.localPosition = Vector3.zero;
+                            turret.transform.localRotation = Quaternion.identity;
+                            turret.InstallConfig();
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    public override void Update()
+    {
+        if (IsOwnedByLocalPlayer())
+        {
+            float dt = Time.deltaTime;
+            if (powerGenerator != null)
+            {
+                powerGenerator.Update(dt);
+
+                float dv = ((float)powerGenerator.currentEnergy / (float)powerGenerator.config.maxEnergy);
+                canvasController.power.fillAmount = 0.4f * dv;
+            }
         }
     }
 }

@@ -25,6 +25,10 @@ public class PlayerShipController : SpaceObjectController
 
     public override void Update()
     {
+        if (_playerService.IsInMenu())
+        {
+            return;
+        }
         if (_rigidbody == null)
         {
             return;
@@ -68,7 +72,14 @@ public class PlayerShipController : SpaceObjectController
 
             mainCam.enabled = !st1;
             mapCam.enabled = st1;
-            _canvasController.main.SetActive(!st1);
+            if (st1)
+            {
+                _canvasController.HideUi();
+            }
+            else
+            {
+                _canvasController.ShowUi();
+            }
             mapCam.transform.localPosition = psys.transform.localPosition + new Vector3(0, 200, 0);
             mapCam.transform.localEulerAngles = new Vector3(90, 0, 0);
 
@@ -77,6 +88,10 @@ public class PlayerShipController : SpaceObjectController
         if (Input.GetKeyDown(KeyCode.Z))
         {
             _saveManager.SaveGame();
+        }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            _saveManager.LoadGame();
         }
         if (Input.GetMouseButton(0))
         {
@@ -102,6 +117,10 @@ public class PlayerShipController : SpaceObjectController
             return;
         }
         Ship ship = (Ship)Sp_object;
+        if (ship.engine == null)
+        {
+            return;
+        }
         int _rotationSpeed = ship.engine.rotationSpeed;
         Ray ray = Sp_object.cameraManager.GetMainCamera().ScreenPointToRay(Input.mousePosition);
 
@@ -165,6 +184,10 @@ public class PlayerShipController : SpaceObjectController
     public override void Move()
     {
         Ship ship = (Ship)Sp_object;
+        if (ship.engine == null)
+        {
+            return;
+        }
         int _accelerationSpeed = ship.engine.accelerationSpeed;
         int _maxSpeed = ship.engine.maxSpeed;
         if (Input.GetKey(KeyCode.Space) && _rigidbody != null)

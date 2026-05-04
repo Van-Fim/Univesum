@@ -62,7 +62,6 @@ public class ProjectilesInstaller : MonoInstaller
             Container.BindMemoryPool<Projectile, ProjectilePool>()
                 .WithInitialSize(3)
                 .FromComponentInNewPrefab(_modelInstance)
-                .UnderTransformGroup("SpaceContainer")
                 .WhenInjectedInto<Weapon>();
             _modelInstance.gameObject.SetActive(false);
         }

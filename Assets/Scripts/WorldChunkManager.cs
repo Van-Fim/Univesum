@@ -26,6 +26,7 @@ public class WorldChunkManager : MonoBehaviour
     public bool isFirstChunksReady = false;
     public bool is_initialized;
     public bool stopWorker;
+    public bool noAsteroids;
     [Inject] DiContainer container;
 
     public static WorldChunkManager singleton;
@@ -34,7 +35,68 @@ public class WorldChunkManager : MonoBehaviour
     {
         return container.ResolveId<Asteroid.Pool>(id);
     }
+    public void ClearChunks()
+    {
+        // Останавливаем все процессы спавна
+        stopWorker = true;
+        if (isSpawningChunks)
+        {
+            StopAllCoroutines();
+            isSpawningChunks = false;
+        }
 
+        // Очищаем очередь спавна
+        spawnQueue?.Clear();
+
+        // Уничтожаем все загруженные чанки
+        if (loadedChunks != null && loadedChunks.Count > 0)
+        {
+            foreach (var kvp in loadedChunks)
+            {
+                Chunk chunk = kvp.Value;
+                if (chunk != null)
+                {
+                    // Уничтожаем все астероиды в чанке
+                    if (chunk.asteroids != null)
+                    {
+                        for (int i = chunk.asteroids.Count - 1; i >= 0; i--)
+                        {
+                            Asteroid asteroid = chunk.asteroids[i];
+                            if (asteroid != null)
+                            {
+                                if (asteroid.gameObject != null)
+                                {
+                                    asteroid.Despawn();
+                                }
+                            }
+                        }
+                        chunk.asteroids.Clear();
+                    }
+
+                    // Уничтожаем GameObject чанка
+                    if (chunk.gameObject != null)
+                    {
+                        Destroy(chunk.gameObject);
+                    }
+                }
+            }
+
+            loadedChunks.Clear();
+        }
+
+        // Очищаем список всех чанков
+        if (chunks != null)
+        {
+            chunks.Clear();
+        }
+
+        // Сбрасываем флаги
+        isFirstChunksReady = false;
+        is_initialized = false;
+        currentChunk = Vector3Int.zero;
+
+        Debug.Log("WorldChunkManager: All chunks cleared successfully");
+    }
     void EnqueueChunkSpawn(Chunk chunk, Vector3Int chunkCoord)
     {
         spawnQueue.Enqueue((chunk, chunkCoord));
@@ -86,6 +148,10 @@ public class WorldChunkManager : MonoBehaviour
     {
         signalBus.Subscribe<SignalOnUpdateTick>(OnUpdateTick);
         Init();
+        isFirstChunksReady = false;
+        UpdateCurrentChunk();
+        UpdateChunksAround(currentChunk);
+        isFirstChunksReady = true;
     }
     public void Init()
     {
@@ -99,9 +165,15 @@ public class WorldChunkManager : MonoBehaviour
         spawnQueue = new();
         isSpawningChunks = false;
         isFirstChunksReady = false;
-        playerTransform = playerService._player.GetCurrentController().transform;
-        UpdateCurrentChunk();
-        UpdateChunksAround(currentChunk);
+        SpaceObjectController spc = playerService._player.GetCurrentController();
+        if(spc)
+        {
+            playerTransform = spc.transform;
+        }
+        else
+        {
+            playerTransform = transform;
+        }
         is_initialized = true;
         signalBus.Fire(new SignalChunkManagerReady());
         singleton = this;
@@ -222,6 +294,7 @@ public class WorldChunkManager : MonoBehaviour
         int rotZ = Random.Range(0, 180 + 1);
         Asteroid.Pool pool = GetPool($"{config.name}_{astItem.name}");
         Asteroid asteroid = pool.Spawn();
+        asteroid.spawnId = $"{config.name}_{astItem.name}";
         asteroid.maxShield = 0;
         asteroid.Init();
         asteroid.Hide();
@@ -300,6 +373,11 @@ public class WorldChunkManager : MonoBehaviour
 
     void HandleFloatingOrigin()
     {
+        if (!playerTransform)
+        {
+            return;
+        }
+
         if (playerTransform.position.magnitude > originThreshold)
         {
             Vector3 offset = playerTransform.position;
@@ -316,19 +394,25 @@ public class WorldChunkManager : MonoBehaviour
         }
     }
 
-    void UpdateCurrentChunk()
+    public void UpdateCurrentChunk()
     {
         Vector3 globalPosition = -(worldPos - playerTransform.localPosition);
+        signalBus.Fire(new SignalChunkFloatingOriginFixStart(globalPosition));
         currentChunk = new Vector3Int(
             Mathf.FloorToInt(globalPosition.x / chunkSize),
             Mathf.FloorToInt(globalPosition.y / chunkSize),
             Mathf.FloorToInt(globalPosition.z / chunkSize)
         );
         spaceContainer.transform.localPosition = -globalPosition;
+        signalBus.Fire(new SignalChunkFloatingOriginFixEnd(globalPosition));
     }
 
     void HandleChunks()
     {
+        if (!playerTransform)
+        {
+            return;
+        }
         Vector3 globalPosition = -(worldPos - playerTransform.localPosition);
 
         Vector3Int newChunk = new Vector3Int(
@@ -344,7 +428,7 @@ public class WorldChunkManager : MonoBehaviour
         }
     }
 
-    void UpdateChunksAround(Vector3Int centerChunk)
+    public void UpdateChunksAround(Vector3Int centerChunk)
     {
         int loadRadius = 5; // сколько чанков вокруг загружать
 
@@ -416,10 +500,18 @@ public class WorldChunkManager : MonoBehaviour
 
         if (isFirstChunksReady)
         {
+            if (noAsteroids)
+            {
+                return chunk;
+            }
             EnqueueChunkSpawn(chunk, chunkCoord);
         }
         else
         {
+            if (noAsteroids)
+            {
+                return chunk;
+            }
             SpawnAsteroids(chunk, chunkCoord);
         }
         return chunk;

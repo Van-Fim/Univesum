@@ -1,0 +1,11 @@
+{
+    "systemId":0,
+    "galaxyId":0,
+    "univesrse":"MainMenu",
+    "ship": "",
+    "ship_loadout": "",
+    "suit": "",
+    "suit_loadout": "",
+    "start_position":{"x":0,"y":0,"z":0},
+    "start_rotation":{"x":0,"y":0,"z":0}
+}

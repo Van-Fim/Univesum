@@ -1,7 +1,10 @@
 {
     "faction":"Faction01",
     "skyboxes": [
-        "Skybox04"
+        {"name":"Skybox01", "color":{"r":80, "g":0, "b":0, "a":255}},
+        {"name":"Skybox03", "color":{"r":40, "g":80, "b":80, "a":255}},
+        {"name":"Skybox03", "color":{"r":80, "g":80, "b":80, "a":255}},
+        {"name":"Skybox04", "color":{"r":80, "g":80, "b":80, "a":255}}
     ],
     "asteroidFields": [
         {

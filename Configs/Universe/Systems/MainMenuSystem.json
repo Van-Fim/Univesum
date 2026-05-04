@@ -1,9 +1,6 @@
 {
     "skyboxes": [
-        {"name":"Skybox01", "color":{"r":80, "g":80, "b":80, "a":255}},
-        {"name":"Skybox01", "color":{"r":0, "g":80, "b":0, "a":255}},
-        {"name":"Skybox02", "color":{"r":80, "g":80, "b":80, "a":255}},
-        {"name":"Skybox01", "color":{"r":80, "g":0, "b":80, "a":255}}
+        {"name":"Skybox01", "color":{"r":80, "g":0, "b":0, "a":255}}
     ],
     "asteroidFields": [
         {

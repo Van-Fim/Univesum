@@ -5,7 +5,7 @@ public class EngineSoundController : MonoBehaviour
     public AudioSource idleSource;
     public AudioSource boostSource;
     public AudioSource shutdownSource;
-    public Ship sp_object;
+    public SpaceObject sp_object;
 
     void Update()
     {

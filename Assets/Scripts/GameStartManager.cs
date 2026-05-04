@@ -12,6 +12,7 @@ public class GameStartManager
     [Inject] private readonly FactionsManager _factionsManager;
     [Inject] private readonly LangManager _langManager;
     [Inject] private readonly CanvasController _canvasController;
+    [Inject] private readonly CameraManager _cameraManager;
     private NpcJobManager _npcJobManager;
 
     public GameStartManager(
@@ -38,20 +39,26 @@ public class GameStartManager
         _canvasController.Init();
         _langManager.Init();
         _factionsManager.Initialize();
-        
+
         _universe.config = JsonConfigLoader.LoadFromFile<SpaceConfig>($"Universe/{_config.univesrse}");
         _universe.Init();
         _universe.Build();
 
         _npcJobManager.Initialize();
 
-        if (string.IsNullOrEmpty(_config.ship))
+        if (string.IsNullOrEmpty(_config.suit) && string.IsNullOrEmpty(_config.ship))
         {
-            CreateSuit();
+            _canvasController.HideUi();
+            CreateShip();
+            _playerService.SetIsInMenu(true);
         }
-        else
+        else if (!string.IsNullOrEmpty(_config.ship))
         {
             CreateShip();
+        }
+        else if (!string.IsNullOrEmpty(_config.suit))
+        {
+            CreateSuit();
         }
         StarSystem sys = _universe.FindSystem(_config.galaxyId, _config.systemId);
         _playerService.Warp(sys, _config.start_position, _config.start_rotation);
@@ -81,15 +88,21 @@ public class GameStartManager
 
     private void CreateShip()
     {
+        string cfg = "SpaceObjects/Ships/" + _config.ship;
+        if (string.IsNullOrEmpty(_config.ship))
+        {
+            cfg = null;
+        }
         Ship ship = _factory.Create<Ship>(
             "Prefabs/ShipPrefab",
-            "SpaceObjects/Ships/" + _config.ship
+            cfg
         );
         ship.InstallConfig();
         var controller = ship.gameObject.AddComponent<PlayerShipController>();
         _container.Inject(controller);
         controller._rigidbody = ship.rigidbody;
         controller.Sp_object = ship;
+        ship.is_player = true;
 
         ship.spaceObjectController = controller;
         _playerService._player.currentController = controller;
@@ -104,7 +117,7 @@ public class GameStartManager
             );
             ship.InstallLoadout(loadout);
         }
-
+        ship.BuildLoadouts();
         ship.transform.localPosition = _config.start_position;
         ship.transform.localEulerAngles = _config.start_position;
         ship.SetStarSystem(_config.galaxyId, _config.systemId);

@@ -15,10 +15,23 @@ public class CanvasController : MonoBehaviour
     public UnityEngine.UI.Image hud03;
     public UnityEngine.UI.Image power;
     public UnityEngine.UI.Image crosshair;
+    public bool is_uiHidden;
     public TargetSelect targetSelect;
     [Inject] private readonly CameraManager cameraManager;
     [Inject] private readonly SignalBus _signalBus;
-
+    public MainMenu mainMenu;
+    public void HideUi()
+    {
+        main.gameObject.SetActive(false);
+        targetSelect.gameObject.SetActive(false);
+        is_uiHidden = true;
+    }
+    public void ShowUi()
+    {
+        main.gameObject.SetActive(true);
+        targetSelect.gameObject.SetActive(true);
+        is_uiHidden = false;
+    }
     public void Init()
     {
         UnityEngine.UI.Image img01 = hud01.GetComponent<UnityEngine.UI.Image>();

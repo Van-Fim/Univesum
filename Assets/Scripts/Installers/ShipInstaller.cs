@@ -9,7 +9,5 @@ public class ShipInstaller : MonoInstaller
     {
         Container.BindFactory<SpaceObject, WeaponConfig, Weapon, WeaponFactory>()
                  .FromComponentInNewPrefab(defaultWeapon);
-        Container.BindFactory<SpaceObject, WeaponConfig, Turret, TurretFactory>()
-        .FromComponentInNewPrefab(defaultTurret);
     }
 }

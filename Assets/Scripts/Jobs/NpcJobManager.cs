@@ -48,6 +48,8 @@ public class NpcJobManager : IInitializable
     [Inject] private SpaceObjectFactory _spFactory;
     [Inject] private SignalBus _signalBus;
 
+    public bool isEnabled = true;
+
     private List<Job> _jobs = new List<Job>();
     private Dictionary<int, List<JobInstance>> _activeJobs = new Dictionary<int, List<JobInstance>>();
     private Dictionary<string, Queue<Job>> _pendingJobs = new Dictionary<string, Queue<Job>>();
@@ -70,6 +72,10 @@ public class NpcJobManager : IInitializable
 
     public void OnUpdateTick()
     {
+        if (!isEnabled)
+        {
+            return;
+        }
         // if (Time.time - _lastSpawnCheck >= _spawnCheckInterval)
         // {
         //     _lastSpawnCheck = Time.time;
@@ -79,9 +85,56 @@ public class NpcJobManager : IInitializable
 
         CleanupDestroyedShips();
     }
-
-    private void LoadJobs()
+    public void ClearJobs()
     {
+        // Удаляем все активные джобы (уничтожаем спавненные объекты)
+        foreach (var jobId in _activeJobs.Keys.ToList())
+        {
+            foreach (var jobInstance in _activeJobs[jobId])
+            {
+                if (jobInstance.spaceObject != null)
+                {
+                    // Уничтожаем объект в игре
+                    GameObject.Destroy(jobInstance.spaceObject.gameObject);
+                }
+            }
+            _activeJobs[jobId].Clear();
+        }
+
+        // Очищаем все очереди ожидающих джобов
+        foreach (var jobId in _pendingJobs.Keys.ToList())
+        {
+            _pendingJobs[jobId].Clear();
+        }
+
+        // Сбрасываем все счетчики у джобов
+        foreach (var job in _jobs)
+        {
+            job.currentUniverseCount = 0;
+            job.currentGalaxyCount = 0;
+            job.currentStarSystemCount = 0;
+            job.galaxyCounts.Clear();
+            job.starSystemCounts.Clear();
+        }
+
+        Debug.Log($"All jobs cleared. Active jobs: {_activeJobs.Values.Sum(list => list.Count)}, Pending jobs: {_pendingJobs.Values.Sum(queue => queue.Count)}");
+    }
+    public void ClearAllJobsAndData()
+    {
+        // Сначала удаляем все активные объекты
+        ClearJobs();
+
+        // Очищаем все структуры данных
+        _jobs.Clear();
+        _activeJobs.Clear();
+        _pendingJobs.Clear();
+
+        Debug.Log("All job data completely cleared");
+    }
+    public void LoadJobs()
+    {
+        _activeJobs = new Dictionary<int, List<JobInstance>>();
+        _pendingJobs = new Dictionary<string, Queue<Job>>();
         // Загрузка джобов из ресурсов или конфига
         var jobsArr = JsonConfigLoader.LoadAllFromFolder<Job>("Jobs");
 
@@ -89,6 +142,7 @@ public class NpcJobManager : IInitializable
         for (int i = 0; i < jobsArr.Length; i++)
         {
             Job job = jobsArr[i];
+            job.id = jobsArr.Length - 1;
             _jobs.Add(job);
             _activeJobs[job.id] = new List<JobInstance>();
             _pendingJobs[job.name] = new Queue<Job>();
@@ -251,12 +305,15 @@ public class NpcJobManager : IInitializable
         int hr = UnityEngine.Random.Range(job.heigthMin, job.heigthMax + 1);
         int y = UnityEngine.Random.Range(-hr, hr + 1);
         Vector3 newPos = new Vector3(randomPoint2D.x, y, randomPoint2D.y);
+        station.jobId = job.id;
         station.loadoutName = "Station01_Loadout01";
         station.transform.localPosition = newPos;
         station.transform.localEulerAngles = Vector3.zero;
         station.SetStarSystem(location.galaxy.id, location.system.id);
         station.Init();
         bool inst = station.TryInstallConfig(station.StarSystem);
+        station.InstallLoadout();
+        station.BuildLoadouts();
         // Создание экземпляра джоба
         var jobInstance = new JobInstance
         {
@@ -281,6 +338,33 @@ public class NpcJobManager : IInitializable
 
         // Debug.Log($"Spawned {job.name} for {job.faction} in galaxy {location.galaxy.id}, system {location.system.id}");
     }
+    public void AddStationForJob(Station station)
+    {
+        Job job = _jobs.Find(x => x.id == station.jobId);
+        // Создание экземпляра джоба
+        var jobInstance = new JobInstance
+        {
+            job = job,
+            spaceObject = station,
+            galaxyId = station.galaxyId,
+            systemId = station.systemId,
+            spawnTime = DateTime.Now
+        };
+
+        _activeJobs[job.id].Add(jobInstance);
+
+        // Обновление счетчиков
+        job.currentUniverseCount++;
+        if (!job.galaxyCounts.ContainsKey(station.galaxyId))
+            job.galaxyCounts[station.galaxyId] = 0;
+        job.galaxyCounts[station.galaxyId]++;
+
+        if (!job.starSystemCounts.ContainsKey(station.systemId))
+            job.starSystemCounts[station.systemId] = 0;
+        job.starSystemCounts[station.systemId]++;
+
+        // Debug.Log($"Spawned {job.name} for {job.faction} in galaxy {location.galaxy.id}, system {location.system.id}");
+    }
     private void SpawnShipForJob(Job job, (Galaxy galaxy, StarSystem system) location)
     {
         // Создание корабля через фабрику
@@ -293,12 +377,14 @@ public class NpcJobManager : IInitializable
         int hr = UnityEngine.Random.Range(job.heigthMin, job.heigthMax + 1);
         int y = UnityEngine.Random.Range(-hr, hr + 1);
         Vector3 newPos = new Vector3(randomPoint2D.x, y, randomPoint2D.y);
+        ship.jobId = job.id;
         ship.loadoutName = "Ship01_Loadout01";
         ship.transform.localPosition = newPos;
         ship.transform.localEulerAngles = Vector3.zero;
         ship.SetStarSystem(location.galaxy.id, location.system.id);
         ship.Init();
         bool inst = ship.TryInstallConfig(ship.StarSystem);
+        ship.InstallLoadout();
         // Создание экземпляра джоба
         var jobInstance = new JobInstance
         {

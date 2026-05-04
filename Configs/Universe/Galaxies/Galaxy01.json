@@ -5,7 +5,7 @@
     "YMax": 0,
     "list": [
         {
-            "name": "System02",
+            "name": "System01",
             "YMin": 0,
             "YMax": 0,
             "rangeMin": 100,
@@ -14,7 +14,7 @@
             "countMax": 20
         },
         {
-            "name": "System01",
+            "name": "System02",
             "YMin": 0,
             "YMax": 0,
             "rangeMin": 100,

@@ -12,7 +12,7 @@ public class SpaceObjectFactory
         _universe = universe;
     }
 
-    public T Create<T>(string prefabPath, string configPath) where T : SpaceObject
+    public T Create<T>(string prefabPath, string configPath = null) where T : SpaceObject
     {
         // Загружаем префаб
         GameObject prefab = Resources.Load<GameObject>(prefabPath);
@@ -21,8 +21,12 @@ public class SpaceObjectFactory
         // Получаем компонент
         T obj = go.GetComponent<T>();
 
-        // Загружаем конфиг
-        obj.spaceObjectConfig = JsonConfigLoader.LoadFromFile<SpaceObjectConfig>(configPath);
+        if (configPath != null)
+        {
+            // Загружаем конфиг
+            obj.spaceObjectConfig = JsonConfigLoader.LoadFromFile<SpaceObjectConfig>(configPath);
+        }
+
         obj.id = _universe.allSpaceObjects.Count;
         _universe.allSpaceObjects.Add(obj);
 

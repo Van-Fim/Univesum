@@ -5,7 +5,7 @@ public class Player
     public SpaceObjectController currentController;
     private readonly SignalBus _signalBus;
     private readonly Universe _universe;
-
+    public bool isInMenu = false;
     public bool IsInShip { get; private set; }
     public Player(
             Universe universe,
