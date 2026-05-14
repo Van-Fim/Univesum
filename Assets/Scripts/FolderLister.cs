@@ -7,7 +7,8 @@ public class FolderLister : MonoBehaviour
     public static List<string> GetDirDirs(string dir)
     {
         List<string> ret = new List<string>();
-        string path = JsonConfigLoader.ConfigPath + "\\" + dir; // Замените на нужный путь
+        string path = JsonConfigLoader.ConfigPath + "/" + dir; // Замените на нужный путь
+        path = path.Replace('/', Path.DirectorySeparatorChar);
         DirectoryInfo dirInfo = new DirectoryInfo(path);
 
         if (dirInfo.Exists)
@@ -27,9 +28,9 @@ public class FolderLister : MonoBehaviour
     public static List<string> GetDirFiles(string dir)
     {
         List<string> ret = new List<string>();
-        string path = JsonConfigLoader.ConfigPath + "\\" + dir;
+        string path = JsonConfigLoader.ConfigPath + "/" + dir;
+        path = path.Replace('/', Path.DirectorySeparatorChar);
         DirectoryInfo dirInfo = new DirectoryInfo(path);
-        Debug.Log(dirInfo);
         if (dirInfo.Exists)
         {
             FileInfo[] files = dirInfo.GetFiles("*.json");

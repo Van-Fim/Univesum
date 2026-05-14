@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -49,6 +50,16 @@ public class MainMenu : MonoBehaviour
 
     public void OnButtonPressedAction(byte v)
     {
-        Debug.Log(v);
+        if (v == 0)
+        {
+            Universe.singleton.Clear();
+            var startConfig = JsonConfigLoader.LoadFromFile<GameStartConfig>("Gamestarts/Default");
+            GameStartManager.singleton.SetConfig(startConfig);
+            GameStartManager.singleton.Load();
+            MusicManager.singleton.audioSource.Stop();
+            CanvasController.singleton.mainMenu.gameObject.SetActive(false);
+            PlayerService.singleton.SetIsInMenu(false);
+            CanvasController.singleton.ShowUi();
+        }
     }
 }

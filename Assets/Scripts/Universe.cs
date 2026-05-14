@@ -8,12 +8,14 @@ public class Universe
     public SpaceConfig config;
     [Inject] private Galaxy.Factory _galaxyFactory;
     [Inject] private StarSystem.Factory _starSystemFactory;
+
     public Transform universeMap;
     public Transform galaxies;
     public Transform systems;
     public List<Galaxy> galaxiesList = new List<Galaxy>();
     public List<StarSystem> systemsList = new List<StarSystem>();
     public List<SpaceObject> allSpaceObjects = new List<SpaceObject>();
+    public static Universe singleton;
     public void Init()
     {
         GameObject gm = new GameObject();
@@ -33,6 +35,20 @@ public class Universe
         systems.transform.rotation = Quaternion.identity;
         systems.transform.localPosition = Vector3.zero;
         systems.name = "Systems";
+        singleton = this;
+    }
+    public void Clear()
+    {
+        NpcJobManager npcJobManager = NpcJobManager.singleton;
+        npcJobManager.isEnabled = false;
+        npcJobManager.ClearAllJobsAndData();
+        PSpace.InvokeDestroyAll();
+        SpaceObject.InvokeDestroyAll();
+        npcJobManager.isEnabled = true;
+        allSpaceObjects = new List<SpaceObject>();
+        galaxiesList = new List<Galaxy>();
+        systemsList = new List<StarSystem>();
+        WorldChunkManager.singleton.Reset();
     }
     public void Build()
     {

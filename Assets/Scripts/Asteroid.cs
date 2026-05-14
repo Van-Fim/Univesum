@@ -11,6 +11,44 @@ public class Asteroid : SpaceObject, ISelectable
     private bool _isDespawned;
     public Chunk chunk;
     [Inject] DiContainer container;
+    public float rotationSpeed= 1;
+    private Vector3 currentRotationSpeed;
+    private Vector3 targetRotationSpeed;
+    private float smoothTime = 2f;
+
+    public void ResetRotation()
+    {
+        // Начальная случайная скорость
+        currentRotationSpeed = new Vector3(
+            UnityEngine.Random.Range(-rotationSpeed, rotationSpeed),
+            UnityEngine.Random.Range(-rotationSpeed, rotationSpeed),
+            UnityEngine.Random.Range(-rotationSpeed, rotationSpeed)
+        );
+
+        // Целевая скорость (будет меняться со временем)
+        SetNewRandomTarget();
+    }
+
+    void SetNewRandomTarget()
+    {
+        targetRotationSpeed = new Vector3(
+            UnityEngine.Random.Range(-rotationSpeed, rotationSpeed),
+            UnityEngine.Random.Range(-rotationSpeed, rotationSpeed),
+            UnityEngine.Random.Range(-rotationSpeed, rotationSpeed)
+        );
+    }
+
+    void Update()
+    {
+        if (!gameObject.activeSelf)
+        {
+            return;
+        }
+        currentRotationSpeed = Vector3.Lerp(currentRotationSpeed, targetRotationSpeed, Time.deltaTime / smoothTime);
+
+        // Вращаем астероид
+        transform.Rotate(currentRotationSpeed * Time.deltaTime);
+    }
 
     public void SetPool(Asteroid.Pool pool)
     {
@@ -81,6 +119,7 @@ public class Asteroid : SpaceObject, ISelectable
             if (item.is_destroyed)
                 return;
             item.Show();
+            item.ResetRotation();
         }
     }
     public void OnDestroyChunkAsteroids(SignalDestroyChunkAsteroids signal)

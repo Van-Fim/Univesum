@@ -59,9 +59,13 @@ public class GameInstaller : MonoInstaller
         GameObject gmObj = Container.InstantiatePrefab(canvasController);
         CanvasController canvasControllerVar = gmObj.GetComponent<CanvasController>();
         Container.Bind<CanvasController>().FromInstance(canvasControllerVar).AsSingle();
+        
 
         UpdateManager updateManagerVar = gmObj.GetComponent<UpdateManager>();
         Container.Bind<UpdateManager>().FromInstance(updateManagerVar).AsSingle();
+
+        MusicManager musicManager = gmObj.GetComponent<MusicManager>();
+        Container.Bind<MusicManager>().FromInstance(musicManager).AsSingle();
 
         SpaceContainer spaceContainer = GameObject.Find("SpaceContainer").GetComponent<SpaceContainer>();
         Container.Bind<SpaceContainer>().FromInstance(spaceContainer).AsSingle();
@@ -71,6 +75,8 @@ public class GameInstaller : MonoInstaller
         Container.Bind<FactionsManager>().AsSingle().NonLazy();
         Container.Bind<NpcJobManager>().AsSingle().NonLazy();
         Container.Bind<GameStartManager>().AsSingle();
+        Container.Bind<MainMenu>().FromInstance(canvasControllerVar.mainMenu).AsSingle();
+        Container.Resolve<GameStartManager>().Init();
         Container.Resolve<GameStartManager>().Load();
 
         WorldChunkManager worldChunkManagerVar = Container.InstantiatePrefab(worldChunkManager).GetComponent<WorldChunkManager>();

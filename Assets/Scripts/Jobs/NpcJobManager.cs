@@ -62,14 +62,21 @@ public class NpcJobManager : IInitializable
     private float _minSpawnDelay = 0.5f;
     private float _maxSpawnDelay = 2f;
 
+    public static NpcJobManager singleton;
+    void Start()
+    {
+        singleton = this;
+    }
     public void Initialize()
     {
+        singleton = this;
         _signalBus.Subscribe<SignalOnUpdateTick>(OnUpdateTick);
-
+    }
+    public void Load()
+    {
         LoadJobs();
         _lastSpawnCheck = Time.time;
     }
-
     public void OnUpdateTick()
     {
         if (!isEnabled)

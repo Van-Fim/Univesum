@@ -20,6 +20,12 @@ public class CanvasController : MonoBehaviour
     [Inject] private readonly CameraManager cameraManager;
     [Inject] private readonly SignalBus _signalBus;
     public MainMenu mainMenu;
+
+    public static CanvasController singleton;
+    void Start()
+    {
+        singleton = this;
+    }
     public void HideUi()
     {
         main.gameObject.SetActive(false);

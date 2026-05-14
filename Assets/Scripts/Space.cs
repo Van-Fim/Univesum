@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using TMPro;
@@ -22,6 +23,8 @@ public class PSpace : MonoBehaviour
     public MapSpaceUi MapSpaceUiPrefab;
     public MapSpaceUi mapSpaceUi;
 
+    public static UnityAction<Type> OnDestroyAllAction;
+
     [Inject] public PlayerService _playerService;
     [Inject] public CameraManager _cameraManager;
     [Inject] public FactionsManager _factionsManager;
@@ -36,6 +39,23 @@ public class PSpace : MonoBehaviour
         mapSpaceUi.cam = _cameraManager.GetMapCamera();
         mapSpaceUi.playerService = _playerService;
         mapSpaceUi.space = this;
+
+        OnDestroyAllAction += OnDestroyAll;
+    }
+    public virtual void OnDestroyAll(Type type)
+    {
+        if (type == null)
+        {
+            Destroy();
+        }
+        else if (type == this.GetType())
+        {
+            Destroy();
+        }
+    }
+    public static void InvokeDestroyAll(Type type = null)
+    {
+        OnDestroyAllAction?.Invoke(type);
     }
     public virtual void OnMinimapRender()
     {
@@ -65,6 +85,12 @@ public class PSpace : MonoBehaviour
     {
         _signalBus.Unsubscribe<SpaceShowSignal>(OnSpaceShow);
         _signalBus.Unsubscribe<SpaceOnMinimapRenderSignal>(OnMinimapRender);
+        OnDestroyAllAction -= OnDestroyAll;
+        if (mapSpaceUi)
+        {
+            mapSpaceUi.gameObject.SetActive(false);
+            mapSpaceUi.Destroy();
+        }
         GameObject.Destroy(gameObject);
     }
     void OnSpaceShow(SpaceShowSignal signal)

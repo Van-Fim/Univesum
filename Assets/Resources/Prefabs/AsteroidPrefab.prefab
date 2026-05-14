@@ -44,19 +44,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9425adb773297624e9106584121871ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 0
+  spawnId: 
   maxHull: 10000
   hull: 0
   maxShield: 10000
   shield: 0
+  jobId: -1
+  loadoutHPs: []
+  spaceObjectConfig:
+    name: 
+    pathToModel: 
+    chinldName: 
+    pathToHardpoints: 
+    pathToMaterial: 
+    scale: 1
+    mass: 0
+    linearDrag: 0
+    angularDrag: 0
   spaceObjectController: {fileID: 0}
   meshCollider: {fileID: 0}
+  targetSelect: {fileID: 0}
   canvasController: {fileID: 0}
   cursorRaycaster: {fileID: 0}
+  weapons: []
   rigidbody: {fileID: 0}
   hardpoints: {fileID: 0}
+  loadoutName: 
   galaxyId: 0
   systemId: 0
+  is_initialized: 0
   is_destroyed: 0
-  is_prefab: 0
+  is_subscribed: 0
+  is_player: 0
+  StarSystem: {fileID: 0}
   worldChunkManager: {fileID: 0}
   chunk: {fileID: 0}
+  rotationSpeed: 10

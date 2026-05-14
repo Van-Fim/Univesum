@@ -15,17 +15,7 @@ public static class JsonConfigLoader
             // Поэтому поднимаемся на уровень выше для папки с .exe
             string dataPath = Application.dataPath;
             
-            #if UNITY_STANDALONE_WIN
-                // Для Windows: удаляем "_Data" из пути
-                string executableDirectory = Path.GetDirectoryName(dataPath);
-                return Path.Combine(executableDirectory, "Configs");
-            #elif UNITY_EDITOR
-                // В редакторе - папка Assets/Configs
-                return Path.Combine(Application.dataPath, "Configs");
-            #else
-                // Для других платформ - просто рядом с .exe
-                return Path.Combine(Path.GetDirectoryName(Application.dataPath), "Configs");
-            #endif
+            return Path.Combine(Path.GetDirectoryName(Application.dataPath), "Configs");
         }
     }
     

@@ -8,11 +8,12 @@ public class GameStartManager
     private readonly Universe _universe;
     private readonly SpaceObjectFactory _factory;
     private readonly SignalBus _signalBus;
-    private readonly GameStartConfig _config;
+    private GameStartConfig _config;
     [Inject] private readonly FactionsManager _factionsManager;
     [Inject] private readonly LangManager _langManager;
     [Inject] private readonly CanvasController _canvasController;
     [Inject] private readonly CameraManager _cameraManager;
+    public static GameStartManager singleton;
     private NpcJobManager _npcJobManager;
 
     public GameStartManager(
@@ -31,20 +32,30 @@ public class GameStartManager
         _signalBus = signalBus;
         _config = config;
         _npcJobManager = npcJobManager;
-    }
 
-    public void Load()
+        singleton = this;
+    }
+    public void SetConfig(GameStartConfig gameStartConfig)
+    {
+        _config = gameStartConfig;
+    }
+    public void Init()
     {
         Random.InitState(_universe.seed);
         _canvasController.Init();
         _langManager.Init();
         _factionsManager.Initialize();
+        _universe.Init();
+        _npcJobManager.Initialize();
+    }
+    public void Load()
+    {
+        Random.InitState(_universe.seed);
 
         _universe.config = JsonConfigLoader.LoadFromFile<SpaceConfig>($"Universe/{_config.univesrse}");
-        _universe.Init();
         _universe.Build();
 
-        _npcJobManager.Initialize();
+        _npcJobManager.Load();
 
         if (string.IsNullOrEmpty(_config.suit) && string.IsNullOrEmpty(_config.ship))
         {
@@ -63,7 +74,6 @@ public class GameStartManager
         StarSystem sys = _universe.FindSystem(_config.galaxyId, _config.systemId);
         _playerService.Warp(sys, _config.start_position, _config.start_rotation);
     }
-
     private void CreateSuit()
     {
         Suit suit = _factory.Create<Suit>(
@@ -73,8 +83,12 @@ public class GameStartManager
 
         suit.InstallCamera();
 
-        var controller = suit.gameObject.AddComponent<SuitController>();
-        _container.Inject(controller);
+        var controller = _container.TryResolve<SuitController>();
+        if (!controller)
+        {
+            controller = suit.gameObject.AddComponent<SuitController>();
+            _container.Inject(controller);
+        }
         controller._rigidbody = suit.rigidbody;
         controller.Sp_object = suit;
         suit.spaceObjectController = controller;
@@ -98,8 +112,12 @@ public class GameStartManager
             cfg
         );
         ship.InstallConfig();
-        var controller = ship.gameObject.AddComponent<PlayerShipController>();
-        _container.Inject(controller);
+        var controller = _container.TryResolve<PlayerShipController>();
+        if (!controller)
+        {
+            controller = ship.gameObject.AddComponent<PlayerShipController>();
+            _container.Inject(controller);
+        }
         controller._rigidbody = ship.rigidbody;
         controller.Sp_object = ship;
         ship.is_player = true;

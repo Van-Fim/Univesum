@@ -35,6 +35,22 @@ public class WorldChunkManager : MonoBehaviour
     {
         return container.ResolveId<Asteroid.Pool>(id);
     }
+    public void Reset()
+    {
+        ClearChunks();
+        is_initialized = false;
+        worldPos = Vector3.zero;
+        currentChunk = Vector3Int.zero;
+        stopWorker = true;
+        StopAllCoroutines();
+        chunks = new List<Chunk>();
+        loadedChunks = new();
+        spawnQueue = new();
+        isSpawningChunks = false;
+        isFirstChunksReady = false;
+        currentChunk = new Vector3Int(0, 0, 0);
+        spaceContainer.transform.localPosition = Vector3.zero;
+    }
     public void ClearChunks()
     {
         // Останавливаем все процессы спавна
@@ -166,7 +182,7 @@ public class WorldChunkManager : MonoBehaviour
         isSpawningChunks = false;
         isFirstChunksReady = false;
         SpaceObjectController spc = playerService._player.GetCurrentController();
-        if(spc)
+        if (spc)
         {
             playerTransform = spc.transform;
         }

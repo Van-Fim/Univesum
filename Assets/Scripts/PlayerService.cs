@@ -10,6 +10,7 @@ public class PlayerService
 
     private Galaxy _galaxy;
     private StarSystem _starSystem;
+    public static PlayerService singleton;
     [Inject] DiContainer container;
     [Inject] SpaceContainer _spaceContainer;
     [Inject]
@@ -18,6 +19,7 @@ public class PlayerService
         _player = player;
         _signalBus = signalBus;
         _universe = universe;
+        singleton = this;
     }
     public bool IsInMenu()
     {
