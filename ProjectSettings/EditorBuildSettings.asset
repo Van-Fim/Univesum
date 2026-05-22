@@ -8,7 +8,8 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/OfflineScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 1
-    path: Assets/Scenes/Main.unity
-    guid: 9573e6d8082c3bf49a1e42f059cf400f
+  - enabled: 0
+    path: Assets/Scenes/main.unity
+    guid: 64d524ea5af2b8d4e9e657ccf18622a4
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0

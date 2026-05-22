@@ -370,7 +370,6 @@ public class WorldChunkManager : MonoBehaviour
             int id = chunk.asteroidFieldsIds[i1];
             AsteroidFieldConfig a = starSystem.asteroidFields[id];
             int count = Random.Range(a.countMin, a.countMax + 1);
-
             for (int i = 0; i < count; i++)
             {
                 if (chunk == null)

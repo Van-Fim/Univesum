@@ -25,10 +25,10 @@ public class FolderLister : MonoBehaviour
         }
         return ret;
     }
-    public static List<string> GetDirFiles(string dir)
+    public static List<string> GetDirFiles(string dir, bool fullName = false)
     {
         List<string> ret = new List<string>();
-        string path = JsonConfigLoader.ConfigPath + "/" + dir;
+        string path = dir;
         path = path.Replace('/', Path.DirectorySeparatorChar);
         DirectoryInfo dirInfo = new DirectoryInfo(path);
         if (dirInfo.Exists)
@@ -36,7 +36,14 @@ public class FolderLister : MonoBehaviour
             FileInfo[] files = dirInfo.GetFiles("*.json");
             foreach (FileInfo file in files)
             {
-                ret.Add(Path.GetFileNameWithoutExtension(file.Name));
+                if (fullName)
+                {
+                    ret.Add(Path.GetFileName(file.Name));
+                }
+                else
+                {
+                    ret.Add(Path.GetFileNameWithoutExtension(file.Name));
+                }
             }
         }
         else

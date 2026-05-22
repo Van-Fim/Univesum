@@ -9,6 +9,9 @@ public class Universe
     [Inject] private Galaxy.Factory _galaxyFactory;
     [Inject] private StarSystem.Factory _starSystemFactory;
 
+
+    public List<AsteroidFieldConfig> _asteroidConfigs;
+
     public Transform universeMap;
     public Transform galaxies;
     public Transform systems;
@@ -50,6 +53,39 @@ public class Universe
         systemsList = new List<StarSystem>();
         WorldChunkManager.singleton.Reset();
     }
+    public void BuildByList(List<SpaceConfig> spaceConfigs)
+    {
+        for (int c = 0; c < spaceConfigs.Count; c++)
+        {
+            SpaceConfig sc = spaceConfigs[c];
+            if (sc.spaceType != null)
+            {
+                if (sc.spaceType == "Galaxy")
+                {
+                    Random.InitState(seed + sc.id);
+                    Galaxy space = _galaxyFactory.Create();
+                    space.transform.SetParent(galaxies);
+                    space.transform.localPosition = sc.position;
+                    space.transform.localEulerAngles = sc.rotation;
+                    space.id = sc.id;
+                    galaxiesList.Add(space);
+                }
+                else if (sc.spaceType == "StarSystem")
+                {
+                    Random.InitState(seed + sc.id);
+                    StarSystem space = _starSystemFactory.Create();
+                    space.transform.SetParent(systems);
+                    space.transform.localPosition = sc.position;
+                    space.transform.localEulerAngles = sc.rotation;
+                    space.id = sc.id;
+                    space.galaxyId = sc.galaxyId;
+                    space.asteroidFields = sc.asteroidFieldsConfig;
+                    space.config = sc;
+                    systemsList.Add(space);
+                }
+            }
+        }
+    }
     public void Build()
     {
         int id = 0;
@@ -65,6 +101,7 @@ public class Universe
                 Galaxy space = _galaxyFactory.Create();
                 space.transform.SetParent(galaxies);
                 space.config = JsonConfigLoader.LoadFromFile<SpaceConfig>($"Universe/Galaxies/{it.name}");
+
                 for (int t = 0; t < tryes; t++)
                 {
                     int range = Random.Range(it.rangeMin, it.rangeMax + 1);

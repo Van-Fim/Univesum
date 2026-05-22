@@ -6,7 +6,7 @@
         },
         {
             "codename": "Asteroid02",
-            "text": "{Asteroid01}"
+            "text": "{Asteroid:Asteroid01}"
         }
     ]
 }

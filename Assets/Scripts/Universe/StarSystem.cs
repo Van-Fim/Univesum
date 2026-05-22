@@ -7,7 +7,14 @@ public class StarSystem : PSpace
     public int galaxyId;
     public List<AsteroidFieldConfig> asteroidFields = new List<AsteroidFieldConfig>();
     public class Factory : PlaceholderFactory<StarSystem> { }
-
+    public override void Save()
+    {
+        base.Save();
+        config.galaxyId = galaxyId;
+        config.systemId = id;
+        config.asteroidFieldsConfig = asteroidFields;
+        SaveManager.singleton.spaceConfigs.Add(config);
+    }
     public void LoadAsteroidFields()
     {
         if (config.asteroidFields.Count == 0)

@@ -63,4 +63,10 @@ public class Galaxy : PSpace
             }
         }
     }
+    public override void Save()
+    {
+        base.Save();
+        config.galaxyId = id;
+        SaveManager.singleton.spaceConfigs.Add(config);
+    }
 }

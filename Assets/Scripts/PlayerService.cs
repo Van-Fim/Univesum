@@ -33,7 +33,6 @@ public class PlayerService
     {
         Random.InitState(_universe.seed + starSystem.galaxyId + starSystem.id);
         int rndm = Random.Range(0, starSystem.config.skyboxes.Count);
-
         ChangeSkybox(starSystem.config.skyboxes[rndm]);
         _signalBus.Fire(new SpaceShowSignal(starSystem));
         _signalBus.Fire(new SpaceObjectOnDestroyHide(null, null));
@@ -86,6 +85,17 @@ public class PlayerService
         Galaxy g = _universe.FindGalaxy(gId);
         _galaxy = g;
         return _galaxy;
+    }
+    public void SetStarSystem(StarSystem starSystem)
+    {
+        SpaceObjectController sp = _player.currentController;
+        _starSystem = starSystem;
+        if (!sp)
+        {
+            return;
+        }
+        sp.Sp_object.galaxyId = starSystem.galaxyId;
+        sp.Sp_object.systemId = starSystem.id;
     }
     public StarSystem GetStarSystem()
     {

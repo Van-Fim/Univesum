@@ -1,21 +1,21 @@
 {
     "shapeSize":{"x":0, "y":0, "z":0},
-    "countMin":11,
-    "countMax":12,
+    "countMin":31,
+    "countMax":48,
     "asteroids": [
         {
             "name": "Asteroid01",
             "spaceObjectPath": "SpaceObjects/Asteroid/Asteroid01",
-            "poolSize": 10,
+            "poolSize": 5,
             "scaleMin": 500,
-            "scaleMax": 3000
+            "scaleMax": 700
         },
         {
             "name": "Asteroid02",
             "spaceObjectPath": "SpaceObjects/Asteroid/Asteroid01",
-            "poolSize": 10,
+            "poolSize": 5,
             "scaleMin": 500,
-            "scaleMax": 3000
+            "scaleMax": 1000
         }
     ]
 }

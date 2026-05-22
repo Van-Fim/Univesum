@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
@@ -33,6 +34,15 @@ public class SpaceConfig
     public List<SpaceAsteroidFieldListItem> asteroidFields;
     public List<SpaceConfigListItem> list;
     public List<SpaceConfigSkybox> skyboxes;
+
+    public List<AsteroidFieldConfig> asteroidFieldsConfig = new List<AsteroidFieldConfig>();
+
+    public int id;
+    public int galaxyId = -1;
+    public int systemId = -1;
+    public string spaceType;
+    public Vector3 position;
+    public Vector3 rotation;
 }
 [System.Serializable]
 public class SpaceAsteroidFieldListItem

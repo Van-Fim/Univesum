@@ -13,6 +13,7 @@ public class GameStartManager
     [Inject] private readonly LangManager _langManager;
     [Inject] private readonly CanvasController _canvasController;
     [Inject] private readonly CameraManager _cameraManager;
+    [Inject] private readonly SaveManager _saveManager;
     public static GameStartManager singleton;
     private NpcJobManager _npcJobManager;
 
@@ -47,6 +48,7 @@ public class GameStartManager
         _factionsManager.Initialize();
         _universe.Init();
         _npcJobManager.Initialize();
+        _saveManager.Init();
     }
     public void Load()
     {

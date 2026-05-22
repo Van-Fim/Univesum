@@ -20,5 +20,26 @@
             "codename": "QuitGame",
             "text": "Выйти"
         }
+        ,
+        {
+            "codename": "Back",
+            "text": "Назад"
+        },
+        {
+            "codename": "SaveName",
+            "text": "Сохранение"
+        },
+        {
+            "codename": "SaveWhere",
+            "text": "Место"
+        },
+        {
+            "codename": "SaveDateTime",
+            "text": "Время"
+        },
+        {
+            "codename": "SaveLoadOk",
+            "text": "Загрузить"
+        }
     ]
 }

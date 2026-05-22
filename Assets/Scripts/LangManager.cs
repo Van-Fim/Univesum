@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
@@ -27,6 +28,26 @@ public class LangManager
         _signalBus.Subscribe<SignalOnUpdateTick>(OnUpdateTick);
         singleton = this;
     }
+    public string ProcessAndReplace(string input, Func<string, string> processor)
+    {
+        return Regex.Replace(input, @"\{([^}]*)\}", match =>
+        {
+            string code = match.Groups[1].Value; // Получаем код без {}
+
+            string[] parts = code.Split(':');
+            if (parts.Length > 1)
+            {
+                code = GetText(parts[0], parts[1]);
+                code = ProcessAndReplace(code, cd =>
+                {
+                    return $"{cd}";
+                });
+            }
+
+            // Обрабатываем и возвращаем замену
+            return processor(code);
+        });
+    }
 
     public string GetText(SpaceObject spaceObject)
     {
@@ -37,7 +58,10 @@ public class LangManager
         {
             return ret;
         }
-        ret = item.text;
+        ret = ProcessAndReplace(item.text, code =>
+        {
+            return $"{code}";
+        });
         return ret;
     }
     public string GetText(string categoryName, string codeName)
@@ -49,7 +73,14 @@ public class LangManager
             return $"Err[{categoryName}:{codeName}]";
         }
         LangDataItem item = langData.data.Find(x => x.codename == codeName);
-        ret = item.text;
+        if (item == null)
+        {
+            return $"Err[{categoryName}:{codeName}]";
+        }
+        ret = ProcessAndReplace(item.text, code =>
+        {
+            return $"{code}";
+        });
         return ret;
     }
     public void OnUpdateTick()

@@ -26,6 +26,7 @@ public class SpaceObjectData
     public bool is_initialized;
     public bool is_subscribed;
     public bool is_player;
+    
     public SpaceObjectConfig spaceObjectConfig;
     public List<LoadoutHP> loadoutHPs;
 
@@ -134,6 +135,12 @@ public abstract class SpaceObject : MonoBehaviour
     public bool is_destroyed = false;
     public bool is_subscribed = false;
     public bool is_player;
+    public bool Is_main_installed {
+        get
+        {
+            return main != null; 
+        }
+    }
 
     protected Mesh mesh;
 
@@ -212,6 +219,7 @@ public abstract class SpaceObject : MonoBehaviour
             }
             else
             {
+                if (is_player)
                 ret = false;
                 DestroyConfig();
                 if (hardpoints)
@@ -222,6 +230,7 @@ public abstract class SpaceObject : MonoBehaviour
         }
         else
         {
+            if (is_player)
             ret = false;
             DestroyConfig();
             if (hardpoints)

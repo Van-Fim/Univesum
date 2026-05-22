@@ -7,6 +7,7 @@ using Zenject;
 
 public class SaveManager
 {
+    private string savesPath;
     private string savePath;
     [Inject] private Universe _universe;
     [Inject] private NpcJobManager _npcJobManager;
@@ -14,14 +15,32 @@ public class SaveManager
     [Inject] private SpaceContainer _spaceContainer;
     [Inject] private readonly DiContainer _container;
     [Inject] private PlayerService _playerService;
-    public void Avake()
+
+    public List<SpaceConfig> spaceConfigs = new List<SpaceConfig>();
+    public static SaveManager singleton;
+
+    public void Init()
     {
-        savePath = Path.Combine(Application.persistentDataPath, "save.json");
+        savesPath = Application.persistentDataPath + "/saves/";
+        singleton = this;
     }
-    public void SaveGame()
+    public List<string> GetAllSaves()
     {
-        savePath = Path.Combine(Application.persistentDataPath, "save.json");
+        List<string> list = FolderLister.GetDirFiles(savesPath);
+        return list;
+    }
+    public void SaveGame(int id = 1)
+    {
+        savePath = Path.Combine(savesPath, $"save{id}.json");
+        spaceConfigs = new List<SpaceConfig>();
+        PSpace.InvokeSaveAll();
+        StarSystem psys = _playerService.GetStarSystem();
         SaveData saveData = new SaveData();
+        saveData.seed = _universe.seed;
+        saveData.dateTime = DateTime.Now.ToString();
+        saveData.playerGalaxyId = psys.galaxyId;
+        saveData.playerSystemId = psys.id;
+        saveData.spaceConfigs = spaceConfigs;
         saveData.currentChunkPos = WorldChunkManager.singleton.currentChunk;
         saveData.worldPos = WorldChunkManager.singleton.worldPos;
         saveData.spContainerPosition = _spaceContainer.transform.localPosition;
@@ -45,14 +64,19 @@ public class SaveManager
         }
         JsonConfigLoader.SaveToFile<SaveData>(saveData, savePath);
     }
-    public void LoadGame()
+    public void LoadGame(int id = 1)
     {
+        Universe.singleton.Clear();
         _npcJobManager.isEnabled = false;
         _npcJobManager.ClearAllJobsAndData();
         _npcJobManager.LoadJobs();
         SpaceObject.InvokeDestroyAll();
-        savePath = Path.Combine(Application.persistentDataPath, "save.json");
+        savePath = Path.Combine(savesPath, $"save{id}.json");
         SaveData saveData = JsonConfigLoader.LoadFromFile<SaveData>(savePath);
+        Universe.singleton.seed = saveData.seed;
+        UnityEngine.Random.InitState(_universe.seed);
+        spaceConfigs = saveData.spaceConfigs;
+        Universe.singleton.BuildByList(spaceConfigs);
         _spaceContainer.transform.localPosition = saveData.spContainerPosition;
         _spaceContainer.transform.localEulerAngles = saveData.spContainerRotation;
         for (int i = 0; i < saveData.stationDatas.Count; i++)
@@ -87,12 +111,21 @@ public class SaveManager
             ship.StarSystem = ship.GetStarSystem();
 
             ship.Init();
-            ship.TryInstallConfig();
+            if (ship.is_player)
+            _playerService.SetStarSystem(ship.StarSystem);
+            if (!ship.Is_main_installed)
+            {
+                ship.TryInstallConfig();
+            }
             if (ship.is_player)
             {
+                var controller = _container.TryResolve<PlayerShipController>();
                 _playerService.Warp(ship.StarSystem, pos, rot);
-                var controller = ship.gameObject.AddComponent<PlayerShipController>();
-                _container.Inject(controller);
+                if (!controller)
+                {
+                    controller = ship.gameObject.AddComponent<PlayerShipController>();
+                    _container.Inject(controller);
+                }
                 controller._rigidbody = ship.rigidbody;
                 controller.Sp_object = ship;
                 ship.is_player = true;
@@ -101,7 +134,7 @@ public class SaveManager
                 _playerService._player.currentController = controller;
                 ship.InstallCamera();
                 // WorldChunkManager.singleton.noAsteroids = true;
-                SpaceObject.InvokeDestroyAll(typeof(Asteroid));
+                //SpaceObject.InvokeDestroyAll(typeof(Asteroid));
                 WorldChunkManager.singleton.ClearChunks();
                 WorldChunkManager.singleton.Init();
                 WorldChunkManager.singleton.UpdateCurrentChunk();
@@ -119,5 +152,11 @@ public class SaveManager
             ship.BuildLoadouts();
         }
         _npcJobManager.isEnabled = true;
+    }
+    public SaveData GetSaveData(int id)
+    {
+        savePath = Path.Combine(savesPath, $"save{id}.json");
+        SaveData saveData = JsonConfigLoader.LoadFromFile<SaveData>(savePath);
+        return saveData;
     }
 }

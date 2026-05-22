@@ -24,6 +24,7 @@ public class PSpace : MonoBehaviour
     public MapSpaceUi mapSpaceUi;
 
     public static UnityAction<Type> OnDestroyAllAction;
+    public static UnityAction<Type> OnSaveAllAction;
 
     [Inject] public PlayerService _playerService;
     [Inject] public CameraManager _cameraManager;
@@ -41,6 +42,7 @@ public class PSpace : MonoBehaviour
         mapSpaceUi.space = this;
 
         OnDestroyAllAction += OnDestroyAll;
+        OnSaveAllAction += OnSaveAll;
     }
     public virtual void OnDestroyAll(Type type)
     {
@@ -53,9 +55,24 @@ public class PSpace : MonoBehaviour
             Destroy();
         }
     }
+    public virtual void OnSaveAll(Type type)
+    {
+        if (type == null)
+        {
+            Save();
+        }
+        else if (type == this.GetType())
+        {
+            Save();
+        }
+    }
     public static void InvokeDestroyAll(Type type = null)
     {
         OnDestroyAllAction?.Invoke(type);
+    }
+    public static void InvokeSaveAll(Type type = null)
+    {
+        OnSaveAllAction?.Invoke(type);
     }
     public virtual void OnMinimapRender()
     {
@@ -81,11 +98,19 @@ public class PSpace : MonoBehaviour
         _asteroidConfigs = asteroidFieldConfigs;
         _canvas = canvas;
     }
+    public virtual void Save()
+    {
+        config.id = id;
+        config.spaceType = this.GetType().ToString();
+        config.position = transform.localPosition;
+        config.rotation = transform.localEulerAngles;
+    }
     public void Destroy()
     {
         _signalBus.Unsubscribe<SpaceShowSignal>(OnSpaceShow);
         _signalBus.Unsubscribe<SpaceOnMinimapRenderSignal>(OnMinimapRender);
         OnDestroyAllAction -= OnDestroyAll;
+        OnSaveAllAction -= OnSaveAll;
         if (mapSpaceUi)
         {
             mapSpaceUi.gameObject.SetActive(false);
