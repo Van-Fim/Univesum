@@ -1,8 +1,9 @@
 {
+    "color":{"r":0, "g":255, "b":0, "a":255},
     "relationship": [
         {
             "faction":"Faction02",
-            "relation":100
+            "relation":-1000000
         }
     ]
 }

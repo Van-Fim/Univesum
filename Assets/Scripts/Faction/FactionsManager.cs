@@ -19,10 +19,13 @@ public class FactionsManager : IInitializable
     [Inject] private SignalBus _signalBus;
 
     private List<Faction> _factions = new List<Faction>();
+    public static FactionsManager singleton;
 
+    public List<Faction> Factions { get => _factions; set => _factions = value; }
 
     public void Initialize()
     {
+        singleton = this;
         _signalBus.Subscribe<SignalOnUpdateTick>(OnUpdateTick);
 
         var allFactions = JsonConfigLoader.LoadAllFromFolder<FactionConfig>("Factions");
@@ -33,13 +36,13 @@ public class FactionsManager : IInitializable
             faction.factionConfig = allFactions[i];
             faction.name = allFactions[i].name;
             Debug.Log(faction.name);
-            _factions.Add(faction);
+            Factions.Add(faction);
         }
     }
     public Faction GetFaction(string name)
     {
         Faction ret = null;
-        ret = _factions.Find(x=>x.name == name);
+        ret = Factions.Find(x=>x.name == name);
         return ret;
     }
     public void OnUpdateTick()

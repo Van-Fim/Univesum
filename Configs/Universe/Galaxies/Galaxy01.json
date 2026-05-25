@@ -22,5 +22,17 @@
             "countMin": 20,
             "countMax": 20
         }
+    ],
+    "start_factions": [
+        {
+            "name":"Faction01",
+            "systems_count_min":7,
+            "systems_count_max":7
+        },
+        {
+            "name":"Faction02",
+            "systems_count_min":7,
+            "systems_count_max":7
+        }
     ]
 }

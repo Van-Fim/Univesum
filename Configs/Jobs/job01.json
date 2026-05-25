@@ -4,11 +4,11 @@
     "task": "",
     "maxUniverseCount": 100,
     "maxGalaxyCount": 100,
-    "maxStarSystemCount": 3,
+    "maxStarSystemCount": 1,
     "faction": "Faction01",
     "onOwnerSystem":true,
-    "spawnRangeMin":200000,
-    "spawnRangeMax":200000,
+    "spawnRangeMin":20000,
+    "spawnRangeMax":20000,
     "heigthMin":10,
     "heigthMax":10
 }

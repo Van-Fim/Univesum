@@ -6,5 +6,10 @@ using Zenject;
 public class FactionConfig
 {
     public string name;
+    public Color32 color;
     public List<FactionRelationshipConfig> relationship;
+    public int systems_count_min;
+    public int systems_count_max;
+    public int systems_count;
+    public bool is_started;
 }

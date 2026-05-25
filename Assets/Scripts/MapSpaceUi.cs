@@ -16,7 +16,7 @@ public class MapSpaceUi : MonoBehaviour, IPointerClickHandler
     public static MapSpaceUi currentSelectedItem;
     public static Color32 currentColor = new Color32(0, 100, 0, 255);
     public static Color32 selectedColor = new Color32(255, 255, 255, 255);
-    public static Color32 defaultColor = new Color32(50, 50, 50, 255);
+    public Color32 defaultColor = new Color32(50, 50, 50, 255);
     public PlayerService playerService;
     public SignalBus _signalBus;
     public void OnPointerClick(PointerEventData eventData)
@@ -32,6 +32,14 @@ public class MapSpaceUi : MonoBehaviour, IPointerClickHandler
         image = GetComponent<Image>();
         Color32 c = image.color;
         image.color = defaultColor;
+        if (space is StarSystem)
+        {
+            StarSystem s = (StarSystem)space;
+            if (s.faction != null)
+            {
+                s.mapSpaceUi.SetColor(0, s.faction.factionConfig.color);
+            }
+        }
     }
     public virtual void Destroy()
     {
@@ -39,6 +47,23 @@ public class MapSpaceUi : MonoBehaviour, IPointerClickHandler
     }
     public void OnSelect()
     {
+        ChangeColor();
+    }
+    public void SetColor(int type = 0, Color32 color = new Color32())
+    {
+        if (type == 0)
+        {
+            defaultColor = color;
+        }
+        else if (type == 1)
+        {
+            currentColor = color;
+        }
+        else if (type == 2)
+        {
+            selectedColor = color;
+        }
+
         ChangeColor();
     }
     public void ChangeColor()

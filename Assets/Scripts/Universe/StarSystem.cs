@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.NetworkInformation;
 using UnityEngine;
 using Zenject;
 
@@ -6,6 +8,7 @@ public class StarSystem : PSpace
 {
     public int galaxyId;
     public List<AsteroidFieldConfig> asteroidFields = new List<AsteroidFieldConfig>();
+    public List<StarSystem> neighbors = new List<StarSystem>();
     public class Factory : PlaceholderFactory<StarSystem> { }
     public override void Save()
     {
@@ -14,6 +17,33 @@ public class StarSystem : PSpace
         config.systemId = id;
         config.asteroidFieldsConfig = asteroidFields;
         SaveManager.singleton.spaceConfigs.Add(config);
+    }
+    public List<StarSystem> GetNeighbors()
+    {
+        // Очищаем старых соседей перед новым расчетом
+        neighbors.Clear();
+
+        List<StarSystem> allValidSystems = new List<StarSystem>();
+
+        // 1. Фильтруем системы: только из нашей галактики и не мы сами
+        for (int i = 0; i < Universe.singleton.systemsList.Count; i++)
+        {
+            StarSystem sys = Universe.singleton.systemsList[i];
+
+            if (sys.galaxyId != galaxyId || sys == this)
+                continue;
+
+            allValidSystems.Add(sys);
+        }
+
+        // 2. Сортируем отфильтрованные системы по расстоянию до этой системы (this)
+        // и берем, например, 4 самые близкие.
+
+        neighbors = allValidSystems
+            .OrderBy(sys => Vector3.Distance(this.transform.position, sys.transform.position))
+            .Take(config.maxNeighborsCount)
+            .ToList();
+        return neighbors;
     }
     public void LoadAsteroidFields()
     {

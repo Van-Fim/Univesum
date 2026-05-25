@@ -31,11 +31,13 @@ public class SpaceConfig
     public int rangeMax;
     public int YMin;
     public int YMax;
+    public int maxNeighborsCount = 4;
     public List<SpaceAsteroidFieldListItem> asteroidFields;
     public List<SpaceConfigListItem> list;
     public List<SpaceConfigSkybox> skyboxes;
 
     public List<AsteroidFieldConfig> asteroidFieldsConfig = new List<AsteroidFieldConfig>();
+    public List<FactionConfig> start_factions = new List<FactionConfig>();
 
     public int id;
     public int galaxyId = -1;

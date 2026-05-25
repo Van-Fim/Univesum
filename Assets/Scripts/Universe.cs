@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Zenject;
 
@@ -53,6 +54,122 @@ public class Universe
         systemsList = new List<StarSystem>();
         WorldChunkManager.singleton.Reset();
     }
+    public void DistributeGalacticTerritories(Galaxy galaxy)
+    {
+        // 1. Собираем все системы нужной галактики
+        List<StarSystem> allSystems = Universe.singleton.systemsList
+            .Where(s => s.galaxyId == galaxy.id)
+            .ToList();
+        List<FactionConfig> startFactions = galaxy.config.start_factions;
+        List<Faction> factions = FactionsManager.singleton.Factions;
+        int numFractions = startFactions.Count;
+
+        // Сразу сбрасываем фракции у всех систем в этой галактике (-1 = нейтральная)
+        foreach (StarSystem sys in allSystems) sys.faction = null; 
+
+        // 2. Выбираем максимально удаленные стартовые точки (столицы)
+        List<StarSystem> capitals = new List<StarSystem>();
+        for (int f = 0; f < numFractions; f++)
+        {
+            Faction ff = factions.Find(x=>x.name == startFactions[f].name);
+            if (ff == null)
+            {
+                continue;
+            }
+            int rnd = Random.Range(startFactions[f].systems_count_min, startFactions[f].systems_count_max + 1);
+            startFactions[f].systems_count = rnd;
+            startFactions[f].is_started = true;
+        }
+        for (int f = 0; f < numFractions; f++)
+        {
+            Faction ff = factions.Find(x=>x.name == startFactions[f].name);
+            if (ff == null)
+            {
+                continue;
+            }
+            if (f == 0)
+            {
+                // Первая столица — в случайную систему
+                capitals.Add(allSystems[Random.Range(0, allSystems.Count)]);
+            }
+            else
+            {
+                // Каждая следующая — максимально далеко от всех уже выбранных столиц
+                var bestCapital = allSystems
+                    .Where(s => s.faction == null)
+                    .OrderByDescending(s => capitals.Min(c => Vector3.Distance(s.transform.position, c.transform.position)))
+                    .First();
+                capitals.Add(bestCapital);
+            }
+            
+            capitals[f].faction = factions[f]; // Задаем ID фракции (0, 1, 2, 3, 4)
+            startFactions[f].systems_count--; // Уменьшаем лимит систем фракции, так как столица уже занята
+        }
+
+        // Подготавливаем списки «фронта экспансии» (граничащие свободные системы)
+        List<List<StarSystem>> expansionFronts = new List<List<StarSystem>>();
+        for (int f = 0; f < numFractions; f++)
+        {
+            // На старте фронт фракции — это соседи её столицы
+            expansionFronts.Add(new List<StarSystem>(capitals[f].neighbors));
+        }
+
+        // 3. Пошаговое круговое расширение
+        bool systemsAssignedInThisTurn = true;
+        
+        while (systemsAssignedInThisTurn)
+        {
+            systemsAssignedInThisTurn = false;
+
+            // По очереди даем походить каждой фракции
+            for (int f = 0; f < numFractions; f++)
+            {
+                // Если фракция уже исчерпала свой лимит X систем, пропускаем её
+                if (startFactions[f].is_started && startFactions[f].systems_count <= 0) continue;
+
+                // Очищаем фронт от систем, которые уже успел захватить кто-то другой
+                expansionFronts[f] = expansionFronts[f].Where(s => s.faction == null).ToList();
+
+                if (expansionFronts[f].Count > 0)
+                {
+                    // Ищем во фронте систему, которая ближе всего к столице этой фракции.
+                    // Это заставляет территорию расти кучно («пятном»), а не сосиской.
+                    var targetSystem = expansionFronts[f]
+                        .OrderBy(s => Vector3.Distance(s.transform.position, capitals[f].transform.position))
+                        .First();
+
+                    // Захватываем систему
+                    targetSystem.faction = FactionsManager.singleton.GetFaction(startFactions[f].name);
+                    if (targetSystem.mapSpaceUi && targetSystem.faction != null)
+                    {
+                        targetSystem.mapSpaceUi.SetColor(0, targetSystem.faction.factionConfig.color);
+                    }
+                    startFactions[f].systems_count--;
+                    systemsAssignedInThisTurn = true;
+
+                    // Добавляем соседей захваченной системы в наш фронт расширения
+                    foreach (var neighbor in targetSystem.neighbors)
+                    {
+                        if (neighbor.faction == null && !expansionFronts[f].Contains(neighbor))
+                        {
+                            expansionFronts[f].Add(neighbor);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4. Страховка (на случай, если из-за генерации остались изолированные «ничейные» системы)
+        // foreach (var sys in allSystems.Where(s => s.faction == null))
+        // {
+        //     var closestOccupied = allSystems
+        //         .Where(s => s.faction != null)
+        //         .OrderBy(s => Vector3.Distance(sys.transform.position, s.transform.position))
+        //         .FirstOrDefault();
+                
+        //     if (closestOccupied != null) sys.faction = closestOccupied.faction;
+        // }
+    }
     public void BuildByList(List<SpaceConfig> spaceConfigs)
     {
         for (int c = 0; c < spaceConfigs.Count; c++)
@@ -81,9 +198,15 @@ public class Universe
                     space.galaxyId = sc.galaxyId;
                     space.asteroidFields = sc.asteroidFieldsConfig;
                     space.config = sc;
+                    space.faction = FactionsManager.singleton.GetFaction(sc.faction);
                     systemsList.Add(space);
                 }
             }
+        }
+        for (int i = 0; i < systemsList.Count; i++)
+        {
+            StarSystem starSystem = systemsList[i];
+            starSystem.GetNeighbors();
         }
     }
     public void Build()
@@ -140,6 +263,15 @@ public class Universe
                     id++;
                 }
             }
+        }
+        for (int i = 0; i < systemsList.Count; i++)
+        {
+            StarSystem starSystem = systemsList[i];
+            starSystem.GetNeighbors();
+        }
+        for (int i = 0; i < galaxiesList.Count; i++)
+        {
+            DistributeGalacticTerritories(galaxiesList[i]);
         }
     }
     public Galaxy FindGalaxy(int galaxyId)
