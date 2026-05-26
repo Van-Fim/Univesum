@@ -1,0 +1,28 @@
+{
+    "data":[
+        {
+            "codename": "Start1",
+            "text": "Никудышный делец"
+        },
+        {
+            "codename": "Start1Descr",
+            "text": "Описание старта {Gamestart:Start1}"
+        },
+        {
+            "codename": "Start2",
+            "text": "Самоотверженный воин"
+        },
+        {
+            "codename": "Start2Descr",
+            "text": "Описание старта {Gamestart:Start2}"
+        },
+        {
+            "codename": "Start3",
+            "text": "Патрульный"
+        },
+        {
+            "codename": "Start3Descr",
+            "text": "Описание старта {Gamestart:Start3}"
+        }
+    ]
+}

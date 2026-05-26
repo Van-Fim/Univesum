@@ -17,7 +17,6 @@ public class GameInstaller : MonoInstaller
         Container.DeclareSignal<SignalDestroyChunkAsteroids>();
         Container.DeclareSignal<SignalGameStarted>();
         Container.DeclareSignal<SpaceShowSignal>();
-        Container.DeclareSignal<SpaceOnMinimapRenderSignal>();
         Container.DeclareSignal<SignalChunkManagerReady>();
         Container.DeclareSignal<SignalChunkDestroy>();
         Container.DeclareSignal<SignalChunkFloatingOriginFix>();

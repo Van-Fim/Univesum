@@ -18,6 +18,35 @@ public class StarSystem : PSpace
         config.asteroidFieldsConfig = asteroidFields;
         SaveManager.singleton.spaceConfigs.Add(config);
     }
+    public override void OnMinimapRender(System.Type type)
+    {
+        base.OnMinimapRender(type);
+        StarSystem psys = _playerService.GetStarSystem();
+        if (canShow)
+        {
+            if (mapSpaceUi)
+            {
+                if (psys != null && psys.galaxyId == galaxyId)
+                {
+                    mapSpaceUi.gameObject.SetActive(true);
+                    gameObject.SetActive(true);
+                }
+                else
+                {
+                    mapSpaceUi.gameObject.SetActive(false);
+                    gameObject.SetActive(false);
+                }
+            }
+        }
+        else
+        {
+            if (mapSpaceUi)
+            {
+                mapSpaceUi.gameObject.SetActive(false);
+                gameObject.SetActive(false);
+            }
+        }
+    }
     public List<StarSystem> GetNeighbors()
     {
         // Очищаем старых соседей перед новым расчетом

@@ -14,6 +14,7 @@ public class MainMenu : MonoBehaviour
 {
     public MainMenuPanel mainPanel;
 
+    public MenuPanel newGame;
     public LoadMenuPanel loadGames;
     public MenuPanel saveGame;
     public MenuPanel settings;

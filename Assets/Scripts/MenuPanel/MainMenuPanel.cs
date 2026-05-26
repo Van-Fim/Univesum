@@ -24,7 +24,7 @@ public class MainMenuPanel : MenuPanel
     public void CreateButtons()
     {
         ClearButtons();
-   
+
         for (int i = 0; i < buttonDatas.Count; i++)
         {
             CreateButton(buttonDatas[i]);
@@ -33,7 +33,7 @@ public class MainMenuPanel : MenuPanel
     public void CreateButton(ButtonData buttonData)
     {
         byte num = (byte)buttonDatas.IndexOf(buttonData);
-   
+
         Button newButton = Instantiate<Button>(mainMenuButtonPrefab, transform);
         newButton.onClick.AddListener(() => OnButtonPressed.Invoke(num));
         newButton.name = $"Button_{buttonData.buttonName}";
@@ -41,11 +41,23 @@ public class MainMenuPanel : MenuPanel
         TXMText txt = newButton.GetComponentInChildren<TXMText>();
         txt.text = "{" + buttonData.buttonName + "}";
     }
-    
+
     public void OnButtonPressedAction(int v)
     {
         if (v == 0)
         {
+            gameObject.SetActive(false);
+            mainMenu.newGame.gameObject.SetActive(true);
+            mainMenu.prev = mainMenu.newGame;
+            NewGameMenuPanel newGameMenu = (NewGameMenuPanel)mainMenu.newGame;
+            List<string> list = GameStartManager.singleton.GetAllStarts();
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i] == "MainMenu")
+                    continue;
+                newGameMenu.CreateButton(i);
+            }
+            /*
             Universe.singleton.Clear();
             var startConfig = JsonConfigLoader.LoadFromFile<GameStartConfig>("Gamestarts/Default");
             GameStartManager.singleton.SetConfig(startConfig);
@@ -55,6 +67,7 @@ public class MainMenuPanel : MenuPanel
             CanvasController.singleton.mainMenu.gameObject.SetActive(false);
             PlayerService.singleton.SetIsInMenu(false);
             CanvasController.singleton.ShowUi();
+            */
         }
         else if (v == 1)
         {

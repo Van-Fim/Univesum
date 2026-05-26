@@ -4,9 +4,16 @@ using Zenject;
 public class Galaxy : PSpace
 {
     public class Factory : PlaceholderFactory<Galaxy> { }
+    public override void OnMinimapRender(System.Type type)
+    {
+        base.OnMinimapRender(type);
+        mapSpaceUi.gameObject.SetActive(false);
+        gameObject.SetActive(false);
+    }
     public void Build()
     {
         int id = 0;
+        Random.InitState($"{_universe.seed.ToString()}{this.id}".GetHashCode());
         for (int i = 0; i < config.list.Count; i++)
         {
             SpaceConfigListItem it = config.list[i];
@@ -16,7 +23,7 @@ public class Galaxy : PSpace
             int count = Random.Range(it.countMin, it.countMax + 1);
             for (int c = 0; c < count; c++)
             {
-                Random.InitState(_universe.seed + this.id + id);
+                Random.InitState($"{_universe.seed.ToString()}{this.id}{id}".GetHashCode());
                 StarSystem space = _starSystemFactory.Create();
                 space.transform.SetParent(_universe.systems);
                 space.config = JsonConfigLoader.LoadFromFile<SpaceConfig>($"Universe/Systems/{it.name}");

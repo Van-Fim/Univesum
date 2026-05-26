@@ -74,7 +74,7 @@ public class SaveManager
         savePath = Path.Combine(savesPath, $"save{id}.json");
         SaveData saveData = JsonConfigLoader.LoadFromFile<SaveData>(savePath);
         Universe.singleton.seed = saveData.seed;
-        UnityEngine.Random.InitState(_universe.seed);
+        UnityEngine.Random.InitState($"{_universe.seed}".GetHashCode());
         spaceConfigs = saveData.spaceConfigs;
         Universe.singleton.BuildByList(spaceConfigs);
         _spaceContainer.transform.localPosition = saveData.spContainerPosition;

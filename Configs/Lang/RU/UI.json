@@ -17,6 +17,10 @@
             "text": "Настройки"
         },
         {
+            "codename": "NewGame",
+            "text": "Новая игра"
+        },
+        {
             "codename": "QuitGame",
             "text": "Выйти"
         }
@@ -40,6 +44,10 @@
         {
             "codename": "SaveLoadOk",
             "text": "Загрузить"
+        },
+        {
+            "codename": "NewGameOk",
+            "text": "Начать"
         }
     ]
 }

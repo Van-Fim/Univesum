@@ -35,7 +35,6 @@ public class FactionsManager : IInitializable
             faction.id = i;
             faction.factionConfig = allFactions[i];
             faction.name = allFactions[i].name;
-            Debug.Log(faction.name);
             Factions.Add(faction);
         }
     }

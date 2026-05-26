@@ -4,6 +4,10 @@
         {
             "faction":"Faction02",
             "relation":-1000000
+        },
+        {
+            "faction":"Faction03",
+            "relation":0
         }
     ]
 }

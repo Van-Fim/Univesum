@@ -8,8 +8,8 @@
             "name": "Galaxy01",
             "rangeMin": 100,
             "rangeMax": 100,
-            "countMin": 1,
-            "countMax": 1
+            "countMin": 3,
+            "countMax": 3
         }
     ]
 }

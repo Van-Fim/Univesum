@@ -25,10 +25,13 @@ public class PSpace : MonoBehaviour
 
     public static UnityAction<Type> OnDestroyAllAction;
     public static UnityAction<Type> OnSaveAllAction;
+    public static UnityAction<Type> OnMinimapRenderAction;
 
     [Inject] public PlayerService _playerService;
     [Inject] public CameraManager _cameraManager;
     [Inject] public FactionsManager _factionsManager;
+
+    public bool canShow = false;
 
     public void Start()
     {
@@ -43,6 +46,7 @@ public class PSpace : MonoBehaviour
 
         OnDestroyAllAction += OnDestroyAll;
         OnSaveAllAction += OnSaveAll;
+        OnMinimapRenderAction += OnMinimapRender;
     }
     public virtual void OnDestroyAll(Type type)
     {
@@ -66,6 +70,20 @@ public class PSpace : MonoBehaviour
             Save();
         }
     }
+    public virtual void OnMinimapRender(Type type)
+    {
+        Camera mapCam = _cameraManager.GetMapCamera();
+        bool v = mapCam.enabled;
+        
+        if (v)
+        {
+            canShow = true;
+        }
+        else
+        {
+            canShow = false;
+        }
+    }
     public static void InvokeDestroyAll(Type type = null)
     {
         OnDestroyAllAction?.Invoke(type);
@@ -74,25 +92,16 @@ public class PSpace : MonoBehaviour
     {
         OnSaveAllAction?.Invoke(type);
     }
-    public virtual void OnMinimapRender()
+    public static void InvokeMinimapRender(Type type = null)
     {
-        Camera mapCam = _cameraManager.GetMapCamera();
-        bool v = mapCam.enabled;
-        if (v)
-        {
-            mapSpaceUi.gameObject.SetActive(true);
-        }
-        else
-        {
-            mapSpaceUi.gameObject.SetActive(false);
-        }
+        OnMinimapRenderAction?.Invoke(type);
     }
+
     [Inject]
     public virtual void Construct(SignalBus signalBus, Universe universe, StarSystem.Factory starSystemFactory, List<AsteroidFieldConfig> asteroidFieldConfigs, CanvasController canvas)
     {
         _signalBus = signalBus;
         _signalBus.Subscribe<SpaceShowSignal>(OnSpaceShow);
-        _signalBus.Subscribe<SpaceOnMinimapRenderSignal>(OnMinimapRender);
         _universe = universe;
         _starSystemFactory = starSystemFactory;
         _asteroidConfigs = asteroidFieldConfigs;
@@ -101,6 +110,10 @@ public class PSpace : MonoBehaviour
     public virtual void Save()
     {
         config.id = id;
+        if (faction != null)
+        {
+            config.faction = faction.name;
+        }
         config.spaceType = this.GetType().ToString();
         config.position = transform.localPosition;
         config.rotation = transform.localEulerAngles;
@@ -108,9 +121,9 @@ public class PSpace : MonoBehaviour
     public void Destroy()
     {
         _signalBus.Unsubscribe<SpaceShowSignal>(OnSpaceShow);
-        _signalBus.Unsubscribe<SpaceOnMinimapRenderSignal>(OnMinimapRender);
         OnDestroyAllAction -= OnDestroyAll;
         OnSaveAllAction -= OnSaveAll;
+        OnMinimapRenderAction -= OnMinimapRender;
         if (mapSpaceUi)
         {
             mapSpaceUi.gameObject.SetActive(false);

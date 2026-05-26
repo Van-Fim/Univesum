@@ -1,0 +1,12 @@
+{
+    "icon": "Materials/Ships/Ship01",
+    "systemId":0,
+    "galaxyId":2,
+    "univesrse":"Default",
+    "ship": "Ship01",
+    "ship_loadout": "Ship01_Loadout02",
+    "suit": "",
+    "suit_loadout": "",
+    "start_position":{"x":0,"y":0,"z":0},
+    "start_rotation":{"x":0,"y":0,"z":0}
+}

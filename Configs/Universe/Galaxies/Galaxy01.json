@@ -26,13 +26,18 @@
     "start_factions": [
         {
             "name":"Faction01",
-            "systems_count_min":7,
-            "systems_count_max":7
+            "systems_count_min":10,
+            "systems_count_max":10
         },
         {
             "name":"Faction02",
-            "systems_count_min":7,
-            "systems_count_max":7
+            "systems_count_min":10,
+            "systems_count_max":10
+        },
+        {
+            "name":"Faction03",
+            "systems_count_min":10,
+            "systems_count_max":10
         }
     ]
 }

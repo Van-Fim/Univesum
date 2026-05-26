@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -16,6 +17,7 @@ public class GameStartManager
     [Inject] private readonly SaveManager _saveManager;
     public static GameStartManager singleton;
     private NpcJobManager _npcJobManager;
+    public string startsPath;
 
     public GameStartManager(
         DiContainer container,
@@ -42,6 +44,8 @@ public class GameStartManager
     }
     public void Init()
     {
+        startsPath = JsonConfigLoader.ConfigPath + "/" + "Gamestarts";
+
         Random.InitState(_universe.seed);
         _canvasController.Init();
         _langManager.Init();
@@ -75,6 +79,11 @@ public class GameStartManager
         }
         StarSystem sys = _universe.FindSystem(_config.galaxyId, _config.systemId);
         _playerService.Warp(sys, _config.start_position, _config.start_rotation);
+    }
+    public List<string> GetAllStarts()
+    {
+        List<string> list = FolderLister.GetDirFiles(startsPath);
+        return list;
     }
     private void CreateSuit()
     {

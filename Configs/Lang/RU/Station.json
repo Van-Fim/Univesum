@@ -2,11 +2,15 @@
     "data":[
         {
             "codename": "Station01",
-            "text": "Завод по переработке руды"
+            "text": "Форпост"
         },
         {
             "codename": "Station02",
-            "text": "Солнечная электростанция"
+            "text": "{Station:Station01}"
+        },
+        {
+            "codename": "Station03",
+            "text": "{Station:Station01}"
         }
     ]
 }

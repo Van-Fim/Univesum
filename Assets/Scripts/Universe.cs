@@ -179,7 +179,7 @@ public class Universe
             {
                 if (sc.spaceType == "Galaxy")
                 {
-                    Random.InitState(seed + sc.id);
+                    Random.InitState($"{seed}{sc.id}".GetHashCode());
                     Galaxy space = _galaxyFactory.Create();
                     space.transform.SetParent(galaxies);
                     space.transform.localPosition = sc.position;
@@ -189,7 +189,7 @@ public class Universe
                 }
                 else if (sc.spaceType == "StarSystem")
                 {
-                    Random.InitState(seed + sc.id);
+                    Random.InitState($"{seed}{sc.id}".GetHashCode());
                     StarSystem space = _starSystemFactory.Create();
                     space.transform.SetParent(systems);
                     space.transform.localPosition = sc.position;
@@ -199,6 +199,7 @@ public class Universe
                     space.asteroidFields = sc.asteroidFieldsConfig;
                     space.config = sc;
                     space.faction = FactionsManager.singleton.GetFaction(sc.faction);
+                    Debug.Log(sc.faction);
                     systemsList.Add(space);
                 }
             }
@@ -220,7 +221,7 @@ public class Universe
             int count = Random.Range(it.countMin, it.countMax + 1);
             for (int c = 0; c < count; c++)
             {
-                Random.InitState(seed + id);
+                Random.InitState($"{seed}{id}".GetHashCode());
                 Galaxy space = _galaxyFactory.Create();
                 space.transform.SetParent(galaxies);
                 space.config = JsonConfigLoader.LoadFromFile<SpaceConfig>($"Universe/Galaxies/{it.name}");

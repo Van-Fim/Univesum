@@ -83,7 +83,7 @@ public class PlayerShipController : SpaceObjectController
             mapCam.transform.localPosition = psys.transform.localPosition + new Vector3(0, 200, 0);
             mapCam.transform.localEulerAngles = new Vector3(90, 0, 0);
 
-            _signalBus.Fire(new SpaceOnMinimapRenderSignal());
+            PSpace.InvokeMinimapRender(typeof(StarSystem));
         }
         if (Input.GetKeyDown(KeyCode.Z))
         {

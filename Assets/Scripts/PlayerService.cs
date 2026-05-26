@@ -31,7 +31,7 @@ public class PlayerService
     }
     public void Warp(StarSystem starSystem, Vector3 position, Vector3 rotation)
     {
-        Random.InitState(_universe.seed + starSystem.galaxyId + starSystem.id);
+        Random.InitState($"{_universe.seed}{starSystem.galaxyId}{starSystem.id}".GetHashCode());
         int rndm = Random.Range(0, starSystem.config.skyboxes.Count);
         ChangeSkybox(starSystem.config.skyboxes[rndm]);
         _signalBus.Fire(new SpaceShowSignal(starSystem));
