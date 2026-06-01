@@ -1,0 +1,14 @@
+{
+    "space_object": "Ship01",
+    "type": "ship",
+    "task": "patrol",
+    "maxUniverseCount": 1000,
+    "maxGalaxyCount": 1000,
+    "maxStarSystemCount": 1,
+    "faction": "Faction01",
+    "onOwnerSystem":true,
+    "spawnRangeMin":2000,
+    "spawnRangeMax":2000,
+    "heigthMin":10,
+    "heigthMax":10
+}

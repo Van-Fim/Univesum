@@ -129,7 +129,14 @@ public class Ship : SpaceObject
             }
         }
     }
-
+    public void OnSelect()
+    {
+        if (targetSelect)
+        {
+            TargetSelect.currentSelectedItem = targetSelect;
+            TargetSelect.InvokeSelect();
+        }
+    }
     public override void Update()
     {
         if (IsOwnedByLocalPlayer())

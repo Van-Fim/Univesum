@@ -1,7 +1,7 @@
 {
     "icon": "Materials/Ships/Ship01",
-    "systemId":0,
-    "galaxyId":2,
+    "systemId":12,
+    "galaxyId":0,
     "univesrse":"Default",
     "ship": "Ship01",
     "ship_loadout": "Ship01_Loadout02",

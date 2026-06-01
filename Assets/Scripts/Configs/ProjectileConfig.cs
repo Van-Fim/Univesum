@@ -4,6 +4,7 @@ using UnityEngine;
 [System.Serializable]
 public class ProjectileConfig
 {
+    public string name;
     public float damage;
     public float speed;
     public float lifetime;

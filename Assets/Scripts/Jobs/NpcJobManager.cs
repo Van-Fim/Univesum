@@ -281,7 +281,6 @@ public class NpcJobManager : IInitializable
             return null;
 
         var selectedSystem = availableSystems[UnityEngine.Random.Range(0, availableSystems.Count)];
-
         return (selectedGalaxy, selectedSystem);
     }
 
@@ -320,7 +319,7 @@ public class NpcJobManager : IInitializable
         station.Init();
         bool inst = station.TryInstallConfig(station.StarSystem);
         station.InstallLoadout();
-        station.BuildLoadouts();
+
         // Создание экземпляра джоба
         var jobInstance = new JobInstance
         {
@@ -392,6 +391,7 @@ public class NpcJobManager : IInitializable
         ship.Init();
         bool inst = ship.TryInstallConfig(ship.StarSystem);
         ship.InstallLoadout();
+        
         // Создание экземпляра джоба
         var jobInstance = new JobInstance
         {

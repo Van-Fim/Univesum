@@ -18,6 +18,7 @@ public class TargetSelect : MonoBehaviour, IPointerClickHandler
     public Image shieldBar;
     public Image hullBar;
     public Image offscreenArrow;
+    public Image clickArea;
     public static UnityAction OnSelectAction;
     public static TargetSelect currentSelectedItem;
     public SpaceObject spaceObject;
@@ -28,8 +29,8 @@ public class TargetSelect : MonoBehaviour, IPointerClickHandler
     public CanvasController canvasController;
     public CameraManager cameraManager;
 
-    public static float scaleValue = 40;
-    public static float posValue = 40;
+    public static float scaleValue = 20;
+    public static float posValue = 20;
 
     public float percentValue = 0.4f;
 
@@ -92,22 +93,22 @@ public class TargetSelect : MonoBehaviour, IPointerClickHandler
         else if (this.type == 0)
         {
             Color32 col = shieldBar.color;
-            shieldBar.color = new Color32(col.r, col.g, col.b, 70);
+            shieldBar.color = new Color32(col.r, col.g, col.b, 150);
 
             col = hullBar.color;
-            hullBar.color = new Color32(col.r, col.g, col.b, 70);
+            hullBar.color = new Color32(col.r, col.g, col.b, 150);
 
             col = topRight.color;
-            topRight.color = new Color32(col.r, col.g, col.b, 70);
+            topRight.color = new Color32(col.r, col.g, col.b, 150);
 
             col = topRight.color;
-            topLeft.color = new Color32(col.r, col.g, col.b, 70);
+            topLeft.color = new Color32(col.r, col.g, col.b, 150);
 
             col = bottomRight.color;
-            bottomRight.color = new Color32(col.r, col.g, col.b, 70);
+            bottomRight.color = new Color32(col.r, col.g, col.b, 150);
 
             col = bottomLeft.color;
-            bottomLeft.color = new Color32(col.r, col.g, col.b, 70);
+            bottomLeft.color = new Color32(col.r, col.g, col.b, 150);
 
             topRight.sprite = Resources.Load<Sprite>("Textures/UI/SelectBox/topRight");
             topLeft.sprite = Resources.Load<Sprite>("Textures/UI/SelectBox/topLeft");
@@ -118,7 +119,16 @@ public class TargetSelect : MonoBehaviour, IPointerClickHandler
     public virtual void UpdateUiPos()
     {
         float dst = Vector3.Distance(playerService._player_sp_object.transform.position, spaceObject.transform.position);
-        dst = Mathf.Clamp(30000 / dst, 0.5f, 2f);
+        if (spaceObject is Station)
+        {
+            dst = Mathf.Clamp(20000 / dst, 0.5f, 1f);
+        }
+        else if (spaceObject is Ship)
+        {
+            dst = Mathf.Clamp(20000 / dst, 0.3f, 1f);
+        }
+
+        float ff = 1 + (1 / dst)*2;
 
         hullBar.fillAmount = (float)spaceObject.hull / spaceObject.maxHull;
         shieldBar.fillAmount = (float)spaceObject.shield / spaceObject.maxShield;
@@ -138,12 +148,15 @@ public class TargetSelect : MonoBehaviour, IPointerClickHandler
         bottomRight.transform.localPosition = new Vector2(posValue * dst, -posValue * dst);
         bottomRight.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scaleValue);
         bottomRight.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scaleValue);
-        hullBar.transform.localPosition = new Vector2(0, posValue * dst + 25);
+        hullBar.transform.localPosition = new Vector2(0, posValue * dst + posValue/2 + 5);
         hullBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, barVals.y);
         hullBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scaleValue + posValue * dst * 2);
         shieldBar.transform.localPosition = new Vector2(0, hullBar.transform.localPosition.y + 7);
         shieldBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, barVals.y);
         shieldBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scaleValue + posValue * dst * 2);
+        
+        clickArea.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, posValue * ff);
+        clickArea.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, posValue * ff);
     }
     public virtual void Destroy()
     {

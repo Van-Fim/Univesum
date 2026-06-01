@@ -378,7 +378,6 @@ public abstract class SpaceObject : MonoBehaviour
         for (int i = 0; i < loadoutHPs.Count; i++)
         {
             LoadoutHP hp = loadoutHPs[i];
-            Debug.Log($"{hp.hardpoint} {hp.item}");
         }
     }
     public virtual void InvokeTakeDamage(SpaceObject attacker, int damage)

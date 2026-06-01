@@ -14,27 +14,31 @@ public class Weapon : MonoBehaviour
     float rotationSpeed = 7f;
     protected GameObject main = null;
     protected float _nextFireTime;
+    private DiContainer container;
     [Inject]
     public CameraManager _cameraManager;
     [Inject]
     public PlayerService _playerService;
     [Inject]
     public SignalBus _signalBus;
-    [Inject]
     public ProjectilePool _pool;
     [Inject]
-    public virtual void Construct(SpaceObject parent, WeaponConfig config, SignalBus signalBus, ProjectilePool pool)
+    private ProjectilePoolFactory poolFactory;
+    [Inject]
+    public virtual void Construct(SpaceObject parent, WeaponConfig config, SignalBus signalBus, DiContainer container)
     {
         _parent = parent;
         _config = config;
 
         _signalBus = signalBus;
         _signalBus.Subscribe<WeaponFiredSignal>(OnFire);
-        _pool = pool;
+        projectileConfig = JsonConfigLoader.LoadFromFile<ProjectileConfig>("Projectiles/" + _config.projectile);
+        this.container = container;
+        _pool = container.ResolveId<ProjectilePool>(projectileConfig.name);
     }
     public virtual void Init()
     {
-        projectileConfig = JsonConfigLoader.LoadFromFile<ProjectileConfig>("Projectiles/" + _config.projectile);
+        
     }
     private void OnDestroy()
     {

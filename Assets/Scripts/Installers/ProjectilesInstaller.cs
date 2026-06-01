@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using Zenject;
 
@@ -7,8 +9,10 @@ public class ProjectilesInstaller : MonoInstaller
     public override void InstallBindings()
     {
         ProjectileConfig[] configs = JsonConfigLoader.LoadAllFromFolder<ProjectileConfig>("Projectiles");
+        Container.Bind<ProjectilePoolFactory>().AsSingle();
+        ProjectilePoolFactory factory = Container.Resolve<ProjectilePoolFactory>();
 
-        foreach (var config in configs)
+        foreach (ProjectileConfig config in configs)
         {
             GameObject projFX = Resources.Load<GameObject>("Prefabs/ProjectileFx");
             GameObject prefab = Resources.Load<GameObject>(config.pathToModel);
@@ -60,9 +64,9 @@ public class ProjectilesInstaller : MonoInstaller
             rb.useGravity = false;
             proj.rb = rb;
             Container.BindMemoryPool<Projectile, ProjectilePool>()
+                .WithId($"{config.name}")
                 .WithInitialSize(3)
-                .FromComponentInNewPrefab(_modelInstance)
-                .WhenInjectedInto<Weapon>();
+                .FromComponentInNewPrefab(_modelInstance);
             _modelInstance.gameObject.SetActive(false);
         }
     }
