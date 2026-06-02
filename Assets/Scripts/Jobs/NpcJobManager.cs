@@ -51,6 +51,7 @@ public class Job
 
 public class JobInstance
 {
+    public int id;
     public Job job;
     public SpaceObject spaceObject;
     public int galaxyId;
@@ -338,15 +339,16 @@ public class NpcJobManager : IInitializable
         station.InstallLoadout();
 
         // Создание экземпляра джоба
-        var jobInstance = new JobInstance
+        JobInstance jobInstance = new JobInstance
         {
+            id = _activeJobs[job.id].Count,
             job = job,
             spaceObject = station,
             galaxyId = location.galaxy.id,
             systemId = location.system.id,
             spawnTime = DateTime.Now
         };
-
+        station.jobInstId = jobInstance.id;
         _activeJobs[job.id].Add(jobInstance);
 
         // Обновление счетчиков
