@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using Zenject;
 
 [Serializable]
@@ -23,6 +24,8 @@ public class Job
     public int heigthMin = 100;
     public int heigthMax = 100;
 
+    public static UnityAction<SpaceObject> OnJobObjectDestroyedAction;
+
     // Текущие счетчики
     [NonSerialized] public int currentUniverseCount = 0;
     [NonSerialized] public int currentGalaxyCount = 0;
@@ -31,6 +34,19 @@ public class Job
     // Словари для отслеживания распределения
     [NonSerialized] public Dictionary<int, int> galaxyCounts = new Dictionary<int, int>();
     [NonSerialized] public Dictionary<int, int> starSystemCounts = new Dictionary<int, int>();
+
+    public void Init()
+    {
+        OnJobObjectDestroyedAction += OnJobObjectDestroyed;
+    }
+    public void OnJobObjectDestroyed(SpaceObject spaceObject)
+    {
+        Debug.Log($"{spaceObject.jobId} {spaceObject.jobInstId}");
+    }
+    public static void InvokeJobObjectDestroyed(SpaceObject spaceObject = null)
+    {
+        OnJobObjectDestroyedAction?.Invoke(spaceObject);
+    }
 }
 
 public class JobInstance
@@ -150,6 +166,7 @@ public class NpcJobManager : IInitializable
         {
             Job job = jobsArr[i];
             job.id = jobsArr.Length - 1;
+            job.Init();
             _jobs.Add(job);
             _activeJobs[job.id] = new List<JobInstance>();
             _pendingJobs[job.name] = new Queue<Job>();

@@ -95,6 +95,7 @@ public abstract class SpaceObject : MonoBehaviour
     public int maxShield = 10000;
     public int shield;
     public int jobId = -1;
+    public int jobInstId = -1;
     public List<LoadoutHP> loadoutHPs;
     public SpaceObjectConfig spaceObjectConfig;
     public SpaceObjectController spaceObjectController;
@@ -316,6 +317,7 @@ public abstract class SpaceObject : MonoBehaviour
     {
         if (signal.target == this || signal.target == null)
         {
+            Job.InvokeJobObjectDestroyed(this);
             Destroy();
         }
     }

@@ -199,7 +199,6 @@ public class Universe
                     space.asteroidFields = sc.asteroidFieldsConfig;
                     space.config = sc;
                     space.faction = FactionsManager.singleton.GetFaction(sc.faction);
-                    Debug.Log(sc.faction);
                     systemsList.Add(space);
                 }
             }
