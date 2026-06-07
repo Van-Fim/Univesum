@@ -212,7 +212,6 @@ public abstract class SpaceObject : MonoBehaviour
             {
                 ret = true;
                 InstallConfig();
-
                 // var loadout = JsonConfigLoader.LoadFromFile<Loadout>(
                 //     "Loadouts/" + loadoutName
                 // );
@@ -312,6 +311,13 @@ public abstract class SpaceObject : MonoBehaviour
     {
         SetTargetSelect();
         TryInstallConfig(signal.starSystem);
+        StarSystem sys = playerService.GetStarSystem();
+        InstallLoadout();
+        if (this is Ship && !is_player && this.systemId == sys.id && this.galaxyId == sys.galaxyId)
+        {
+            BuildLoadouts();
+            Debug.Log(this.id);
+        }
     }
     public virtual void OnSpDestroy(SpaceObjectOnDestroy signal)
     {
@@ -357,7 +363,7 @@ public abstract class SpaceObject : MonoBehaviour
 
     public virtual void InstallLoadout(Loadout loadout)
     {
-        if (loadout.hardpoints == null)
+        if (loadout == null || loadout.hardpoints == null)
         {
             return;
         }
@@ -553,6 +559,10 @@ public abstract class SpaceObject : MonoBehaviour
         if (targetSelect)
         {
             targetSelect.Destroy();
+        }
+        if (_universe.allSpaceObjects.Contains(this))
+        {
+            _universe.allSpaceObjects.Remove(this);
         }
         Destroy(gameObject);
     }

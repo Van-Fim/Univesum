@@ -1,7 +1,7 @@
 {
-    "damage": 1090,
-    "speed": 600,
-    "lifetime": 20,
+    "damage": 290,
+    "speed": 200,
+    "lifetime": 2.8,
     "explodeTime": 0.25,
     "pathToModel": "Models/Projectiles/Projectile01",
     "baseColor": {"r":255,"g":0,"b":100,"a":255}

@@ -41,7 +41,7 @@ public class Job
     }
     public void OnJobObjectDestroyed(SpaceObject spaceObject)
     {
-        Debug.Log($"{spaceObject.jobId} {spaceObject.jobInstId}");
+
     }
     public static void InvokeJobObjectDestroyed(SpaceObject spaceObject = null)
     {
@@ -397,6 +397,7 @@ public class NpcJobManager : IInitializable
             "Prefabs/ShipPrefab",
             "SpaceObjects/Ships/" + job.space_object
         );
+        StarSystem sys = PlayerService.singleton.GetStarSystem();
         int radius = UnityEngine.Random.Range(job.spawnRangeMin, job.spawnRangeMax + 1);
         Vector2 randomPoint2D = UnityEngine.Random.insideUnitCircle * radius;
         int hr = UnityEngine.Random.Range(job.heigthMin, job.heigthMax + 1);
@@ -410,7 +411,7 @@ public class NpcJobManager : IInitializable
         ship.Init();
         bool inst = ship.TryInstallConfig(ship.StarSystem);
         ship.InstallLoadout();
-        
+
         // Создание экземпляра джоба
         var jobInstance = new JobInstance
         {
@@ -432,7 +433,10 @@ public class NpcJobManager : IInitializable
         if (!job.starSystemCounts.ContainsKey(location.system.id))
             job.starSystemCounts[location.system.id] = 0;
         job.starSystemCounts[location.system.id]++;
-
+        if (!ship.is_player && ship.systemId == sys.id && ship.galaxyId == sys.galaxyId)
+        {
+            ship.BuildLoadouts();
+        }
         Debug.Log($"Spawned {job.name} for {job.faction} in galaxy {location.galaxy.id}, system {location.system.id}");
     }
 

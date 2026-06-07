@@ -39,10 +39,13 @@ public class Ship : SpaceObject
 
     public override void BuildLoadouts()
     {
+        Debug.Log($"Starting building loadouts {loadoutName}");
         if (hardpoints == null)
         {
             return;
         }
+        Debug.Log($"hardpoints exsists");
+        Debug.Log($"loadoutHPs {loadoutHPs.Count}");
         for (int i = 0; i < loadoutHPs.Count; i++)
         {
             LoadoutHP hp = loadoutHPs[i];

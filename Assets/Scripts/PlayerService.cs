@@ -42,6 +42,7 @@ public class PlayerService
         {
             return;
         }
+        
         sp.Sp_object.galaxyId = starSystem.galaxyId;
         sp.Sp_object.systemId = starSystem.id;
         WorldChunkManager wcm = WorldChunkManager.singleton;
