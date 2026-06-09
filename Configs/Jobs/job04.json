@@ -1,7 +1,8 @@
 {
     "space_object": "Ship01",
     "type": "ship",
-    "task": "patrol",
+    "task": "FlyTo",
+    "taskParams": "player",
     "maxUniverseCount": 1000,
     "maxGalaxyCount": 1000,
     "maxStarSystemCount": 1,

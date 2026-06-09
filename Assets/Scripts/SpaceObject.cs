@@ -103,6 +103,7 @@ public abstract class SpaceObject : MonoBehaviour
     protected MeshRenderer meshRenderer;
     public MeshCollider meshCollider;
     public TargetSelect targetSelect;
+    public SpAIExecutor aIExecutor;
     [Inject] public LangManager _langManager;
     [Inject] public SignalBus signalBus;
     [Inject] public PlayerService playerService;
@@ -187,6 +188,21 @@ public abstract class SpaceObject : MonoBehaviour
                     "Loadouts/" + loadoutName
                 );
         InstallLoadout(loadout);
+    }
+    public void InstallAi()
+    {
+        if (aIExecutor)
+        {
+            Debug.Log("aIExecutor already installed");
+            return;
+        }
+        aIExecutor = gameObject.AddComponent<SpAIExecutor>();
+    }
+    public void InstallController()
+    {
+        spaceObjectController = gameObject.AddComponent<ShipController>();
+        spaceObjectController._rigidbody = rigidbody;
+        spaceObjectController.Sp_object = this;
     }
     public bool TryInstallConfig(StarSystem starSystem = null)
     {

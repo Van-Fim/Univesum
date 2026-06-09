@@ -11,7 +11,8 @@ public class Job
     public int id;
     public string space_object = "ship01";
     public string name = "police_patrol01";
-    public string task = "patrol_sector";
+    public string task = "follow";
+    public string taskParams = "player";
     public string type;
     public int maxUniverseCount = 60;
     public int maxGalaxyCount = 30;
@@ -411,6 +412,10 @@ public class NpcJobManager : IInitializable
         ship.Init();
         bool inst = ship.TryInstallConfig(ship.StarSystem);
         ship.InstallLoadout();
+        ship.InstallController();
+        ship.InstallAi();
+        string[] paramsList = job.taskParams.Split(';');
+        ship.spaceObjectController.SetCommand(job.task, paramsList);
 
         // Создание экземпляра джоба
         var jobInstance = new JobInstance

@@ -2,6 +2,7 @@ using TMPro.Examples;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
+using System.Collections.Generic;
 
 public class SpaceObjectController : MonoBehaviour
 {
@@ -31,23 +32,29 @@ public class SpaceObjectController : MonoBehaviour
 
     public Vector2 _screenCenter;
 
+    public string mainCommand;
+    public List<string> parameters;
+
+    public SpaceObjectController()
+    {
+        parameters = new List<string>();
+    }
+    
+    public void SetCommand(string command, params string[] args)
+    {
+        mainCommand = command;
+        parameters = new List<string>(args);
+    }
+
     public SpaceObject Sp_object
     {
         get
         {
-            if (_playerService._player.currentController == this)
-            {
-                _playerService._player_sp_object = sp_object;
-            }
             return sp_object;
         }
         set
         {
             sp_object = value;
-            if (_playerService._player.currentController == this)
-            {
-                _playerService._player_sp_object = sp_object;
-            }
         }
     }
 

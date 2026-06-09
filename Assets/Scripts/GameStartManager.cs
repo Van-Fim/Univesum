@@ -105,6 +105,7 @@ public class GameStartManager
         suit.spaceObjectController = controller;
 
         _playerService._player.currentController = controller;
+        _playerService._player_sp_object = suit;
 
         suit.transform.localPosition = _config.start_position;
         suit.transform.localEulerAngles = _config.start_position;
@@ -135,6 +136,7 @@ public class GameStartManager
 
         ship.spaceObjectController = controller;
         _playerService._player.currentController = controller;
+        _playerService._player_sp_object = ship;
 
         ship.InstallCamera();
 
