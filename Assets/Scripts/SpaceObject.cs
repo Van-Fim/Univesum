@@ -26,7 +26,7 @@ public class SpaceObjectData
     public bool is_initialized;
     public bool is_subscribed;
     public bool is_player;
-    
+
     public SpaceObjectConfig spaceObjectConfig;
     public List<LoadoutHP> loadoutHPs;
 
@@ -122,6 +122,7 @@ public abstract class SpaceObject : MonoBehaviour
     public List<Weapon> weapons = new List<Weapon>();
 
     public static UnityAction<Type> OnDestroyAllAction;
+    public static UnityAction OnTickAction;
 
     TargetSelect targetSelectPrefab;
 
@@ -137,10 +138,11 @@ public abstract class SpaceObject : MonoBehaviour
     public bool is_destroyed = false;
     public bool is_subscribed = false;
     public bool is_player;
-    public bool Is_main_installed {
+    public bool Is_main_installed
+    {
         get
         {
-            return main != null; 
+            return main != null;
         }
     }
 
@@ -148,6 +150,13 @@ public abstract class SpaceObject : MonoBehaviour
 
     protected GameObject main = null;
     public StarSystem StarSystem;
+    public virtual void OnTick()
+    {
+        if (spaceObjectController == null || aIExecutor == null) return;
+
+        // Выполняем текущую команду
+        aIExecutor.ExecuteCommand();
+    }
     public virtual void OnChunkFloatingOriginFixStart(SignalChunkFloatingOriginFixStart signal)
     {
         if (is_player || this is Asteroid)
@@ -180,10 +189,6 @@ public abstract class SpaceObject : MonoBehaviour
     }
     public void InstallLoadout()
     {
-        if (!hardpoints)
-        {
-            return;
-        }
         var loadout = JsonConfigLoader.LoadFromFile<Loadout>(
                     "Loadouts/" + loadoutName
                 );
@@ -236,7 +241,7 @@ public abstract class SpaceObject : MonoBehaviour
             else
             {
                 if (is_player)
-                ret = false;
+                    ret = false;
                 DestroyConfig();
                 if (hardpoints)
                 {
@@ -247,7 +252,7 @@ public abstract class SpaceObject : MonoBehaviour
         else
         {
             if (is_player)
-            ret = false;
+                ret = false;
             DestroyConfig();
             if (hardpoints)
             {
@@ -277,6 +282,7 @@ public abstract class SpaceObject : MonoBehaviour
             signalBus.Subscribe<SignalChunkFloatingOriginFixStart>(OnChunkFloatingOriginFixStart);
             signalBus.Subscribe<SignalChunkFloatingOriginFixEnd>(OnChunkFloatingOriginFixEnd);
             OnDestroyAllAction += OnDestroyAll;
+            OnTickAction += OnTick;
             is_subscribed = true;
         }
     }
@@ -386,8 +392,15 @@ public abstract class SpaceObject : MonoBehaviour
         for (int i = 0; i < loadout.hardpoints.Count; i++)
         {
             LoadoutHP hp = loadout.hardpoints[i];
-            Transform checkHP = hardpoints.Find(hp.hardpoint);
-            if (checkHP || hp.hardpoint == "Engine" || hp.hardpoint == "PowerGenerator")
+            if (hardpoints)
+            {
+                Transform checkHP = hardpoints.Find(hp.hardpoint);
+                if (checkHP || hp.hardpoint == "PowerGenerator")
+                {
+                    loadoutHPs.Add(hp);
+                }
+            }
+            if (hp.hardpoint == "Engine")
             {
                 loadoutHPs.Add(hp);
             }
@@ -572,6 +585,7 @@ public abstract class SpaceObject : MonoBehaviour
         signalBus.Unsubscribe<SignalChunkFloatingOriginFixStart>(OnChunkFloatingOriginFixStart);
         signalBus.Unsubscribe<SignalChunkFloatingOriginFixEnd>(OnChunkFloatingOriginFixEnd);
         OnDestroyAllAction -= OnDestroyAll;
+        OnTickAction -= OnTick;
         if (targetSelect)
         {
             targetSelect.Destroy();
@@ -585,5 +599,9 @@ public abstract class SpaceObject : MonoBehaviour
     public static void InvokeDestroyAll(Type type = null)
     {
         OnDestroyAllAction?.Invoke(type);
+    }
+    public static void InvokeTick()
+    {
+        OnTickAction?.Invoke();
     }
 }

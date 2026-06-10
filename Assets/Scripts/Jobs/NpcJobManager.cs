@@ -11,6 +11,7 @@ public class Job
     public int id;
     public string space_object = "ship01";
     public string name = "police_patrol01";
+    public string loadoutName;
     public string task = "follow";
     public string taskParams = "player";
     public string type;
@@ -405,7 +406,7 @@ public class NpcJobManager : IInitializable
         int y = UnityEngine.Random.Range(-hr, hr + 1);
         Vector3 newPos = new Vector3(randomPoint2D.x, y, randomPoint2D.y);
         ship.jobId = job.id;
-        ship.loadoutName = "Ship01_Loadout01";
+        ship.loadoutName = job.loadoutName;
         ship.transform.localPosition = newPos;
         ship.transform.localEulerAngles = Vector3.zero;
         ship.SetStarSystem(location.galaxy.id, location.system.id);
@@ -414,6 +415,7 @@ public class NpcJobManager : IInitializable
         ship.InstallLoadout();
         ship.InstallController();
         ship.InstallAi();
+        ship.BuildLoadouts();
         string[] paramsList = job.taskParams.Split(';');
         ship.spaceObjectController.SetCommand(job.task, paramsList);
 

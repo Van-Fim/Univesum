@@ -1,8 +1,9 @@
 {
     "space_object": "Ship01",
+    "loadoutName":"Ship01_Loadout01",
     "type": "ship",
-    "task": "FlyTo",
-    "taskParams": "player",
+    "task": "Follow",
+    "taskParams": "player;200",
     "maxUniverseCount": 1000,
     "maxGalaxyCount": 1000,
     "maxStarSystemCount": 1,

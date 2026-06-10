@@ -7,4 +7,9 @@ using Zenject;
 
 public class SpaceContainer : MonoBehaviour
 {
+    public static SpaceContainer singleton;
+    public void Start()
+    {
+        singleton = this;
+    }
 }

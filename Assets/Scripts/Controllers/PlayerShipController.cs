@@ -110,7 +110,7 @@ public class PlayerShipController : SpaceObjectController
     }
 
     #region Rotation Logic
-    public override void Turn()
+    public override void Turn(Transform target = null)
     {
         if (_cameraManager.GetMapCamera().enabled)
         {
@@ -181,7 +181,7 @@ public class PlayerShipController : SpaceObjectController
     #endregion
 
     #region Movement Logic
-    public override void Move()
+    public override void Move(Transform target = null)
     {
         Ship ship = (Ship)Sp_object;
         if (ship.engine == null)

@@ -128,7 +128,7 @@ public class TargetSelect : MonoBehaviour, IPointerClickHandler
             dst = Mathf.Clamp(20000 / dst, 0.3f, 1f);
         }
 
-        float ff = 1 + (1 / dst)*2;
+        float ff = 1 + (1 * dst)*2;
 
         hullBar.fillAmount = (float)spaceObject.hull / spaceObject.maxHull;
         shieldBar.fillAmount = (float)spaceObject.shield / spaceObject.maxShield;

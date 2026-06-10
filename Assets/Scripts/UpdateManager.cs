@@ -8,5 +8,6 @@ public class UpdateManager : MonoBehaviour
     public void Update()
     {
         _signalBus.Fire<SignalOnUpdateTick>();
+        SpaceObject.InvokeTick();
     }
 }

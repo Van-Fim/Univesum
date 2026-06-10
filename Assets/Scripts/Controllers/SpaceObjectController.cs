@@ -84,7 +84,7 @@ public class SpaceObjectController : MonoBehaviour
 
     }
 
-    public virtual void Turn()
+    public virtual void Turn(Transform target = null)
     {
 
     }
@@ -96,7 +96,7 @@ public class SpaceObjectController : MonoBehaviour
         return value;
     }
 
-    public virtual void Move()
+    public virtual void Move(Transform target = null)
     {
 
     }
