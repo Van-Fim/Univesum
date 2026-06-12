@@ -39,7 +39,7 @@ public class SpaceObjectController : MonoBehaviour
     {
         parameters = new List<string>();
     }
-    
+
     public void SetCommand(string command, params string[] args)
     {
         mainCommand = command;
@@ -83,7 +83,10 @@ public class SpaceObjectController : MonoBehaviour
     {
 
     }
+    public virtual void Turn(Vector3 position)
+    {
 
+    }
     public virtual void Turn(Transform target = null)
     {
 
@@ -95,7 +98,10 @@ public class SpaceObjectController : MonoBehaviour
             return 0;
         return value;
     }
+    public virtual void Move(Vector3 position)
+    {
 
+    }
     public virtual void Move(Transform target = null)
     {
 

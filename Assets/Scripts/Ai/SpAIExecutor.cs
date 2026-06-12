@@ -9,6 +9,11 @@ public class SpAIExecutor : MonoBehaviour
 {
     private Ship ship;
     private SpaceObjectController controller;
+    public List<Waypoint> waypoints = new List<Waypoint>();
+    private int currentWaypointIndex = -1;
+    public Waypoint currentWaypoint;
+    private float waypointGenerationCooldown = 0f;
+    private const float MIN_WAYPOINT_DISTANCE = 2000f; // Минимальная дистанция между waypoint'ами
     void Start()
     {
         ship = GetComponent<Ship>();
@@ -35,9 +40,12 @@ public class SpAIExecutor : MonoBehaviour
                 // Просто дрейфуем или стоим на месте
 
                 break;
-
             case "FlyTo":
                 ExecuteFlyTo();
+                break;
+
+            case "Patrol":
+                ExecutePatrol();
                 break;
 
             case "Attack":
@@ -53,11 +61,168 @@ public class SpAIExecutor : MonoBehaviour
                 break;
         }
     }
+    void ExecutePatrol()
+    {
+        // Параметры: [0] maxJumps, [1] maxRange, [2] maxHeight, [3] waypointsCount, [4] successWaypointDistance
+        if (controller.parameters.Count < 5)
+        {
+            Debug.LogError($"Patrol command missing parameters! Need 5, got {controller.parameters.Count}");
+            return;
+        }
 
+        int maxJumps = int.Parse(controller.parameters[0]);
+        int maxRange = int.Parse(controller.parameters[1]);
+        int maxHeight = int.Parse(controller.parameters[2]);
+        int waypointsCount = int.Parse(controller.parameters[3]);
+        float successWaypointDistance = float.Parse(controller.parameters[4]);
+
+        // 1. Генерация waypoint'ов если их нет
+        if (waypoints.Count == 0)
+        {
+            GenerateWaypoints(waypointsCount, maxRange, maxHeight);
+        }
+
+        // 2. Выбор или обновление текущего waypoint'а
+        if (currentWaypoint == null && waypoints.Count > 0)
+        {
+            SelectNextWaypoint();
+        }
+
+        // 3. Если нет waypoint'ов - выходим
+        if (currentWaypoint == null || waypoints.Count == 0)
+        {
+            // Патруль завершен - переходим в Idle
+
+            Debug.Log($"{ship.id}: Патруль завершен, нет активных точек");
+            return;
+        }
+        Vector3 wpPosition = currentWaypoint.position;
+
+        // Отладка (только если игрок в той же системе)
+        if (PlayerService.singleton.GetStarSystem() == ship.StarSystem)
+        {
+            wpPosition = SpaceContainer.singleton.transform.position + currentWaypoint.position;
+            // Debug.Log($"{ship.id}: Waypoints left: {waypoints.Count}, Current WP: {currentWaypointIndex}, Distance: {distanceToWaypoint:F0}");
+        }
+
+        // 4. Логика движения к текущему waypoint'у
+        float distanceToWaypoint = Vector3.Distance(transform.position, wpPosition);
+
+        // Поворачиваемся к waypoint'у
+        controller.Turn(wpPosition);
+
+        // Двигаемся или уничтожаем waypoint при достижении
+        if (distanceToWaypoint > successWaypointDistance)
+        {
+            controller.Move(wpPosition);
+        }
+        else
+        {
+            // Достигли waypoint'а - удаляем его
+            Debug.Log($"{ship.id}: Достиг waypoint {currentWaypointIndex} на дистанции {distanceToWaypoint:F0}");
+            currentWaypoint.Destroy();
+            currentWaypoint = null;
+
+            // Небольшая задержка перед выбором следующего (через корутину или в следующем кадре)
+            // Это предотвратит мгновенное переключение
+        }
+    }
+
+    // Добавьте метод для генерации waypoint'ов
+    void GenerateWaypoints(int count, int maxRange, int maxHeight)
+    {
+        waypoints.Clear();
+
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 newPosition = GenerateValidWaypointPosition(maxRange, maxHeight);
+
+            // Проверяем, не слишком ли близко к существующим waypoint'ам
+            bool tooClose = false;
+            foreach (var existingWP in waypoints)
+            {
+                if (Vector3.Distance(existingWP.position, newPosition) < MIN_WAYPOINT_DISTANCE)
+                {
+                    tooClose = true;
+                    break;
+                }
+            }
+
+            // Если слишком близко - генерируем заново (с ограничением попыток)
+            if (tooClose && i > 0)
+            {
+                int attempts = 0;
+                while (tooClose && attempts < 10)
+                {
+                    newPosition = GenerateValidWaypointPosition(maxRange, maxHeight);
+                    tooClose = false;
+
+                    foreach (var existingWP in waypoints)
+                    {
+                        if (Vector3.Distance(existingWP.position, newPosition) < MIN_WAYPOINT_DISTANCE)
+                        {
+                            tooClose = true;
+                            break;
+                        }
+                    }
+                    attempts++;
+                }
+            }
+
+            Waypoint waypoint = new Waypoint(newPosition, waypoints.Count());
+            waypoint.spAIExecutor = this;
+            waypoints.Add(waypoint);
+        }
+
+        Debug.Log($"{ship.id}: Сгенерировано {waypoints.Count} waypoint'ов в радиусе {maxRange}");
+    }
+
+    // Вспомогательный метод для генерации позиции waypoint'а
+    Vector3 GenerateValidWaypointPosition(int maxRange, int maxHeight)
+    {
+        Vector2 randomCircle = UnityEngine.Random.insideUnitCircle * maxRange;
+        int randomY = UnityEngine.Random.Range(-maxHeight / 2, maxHeight / 2);
+
+        return new Vector3(randomCircle.x, randomY, randomCircle.y);
+    }
+
+    // Выбор следующего waypoint'а (можно случайный или последовательный)
+    void SelectNextWaypoint()
+    {
+        if (waypoints.Count == 0) return;
+
+        // Случайный выбор (как в вашем коде)
+        int randomIndex = UnityEngine.Random.Range(0, waypoints.Count);
+        currentWaypoint = waypoints[randomIndex];
+        currentWaypointIndex = randomIndex;
+
+        Debug.Log($"{ship.id}: Выбран waypoint {waypoints[randomIndex]} {currentWaypointIndex} из {waypoints.Count}");
+    }
+
+    // Альтернативный метод - последовательный выбор (более предсказуемый)
+    void SelectNextWaypointSequential()
+    {
+        if (waypoints.Count == 0) return;
+
+        if (currentWaypointIndex >= waypoints.Count - 1)
+        {
+            currentWaypointIndex = 0; // Зацикливаем
+        }
+        else if (currentWaypointIndex < 0)
+        {
+            currentWaypointIndex = 0;
+        }
+        else
+        {
+            currentWaypointIndex++;
+        }
+
+        currentWaypoint = waypoints[currentWaypointIndex];
+    }
     void ExecuteFlyTo()
     {
         // Параметры: controller.parameters[0] = X, [1] = Y, [2] = Z
-        if (controller.parameters.Count >= 3)
+        if (controller.parameters.Count >= 4)
         {
             Vector3 targetPos = new Vector3(
                 float.Parse(controller.parameters[0]),
@@ -110,7 +275,7 @@ public class SpAIExecutor : MonoBehaviour
     {
         SpaceObject target = null;
         Vector3 targetPos = Vector3.zero;
-        
+
         if (controller.parameters.Count > 1)
         {
             if (controller.parameters[0] == "player")
@@ -118,19 +283,19 @@ public class SpAIExecutor : MonoBehaviour
                 target = PlayerService.singleton._player_sp_object;
                 targetPos = target.transform.position;
             }
-            
+
             if (target)
             {
                 float dst = Vector3.Distance(transform.position, targetPos);
-                controller.Turn(target.transform);
-                
+                controller.Turn(targetPos);
+
                 if (dst > int.Parse(controller.parameters[1]))
                 {
-                    controller.Move(target.transform);
+                    controller.Move(targetPos);
                 }
                 else
                 {
-                    Debug.Log($"{dst}   {int.Parse(controller.parameters[1])}   {target.galaxyId}:{target.systemId}");
+
                 }
             }
         }

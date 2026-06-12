@@ -338,7 +338,6 @@ public abstract class SpaceObject : MonoBehaviour
         if (this is Ship && !is_player && this.systemId == sys.id && this.galaxyId == sys.galaxyId)
         {
             BuildLoadouts();
-            Debug.Log(this.id);
         }
     }
     public virtual void OnSpDestroy(SpaceObjectOnDestroy signal)
