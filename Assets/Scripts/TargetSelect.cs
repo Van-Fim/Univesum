@@ -128,7 +128,7 @@ public class TargetSelect : MonoBehaviour, IPointerClickHandler
             dst = Mathf.Clamp(20000 / dst, 0.3f, 1f);
         }
 
-        float ff = 1 + (1 * dst)*2;
+        float ff = 1 + (1 * dst) * 2;
 
         hullBar.fillAmount = (float)spaceObject.hull / spaceObject.maxHull;
         shieldBar.fillAmount = (float)spaceObject.shield / spaceObject.maxShield;
@@ -148,13 +148,13 @@ public class TargetSelect : MonoBehaviour, IPointerClickHandler
         bottomRight.transform.localPosition = new Vector2(posValue * dst, -posValue * dst);
         bottomRight.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scaleValue);
         bottomRight.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scaleValue);
-        hullBar.transform.localPosition = new Vector2(0, posValue * dst + posValue/2 + 5);
+        hullBar.transform.localPosition = new Vector2(0, posValue * dst + posValue / 2 + 5);
         hullBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, barVals.y);
         hullBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scaleValue + posValue * dst * 2);
         shieldBar.transform.localPosition = new Vector2(0, hullBar.transform.localPosition.y + 7);
         shieldBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, barVals.y);
         shieldBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scaleValue + posValue * dst * 2);
-        
+
         clickArea.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, posValue * ff);
         clickArea.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, posValue * ff);
     }
@@ -200,7 +200,7 @@ public class TargetSelect : MonoBehaviour, IPointerClickHandler
             gameObject.SetActive(false);
             return;
         }
-        if (spaceObject.StarSystem != playerService.GetStarSystem())
+        if (spaceObject._StarSystem != playerService.GetStarSystem())
         {
             gameObject.SetActive(false);
             return;

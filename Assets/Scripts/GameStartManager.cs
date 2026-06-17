@@ -153,5 +153,6 @@ public class GameStartManager
         ship.transform.localEulerAngles = _config.start_position;
         ship.SetStarSystem(_config.galaxyId, _config.systemId);
         ship.Init();
+        ship.SetOwner("Player");
     }
 }

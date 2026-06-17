@@ -61,6 +61,34 @@ public class SpAIExecutor : MonoBehaviour
                 break;
         }
     }
+
+    public void CheckEnemiesInRange(float range)
+    {
+        for (int i = 0; i < ship._StarSystem.ships.Count; i++)
+        {
+            Ship fs = ship._StarSystem.ships[i];
+            if (fs == null) continue;
+            if (fs == ship) continue;
+
+            Faction faction = ship.owner;
+            FactionRelationshipConfig relConf = faction.factionConfig.relationships[fs.owner.id];
+            int rel = 0;
+            if (relConf != null) rel = relConf.relation;
+            Vector3 targetPos = fs.transform.position;
+            if (fs.is_player)
+            {
+                targetPos = fs.transform.position;
+            }
+            float distance = Vector3.Distance(ship.transform.position, targetPos);
+            if (fs.GetStarSystem() == ship.GetStarSystem() && distance < range)
+            {
+                if (faction != null && rel < -10000)
+                {
+                    Debug.Log($"Enemy found: {fs.name}");
+                }
+            }
+        }
+    }
     void ExecutePatrol()
     {
         // Параметры: [0] maxJumps, [1] maxRange, [2] maxHeight, [3] waypointsCount, [4] successWaypointDistance
@@ -75,6 +103,7 @@ public class SpAIExecutor : MonoBehaviour
         int maxHeight = int.Parse(controller.parameters[2]);
         int waypointsCount = int.Parse(controller.parameters[3]);
         float successWaypointDistance = float.Parse(controller.parameters[4]);
+        CheckEnemiesInRange(10000);
 
         // 1. Генерация waypoint'ов если их нет
         if (waypoints.Count == 0)
@@ -99,7 +128,7 @@ public class SpAIExecutor : MonoBehaviour
         Vector3 wpPosition = currentWaypoint.position;
 
         // Отладка (только если игрок в той же системе)
-        if (PlayerService.singleton.GetStarSystem() == ship.StarSystem)
+        if (PlayerService.singleton.GetStarSystem() == ship._StarSystem)
         {
             wpPosition = SpaceContainer.singleton.transform.position + currentWaypoint.position;
             // Debug.Log($"{ship.id}: Waypoints left: {waypoints.Count}, Current WP: {currentWaypointIndex}, Distance: {distanceToWaypoint:F0}");
@@ -119,7 +148,7 @@ public class SpAIExecutor : MonoBehaviour
         else
         {
             // Достигли waypoint'а - удаляем его
-            Debug.Log($"{ship.id}: Достиг waypoint {currentWaypointIndex} на дистанции {distanceToWaypoint:F0}");
+            // Debug.Log($"{ship.id}: Достиг waypoint {currentWaypointIndex} на дистанции {distanceToWaypoint:F0}");
             currentWaypoint.Destroy();
             currentWaypoint = null;
 
@@ -174,7 +203,7 @@ public class SpAIExecutor : MonoBehaviour
             waypoints.Add(waypoint);
         }
 
-        Debug.Log($"{ship.id}: Сгенерировано {waypoints.Count} waypoint'ов в радиусе {maxRange}");
+        // Debug.Log($"{ship.id}: Сгенерировано {waypoints.Count} waypoint'ов в радиусе {maxRange}");
     }
 
     // Вспомогательный метод для генерации позиции waypoint'а
@@ -196,7 +225,7 @@ public class SpAIExecutor : MonoBehaviour
         currentWaypoint = waypoints[randomIndex];
         currentWaypointIndex = randomIndex;
 
-        Debug.Log($"{ship.id}: Выбран waypoint {waypoints[randomIndex]} {currentWaypointIndex} из {waypoints.Count}");
+        // Debug.Log($"{ship.id}: Выбран waypoint {waypoints[randomIndex]} {currentWaypointIndex} из {waypoints.Count}");
     }
 
     // Альтернативный метод - последовательный выбор (более предсказуемый)

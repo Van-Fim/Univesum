@@ -331,15 +331,16 @@ public class NpcJobManager : IInitializable
         int hr = UnityEngine.Random.Range(job.heigthMin, job.heigthMax + 1);
         int y = UnityEngine.Random.Range(-hr, hr + 1);
         Vector3 newPos = new Vector3(randomPoint2D.x, y, randomPoint2D.y);
+        Faction faction = FactionsManager.singleton.GetFaction(job.faction);
         station.jobId = job.id;
         station.loadoutName = "Station01_Loadout01";
         station.transform.localPosition = newPos;
         station.transform.localEulerAngles = Vector3.zero;
         station.SetStarSystem(location.galaxy.id, location.system.id);
         station.Init();
-        bool inst = station.TryInstallConfig(station.StarSystem);
+        bool inst = station.TryInstallConfig(station._StarSystem);
         station.InstallLoadout();
-
+        station.SetOwner(faction);
         // Создание экземпляра джоба
         JobInstance jobInstance = new JobInstance
         {
@@ -405,17 +406,19 @@ public class NpcJobManager : IInitializable
         int hr = UnityEngine.Random.Range(job.heigthMin, job.heigthMax + 1);
         int y = UnityEngine.Random.Range(-hr, hr + 1);
         Vector3 newPos = new Vector3(randomPoint2D.x, y, randomPoint2D.y);
+        Faction faction = FactionsManager.singleton.GetFaction(job.faction);
         ship.jobId = job.id;
         ship.loadoutName = job.loadoutName;
         ship.transform.localPosition = newPos;
         ship.transform.localEulerAngles = Vector3.zero;
         ship.SetStarSystem(location.galaxy.id, location.system.id);
         ship.Init();
-        bool inst = ship.TryInstallConfig(ship.StarSystem);
+        bool inst = ship.TryInstallConfig(ship._StarSystem);
         ship.InstallLoadout();
         ship.InstallController();
         ship.InstallAi();
         ship.BuildLoadouts();
+        ship.SetOwner(faction);
         string[] paramsList = job.taskParams.Split(';');
         ship.spaceObjectController.SetCommand(job.task, paramsList);
 

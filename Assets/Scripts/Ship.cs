@@ -37,6 +37,28 @@ public class Ship : SpaceObject
         return shipData;
     }
 
+    public override StarSystem SetStarSystem(int galaxyId, int systemId)
+    {
+        StarSystem oldStarSystem = _StarSystem;
+        if (oldStarSystem != null && (oldStarSystem.galaxyId != galaxyId || oldStarSystem.id != systemId) && oldStarSystem.ships.Contains(this))
+        {
+            oldStarSystem.ships.Remove(this);
+        }
+
+        this.galaxyId = galaxyId;
+        this.systemId = systemId;
+        _StarSystem = GetStarSystem();
+        if (_StarSystem != null && !_StarSystem.ships.Contains(this))
+        {
+            _StarSystem.ships.Add(this);
+            if (is_player)
+            {
+                Debug.Log($"Player ship {name} added to star system {_StarSystem.name}");
+            }
+        }
+        return _StarSystem;
+    }
+
     public override void BuildLoadouts()
     {
         Debug.Log($"Starting building loadouts {loadoutName}");

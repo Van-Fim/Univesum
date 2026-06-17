@@ -35,6 +35,7 @@ public class Station : SpaceObject, ISelectable
         stationData.ReadData(this);
         return stationData;
     }
+
     public override SpaceObject LoadData(SpaceObjectData spaceObjectData)
     {
         Station station = _spaceObjectFactory.Create<Station>(
@@ -43,7 +44,23 @@ public class Station : SpaceObject, ISelectable
         );
         return station;
     }
+    public override StarSystem SetStarSystem(int galaxyId, int systemId)
+    {
+        StarSystem oldStarSystem = _StarSystem;
+        if (oldStarSystem != null && (oldStarSystem.galaxyId != galaxyId || oldStarSystem.id != systemId) && oldStarSystem.stations.Contains(this))
+        {
+            oldStarSystem.stations.Remove(this);
+        }
 
+        this.galaxyId = galaxyId;
+        this.systemId = systemId;
+        _StarSystem = GetStarSystem();
+        if (_StarSystem != null && !_StarSystem.stations.Contains(this))
+        {
+            _StarSystem.stations.Add(this);
+        }
+        return _StarSystem;
+    }
     public override void Update()
     {
 

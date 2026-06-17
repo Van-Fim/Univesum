@@ -37,12 +37,66 @@ public class FactionsManager : IInitializable
             faction.name = allFactions[i].name;
             Factions.Add(faction);
         }
+        for (int i = 0; i < Factions.Count; i++)
+        {
+            Faction f = Factions[i];
+            f.factionConfig.relationships = InstallRelationship(f);
+        }
+        for (int i = 0; i < Factions.Count; i++)
+        {
+            Faction f = Factions[i];
+            FixRelationship(f);
+        }
     }
     public Faction GetFaction(string name)
     {
         Faction ret = null;
-        ret = Factions.Find(x=>x.name == name);
+        ret = Factions.Find(x => x.name == name);
         return ret;
+    }
+    public List<FactionRelationshipConfig> InstallRelationship(Faction faction)
+    {
+
+        List<FactionRelationshipConfig> relationships = faction.factionConfig.relationships;
+        List<FactionRelationshipConfig> ret = new List<FactionRelationshipConfig>();
+        for (int i = 0; i < Factions.Count; i++)
+        {
+            Faction f = Factions[i];
+            FactionRelationshipConfig rel = relationships.Find(x => x.faction == f.name);
+            int relValue = 0;
+            if (rel != null)
+            {
+                relValue = rel.relation;
+            }
+            ret.Add(new FactionRelationshipConfig { faction = f.name, relation = relValue });
+        }
+        return ret;
+    }
+    public List<FactionRelationshipConfig> FixRelationship(Faction faction)
+    {
+
+        List<FactionRelationshipConfig> relationships = faction.factionConfig.relationships;
+        for (int i = 0; i < Factions.Count; i++)
+        {
+            Faction f = Factions[i];
+            FactionRelationshipConfig rel1 = relationships[f.id];
+            FactionRelationshipConfig rel2 = f.factionConfig.relationships[faction.id];
+            int relValue1 = rel1.relation;
+            int relValue2 = rel2.relation;
+            if (relValue1 != 0 && relValue2 == 0)
+            {
+                relValue2 = relValue1;
+            }
+            if (relValue1 == 0 && relValue2 != 0)
+            {
+                relValue1 = relValue2;
+            }
+            rel1.relation = relValue1;
+            rel2.relation = relValue2;
+            relationships[f.id] = rel1;
+            f.factionConfig.relationships[faction.id] = rel2;
+        }
+        return relationships;
     }
     public void OnUpdateTick()
     {

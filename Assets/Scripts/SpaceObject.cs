@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using NUnit.Framework;
 using Unity.Collections;
 using UnityEngine;
@@ -18,6 +19,9 @@ public class SpaceObjectData
     public int maxShield = 10000;
     public int shield;
     public int jobId;
+
+    public int factionId;
+    public string factionName;
 
     public Vector3 position = new Vector3();
     public Vector3 rotation = new Vector3();
@@ -40,6 +44,11 @@ public class SpaceObjectData
         position = spaceObject.transform.localPosition;
         rotation = spaceObject.transform.localEulerAngles;
         id = spaceObject.id;
+        if (spaceObject.owner != null)
+        {
+            factionId = spaceObject.owner.id;
+            factionName = spaceObject.owner.name;
+        }
         galaxyId = spaceObject.galaxyId;
         systemId = spaceObject.systemId;
         jobId = spaceObject.jobId;
@@ -66,6 +75,12 @@ public class SpaceObjectData
         }
         spaceObject.transform.localPosition = position;
         spaceObject.transform.localEulerAngles = rotation;
+
+        Faction faction = FactionsManager.singleton.GetFaction(factionName);
+        if (faction != null)
+        {
+            spaceObject.owner = faction;
+        }
 
         spaceObject.id = id;
         spaceObject.galaxyId = galaxyId;
@@ -104,6 +119,7 @@ public abstract class SpaceObject : MonoBehaviour
     public MeshCollider meshCollider;
     public TargetSelect targetSelect;
     public SpAIExecutor aIExecutor;
+    public Faction owner;
     [Inject] public LangManager _langManager;
     [Inject] public SignalBus signalBus;
     [Inject] public PlayerService playerService;
@@ -149,7 +165,33 @@ public abstract class SpaceObject : MonoBehaviour
     protected Mesh mesh;
 
     protected GameObject main = null;
-    public StarSystem StarSystem;
+    public StarSystem _StarSystem;
+    public void SetOwner(string name)
+    {
+        Faction faction = FactionsManager.singleton.GetFaction(name);
+        if (faction != null)
+        {
+            SetOwner(faction);
+        }
+    }
+    public void SetOwner(Faction faction)
+    {
+        if (faction != null)
+        {
+            owner = faction;
+        }
+    }
+
+    public Faction GetOwner()
+    {
+        Faction ret = null;
+        if (owner != null)
+        {
+            ret = owner;
+        }
+        return ret;
+    }
+
     public virtual void OnTick()
     {
         if (spaceObjectController == null || aIExecutor == null) return;
@@ -216,7 +258,7 @@ public abstract class SpaceObject : MonoBehaviour
         {
             starSystem = SetStarSystem(galaxyId, systemId);
         }
-        if (starSystem == null || StarSystem == null)
+        if (starSystem == null || _StarSystem == null)
             return ret;
 
         if (playerService._player_sp_object && (playerService._player_sp_object == this || GetType() == typeof(Asteroid)))
@@ -229,7 +271,7 @@ public abstract class SpaceObject : MonoBehaviour
 
         if (playerService.GetStarSystem() == starSystem)
         {
-            if (starSystem == StarSystem)
+            if (starSystem == _StarSystem)
             {
                 ret = true;
                 InstallConfig();
@@ -319,8 +361,8 @@ public abstract class SpaceObject : MonoBehaviour
     {
         this.galaxyId = galaxyId;
         this.systemId = systemId;
-        StarSystem = GetStarSystem();
-        return StarSystem;
+        _StarSystem = GetStarSystem();
+        return _StarSystem;
     }
     public virtual void OnSpDestroyHide(SpaceObjectOnDestroyHide signal)
     {
@@ -549,7 +591,7 @@ public abstract class SpaceObject : MonoBehaviour
         {
             return;
         }
-        if (targetSelect == null && playerService.GetStarSystem() == StarSystem)
+        if (targetSelect == null && playerService.GetStarSystem() == _StarSystem)
         {
             targetSelectPrefab = Resources.Load<TargetSelect>("Prefabs/TargetSelect");
             targetSelect = GameObject.Instantiate<TargetSelect>(targetSelectPrefab);

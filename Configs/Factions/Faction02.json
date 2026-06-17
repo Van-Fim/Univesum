@@ -1,13 +1,13 @@
 {
-    "color":{"r":255, "g":0, "b":0, "a":255},
-    "relationship": [
+    "color": { "r": 255, "g": 0, "b": 0, "a": 255 },
+    "relationships": [
         {
-            "faction":"Faction01",
-            "relation":-1000000
+            "faction": "Faction01",
+            "relation": -1000000
         },
         {
-            "faction":"Faction03",
-            "relation":0
+            "faction": "Faction03",
+            "relation": 0
         }
     ]
 }
