@@ -33,17 +33,25 @@ public class SpaceObjectController : MonoBehaviour
     public Vector2 _screenCenter;
 
     public string mainCommand;
+    public string command;
+    public List<string> mainParameters;
     public List<string> parameters;
 
     public SpaceObjectController()
     {
-        parameters = new List<string>();
+        mainParameters = new List<string>();
     }
 
-    public void SetCommand(string command, params string[] args)
+    public void SetMainCommand(string command, List<string> args = null)
     {
-        mainCommand = command;
-        parameters = new List<string>(args);
+        this.mainCommand = command;
+        if (args != null) mainParameters = new List<string>(args);
+    }
+
+    public void SetCommand(string command, List<string> args = null)
+    {
+        this.command = command;
+        if (args != null) parameters = new List<string>(args);
     }
 
     public SpaceObject Sp_object

@@ -409,18 +409,18 @@ public class NpcJobManager : IInitializable
         Faction faction = FactionsManager.singleton.GetFaction(job.faction);
         ship.jobId = job.id;
         ship.loadoutName = job.loadoutName;
-        ship.transform.localPosition = newPos;
         ship.transform.localEulerAngles = Vector3.zero;
         ship.SetStarSystem(location.galaxy.id, location.system.id);
         ship.Init();
         bool inst = ship.TryInstallConfig(ship._StarSystem);
+        ship.transform.localPosition = newPos;
         ship.InstallLoadout();
         ship.InstallController();
         ship.InstallAi();
         ship.BuildLoadouts();
         ship.SetOwner(faction);
         string[] paramsList = job.taskParams.Split(';');
-        ship.spaceObjectController.SetCommand(job.task, paramsList);
+        ship.spaceObjectController.SetMainCommand(job.task, paramsList.ToList());
 
         // Создание экземпляра джоба
         var jobInstance = new JobInstance

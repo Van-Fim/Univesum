@@ -18,9 +18,6 @@ public class SpAIExecutor : MonoBehaviour
     {
         ship = GetComponent<Ship>();
         controller = ship.spaceObjectController;
-        // Инициализация команды "Idle"
-        if (controller == null)
-            controller.SetCommand("Idle");
     }
 
     void Update()
@@ -53,7 +50,7 @@ public class SpAIExecutor : MonoBehaviour
                 break;
 
             case "Follow":
-                ExecuteFollow();
+
                 break;
 
             case "Dock":
@@ -62,8 +59,9 @@ public class SpAIExecutor : MonoBehaviour
         }
     }
 
-    public void CheckEnemiesInRange(float range)
+    public bool CheckEnemiesInRange(float range)
     {
+        bool result = false;
         for (int i = 0; i < ship._StarSystem.ships.Count; i++)
         {
             Ship fs = ship._StarSystem.ships[i];
@@ -85,16 +83,59 @@ public class SpAIExecutor : MonoBehaviour
                 if (faction != null && rel < -10000)
                 {
                     Debug.Log($"Enemy found: {fs.name}");
+                    result = true;
+                    break;
                 }
             }
         }
+        return result;
     }
     void ExecutePatrol()
+    {
+        if (controller.command == null)
+        {
+            controller.SetCommand("Idle");
+        }
+        switch (controller.command)
+        {
+            case "Idle":
+                controller.parameters = controller.mainParameters;
+                PatrolIdle();
+                break;
+            case "FollowAttack":
+                FollowAttack();
+                break;
+            case "Attack":
+                SpaceObject target = null;
+                Vector3 targetPos = Vector3.zero;
+
+                if (controller.parameters[0] == "player")
+                {
+                    target = PlayerService.singleton._player_sp_object;
+                    targetPos = target.transform.position;
+                }
+                float dst = Vector3.Distance(transform.position, targetPos);
+                controller.Turn(targetPos);
+                Debug.Log($"Distance to target: {dst} {controller.parameters[1]}");
+                if (dst > int.Parse(controller.parameters[1]))
+                {
+                    List<string> parameters = "player;500;10000".Split(';').ToList();
+                    controller.SetCommand("FollowAttack", parameters);
+                }
+                else
+                {
+                    Debug.Log($"Pew! Pew!");
+                }
+
+                break;
+        }
+    }
+    void PatrolIdle()
     {
         // Параметры: [0] maxJumps, [1] maxRange, [2] maxHeight, [3] waypointsCount, [4] successWaypointDistance
         if (controller.parameters.Count < 5)
         {
-            Debug.LogError($"Patrol command missing parameters! Need 5, got {controller.parameters.Count}");
+            Debug.LogError($"Patrol command missing parameters! Need 5, got {controller.mainParameters.Count}");
             return;
         }
 
@@ -103,7 +144,11 @@ public class SpAIExecutor : MonoBehaviour
         int maxHeight = int.Parse(controller.parameters[2]);
         int waypointsCount = int.Parse(controller.parameters[3]);
         float successWaypointDistance = float.Parse(controller.parameters[4]);
-        CheckEnemiesInRange(10000);
+        if (CheckEnemiesInRange(10000))
+        {
+            List<string> parameters = "player;500;10000".Split(';').ToList();
+            controller.SetCommand("FollowAttack", parameters);
+        }
 
         // 1. Генерация waypoint'ов если их нет
         if (waypoints.Count == 0)
@@ -156,7 +201,6 @@ public class SpAIExecutor : MonoBehaviour
             // Это предотвратит мгновенное переключение
         }
     }
-
     // Добавьте метод для генерации waypoint'ов
     void GenerateWaypoints(int count, int maxRange, int maxHeight)
     {
@@ -251,12 +295,12 @@ public class SpAIExecutor : MonoBehaviour
     void ExecuteFlyTo()
     {
         // Параметры: controller.parameters[0] = X, [1] = Y, [2] = Z
-        if (controller.parameters.Count >= 4)
+        if (controller.mainParameters.Count >= 4)
         {
             Vector3 targetPos = new Vector3(
-                float.Parse(controller.parameters[0]),
-                float.Parse(controller.parameters[1]),
-                float.Parse(controller.parameters[2])
+                float.Parse(controller.mainParameters[0]),
+                float.Parse(controller.mainParameters[1]),
+                float.Parse(controller.mainParameters[2])
             );
 
             // Движение к точке
@@ -275,10 +319,10 @@ public class SpAIExecutor : MonoBehaviour
     void ExecuteAttack()
     {
         // Параметр: controller.parameters[0] - GameObject ID или имя цели
-        if (controller.parameters.Count > 0)
+        if (controller.mainParameters.Count > 0)
         {
             // Находим цель (в реальном коде нужен менеджер объектов)
-            Ship target = FindTargetByName(controller.parameters[0]);
+            Ship target = FindTargetByName(controller.mainParameters[0]);
 
             if (target != null)
             {
@@ -300,7 +344,7 @@ public class SpAIExecutor : MonoBehaviour
         }
     }
 
-    void ExecuteFollow()
+    void FollowAttack()
     {
         SpaceObject target = null;
         Vector3 targetPos = Vector3.zero;
@@ -317,14 +361,14 @@ public class SpAIExecutor : MonoBehaviour
             {
                 float dst = Vector3.Distance(transform.position, targetPos);
                 controller.Turn(targetPos);
-
+                Debug.Log($"Distance to target: {dst} {controller.parameters[1]}");
                 if (dst > int.Parse(controller.parameters[1]))
                 {
                     controller.Move(targetPos);
                 }
                 else
                 {
-
+                    controller.SetCommand("Attack", controller.parameters);
                 }
             }
         }
@@ -346,7 +390,7 @@ public class SpAIExecutor : MonoBehaviour
         // Стыковка со станцией
         // В X3 это сложный процесс с запросом разрешения и т.д.
         // Упрощенная версия:
-        Station station = FindStationByName(controller.parameters[0]);
+        Station station = FindStationByName(controller.mainParameters[0]);
         if (station != null)
         {
             // MoveTowards(station.dockingPort.position);

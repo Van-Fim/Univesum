@@ -1,5 +1,5 @@
 {
-    "maxSpeed": 100,
+    "maxSpeed": 1000,
     "rotationSpeed": 150,
     "accelerationSpeed": 100,
 
