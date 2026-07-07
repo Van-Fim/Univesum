@@ -144,6 +144,7 @@ public abstract class SpaceObject : MonoBehaviour
 
     public Rigidbody rigidbody;
     public Transform hardpoints;
+    public GameObject sphere;
 
     public string loadoutName;
 
@@ -504,6 +505,7 @@ public abstract class SpaceObject : MonoBehaviour
         main.transform.localPosition = Vector3.zero;
         main.transform.localEulerAngles = Vector3.zero;
         main.name = "MAIN";
+
         hardpoints = main.transform.Find("HARDPOINTS");
         if (!hardpoints)
         {
@@ -547,6 +549,13 @@ public abstract class SpaceObject : MonoBehaviour
         {
             Material mat = Resources.Load<Material>(spaceObjectConfig.pathToMaterial);
             meshRenderer.material = mat;
+        }
+        if (sphere == null)
+        {
+            // sphere = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SphereCollider"));
+            // sphere.transform.SetParent(main.transform);
+            // sphere.name = "SPHERE";
+            // sphere.transform.localScale = Vector3.one * 30;
         }
     }
 

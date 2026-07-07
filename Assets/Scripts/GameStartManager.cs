@@ -130,6 +130,7 @@ public class GameStartManager
             controller = ship.gameObject.AddComponent<PlayerShipController>();
             _container.Inject(controller);
         }
+
         controller._rigidbody = ship.rigidbody;
         controller.Sp_object = ship;
         ship.is_player = true;
@@ -152,6 +153,7 @@ public class GameStartManager
         ship.transform.localPosition = _config.start_position;
         ship.transform.localEulerAngles = _config.start_position;
         ship.SetStarSystem(_config.galaxyId, _config.systemId);
+
         ship.Init();
         ship.SetOwner("Player");
     }

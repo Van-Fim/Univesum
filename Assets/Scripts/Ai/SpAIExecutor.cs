@@ -14,6 +14,15 @@ public class SpAIExecutor : MonoBehaviour
     public Waypoint currentWaypoint;
     private float waypointGenerationCooldown = 0f;
     private const float MIN_WAYPOINT_DISTANCE = 2000f; // Минимальная дистанция между waypoint'ами
+
+    [Header("Collision Avoidance")]
+    public LayerMask obstacleMask = 8;
+    public float raycastDistance = 500f;
+    public float evasiveTurnSpeed = 100f;
+    public float evasiveDuration = 1.5f; // Сколько времени уклоняться
+    private bool isEvading = false;
+    private Vector3 evadeDirection;
+    private float evadeTimer = 0f;
     void Start()
     {
         ship = GetComponent<Ship>();
@@ -30,6 +39,27 @@ public class SpAIExecutor : MonoBehaviour
         if (controller == null)
         {
             return;
+        }
+        Collider[] hits = Physics.OverlapSphere(
+                    transform.position,
+                    raycastDistance,
+                    LayerMask.GetMask("Default", "Sensor")
+                );
+        List<Collider> detectedObjects = new List<Collider>();
+        detectedObjects.AddRange(hits);
+        if (PlayerService.singleton.GetStarSystem() == ship._StarSystem)
+        {
+            Debug.Log($"Обнаружено объектов: {detectedObjects.Count}");
+        }
+
+        if (detectedObjects.Count > 0)
+        {
+            // Обработка обнаруженных объектов
+            foreach (var obj in detectedObjects)
+            {
+                if (obj.gameObject == ship.gameObject) continue;
+                Debug.Log($"Обнаружен: {obj.name} на расстоянии {Vector3.Distance(transform.position, obj.transform.position)}");
+            }
         }
         switch (controller.mainCommand)
         {
@@ -116,7 +146,7 @@ public class SpAIExecutor : MonoBehaviour
                 }
                 float dst = Vector3.Distance(transform.position, targetPos);
                 controller.Turn(targetPos);
-                Debug.Log($"Distance to target: {dst} {controller.parameters[1]}");
+                // Debug.Log($"Distance to target: {dst} {controller.parameters[1]}");
                 if (dst > int.Parse(controller.parameters[1]))
                 {
                     List<string> parameters = "player;500;10000".Split(';').ToList();
@@ -124,7 +154,7 @@ public class SpAIExecutor : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log($"Pew! Pew!");
+                    // Debug.Log($"Pew! Pew!");
                 }
 
                 break;
@@ -361,7 +391,7 @@ public class SpAIExecutor : MonoBehaviour
             {
                 float dst = Vector3.Distance(transform.position, targetPos);
                 controller.Turn(targetPos);
-                Debug.Log($"Distance to target: {dst} {controller.parameters[1]}");
+                // Debug.Log($"Distance to target: {dst} {controller.parameters[1]}");
                 if (dst > int.Parse(controller.parameters[1]))
                 {
                     controller.Move(targetPos);
