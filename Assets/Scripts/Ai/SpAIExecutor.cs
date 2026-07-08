@@ -17,7 +17,7 @@ public class SpAIExecutor : MonoBehaviour
 
     [Header("Collision Avoidance")]
     public LayerMask obstacleMask = 8;
-    public float raycastDistance = 500f;
+    public float raycastDistance = 300f;
     public float evasiveTurnSpeed = 100f;
     public float evasiveDuration = 1.5f; // Сколько времени уклоняться
     private bool isEvading = false;
@@ -49,16 +49,49 @@ public class SpAIExecutor : MonoBehaviour
         detectedObjects.AddRange(hits);
         if (PlayerService.singleton.GetStarSystem() == ship._StarSystem)
         {
-            Debug.Log($"Обнаружено объектов: {detectedObjects.Count}");
+            // Debug.Log($"Обнаружено объектов: {detectedObjects.Count}");
         }
-
-        if (detectedObjects.Count > 0)
+        if (controller.command != "FlyAway")
         {
-            // Обработка обнаруженных объектов
-            foreach (var obj in detectedObjects)
+            if (detectedObjects.Count > 0)
             {
-                if (obj.gameObject == ship.gameObject) continue;
-                Debug.Log($"Обнаружен: {obj.name} на расстоянии {Vector3.Distance(transform.position, obj.transform.position)}");
+                // Обработка обнаруженных объектов
+                foreach (var obj in detectedObjects)
+                {
+                    if (obj.gameObject == ship.gameObject) continue;
+                    if (obj.GetComponent<SpaceObject>() != null && DirectionHelper.IsInFront(ship.transform, obj.transform, 30f))
+                    {
+                        controller.prevCommand = controller.command;
+                        controller.prevParameters = controller.parameters;
+                        Vector3 movePos = ship.transform.position - ship.transform.forward * raycastDistance * 5;
+                        controller.parameters = new List<string>();
+                        controller.parameters.Add($"{movePos.x};{movePos.y};{movePos.z}");
+                        controller.SetCommand("FlyAway");
+                        FlyAway();
+                        return;
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (controller.parameters != null && controller.parameters.Count > 0)
+            {
+                string[] s = controller.parameters[0].Split(';');
+                Vector3 targetPosition = new Vector3(float.Parse(s[0]), float.Parse(s[1]), float.Parse(s[2]));
+                float dst = Vector3.Distance(ship.transform.position, targetPosition);
+
+                if (dst > 5)
+                {
+                    FlyAway();
+                    return;
+                }
+                else
+                {
+                    controller.command = controller.prevCommand;
+                    controller.parameters = controller.prevParameters;
+                    Debug.Log($"{controller.command} {controller.parameters}");
+                }
             }
         }
         switch (controller.mainCommand)
@@ -149,7 +182,7 @@ public class SpAIExecutor : MonoBehaviour
                 // Debug.Log($"Distance to target: {dst} {controller.parameters[1]}");
                 if (dst > int.Parse(controller.parameters[1]))
                 {
-                    List<string> parameters = "player;500;10000".Split(';').ToList();
+                    List<string> parameters = "player;100;10000".Split(';').ToList();
                     controller.SetCommand("FollowAttack", parameters);
                 }
                 else
@@ -158,6 +191,21 @@ public class SpAIExecutor : MonoBehaviour
                 }
 
                 break;
+        }
+    }
+    void FlyAway()
+    {
+        string[] s = controller.parameters[0].Split(';');
+        Vector3 targetPosition = new Vector3(float.Parse(s[0]), float.Parse(s[1]), float.Parse(s[2]));
+        bool bp = DirectionHelper.IsInFront(ship.transform, targetPosition, 10f);
+
+        if (!bp)
+        {
+            controller.Turn(targetPosition);
+        }
+        else
+        {
+            controller.Move(targetPosition);
         }
     }
     void PatrolIdle()

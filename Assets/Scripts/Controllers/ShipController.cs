@@ -15,19 +15,28 @@ public class ShipController : SpaceObjectController
         int _rotationSpeed = ship.engine.rotationSpeed;
         // 1. Получаем направление к цели
         Vector3 directionToTarget = position - transform.position;
-        
+
         // 2. Игнорируем расстояние по вертикали (опционально, для космоса)
         // directionToTarget.y = 0; // Раскомментировать для 2D-подобного поворота
-        
+
         // 3. Создаем целевой поворот
         Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
-        
+
         // 4. Плавно поворачиваемся с ограничением максимальной скорости
         transform.rotation = Quaternion.RotateTowards(
-            transform.rotation, 
-            targetRotation, 
+            transform.rotation,
+            targetRotation,
             _rotationSpeed * Time.deltaTime
         );
+    }
+    public override void TurnDir(Vector3 direction)
+    {
+        base.TurnDir(direction);
+        if (Sp_object == null) return;
+        Ship ship = (Ship)Sp_object;
+        if (ship.engine == null) return;
+        int _rotationSpeed = ship.engine.rotationSpeed;
+
     }
     public override void Move(Vector3 position)
     {

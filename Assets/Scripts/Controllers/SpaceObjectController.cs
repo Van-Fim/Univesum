@@ -34,8 +34,10 @@ public class SpaceObjectController : MonoBehaviour
 
     public string mainCommand;
     public string command;
+    public string prevCommand;
     public List<string> mainParameters;
     public List<string> parameters;
+    public List<string> prevParameters;
 
     public SpaceObjectController()
     {
@@ -88,6 +90,10 @@ public class SpaceObjectController : MonoBehaviour
     }
 
     public virtual void Warp(StarSystem starSystem, Vector3 position, Vector3 rotation)
+    {
+
+    }
+    public virtual void TurnDir(Vector3 direction)
     {
 
     }

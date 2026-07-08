@@ -1,6 +1,6 @@
 {
     "space_object": "Ship01",
-    "loadoutName":"Ship01_Loadout01",
+    "loadoutName": "Ship01_Loadout01",
     "type": "ship",
     "task": "Patrol",
     "taskParams": "0;10000;10000;5;500",
@@ -8,9 +8,9 @@
     "maxGalaxyCount": 1000,
     "maxStarSystemCount": 1,
     "faction": "Faction01",
-    "onOwnerSystem":true,
-    "spawnRangeMin":20000,
-    "spawnRangeMax":20000,
-    "heigthMin":10,
-    "heigthMax":10
+    "onOwnerSystem": true,
+    "spawnRangeMin": 10000,
+    "spawnRangeMax": 10000,
+    "heigthMin": 10,
+    "heigthMax": 10
 }
