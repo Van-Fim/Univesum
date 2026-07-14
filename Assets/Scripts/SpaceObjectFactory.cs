@@ -27,11 +27,8 @@ public class SpaceObjectFactory
             obj.spaceObjectConfig = JsonConfigLoader.LoadFromFile<SpaceObjectConfig>(configPath);
         }
 
-        if (obj is not Asteroid)
-        {
-            obj.id = _universe.allSpaceObjects.Count;
-            _universe.allSpaceObjects.Add(obj);
-        }
+        obj.id = obj.GetId();
+        _universe.allSpaceObjects.Add(obj);
 
         return obj;
     }

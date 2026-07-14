@@ -167,6 +167,29 @@ public abstract class SpaceObject : MonoBehaviour
 
     protected GameObject main = null;
     public StarSystem _StarSystem;
+    public int GetId()
+    {
+        int id = -1;
+        List<int> ints = new List<int>();
+        if (_universe.allSpaceObjects.Count == 0){
+            id = 0;
+            ints.Add(id);
+            return id;
+        }
+        for (int i = 0; i < _universe.allSpaceObjects.Count; i++)
+        {
+            if (ints.Contains(_universe.allSpaceObjects[i].id))
+            {
+                id++;
+                continue;
+            }
+            else
+            {
+                ints.Add(_universe.allSpaceObjects[i].id);
+            }
+        }
+        return id;
+    }
     public void SetOwner(string name)
     {
         Faction faction = FactionsManager.singleton.GetFaction(name);
@@ -198,7 +221,7 @@ public abstract class SpaceObject : MonoBehaviour
         if (spaceObjectController == null || aIExecutor == null) return;
 
         // Выполняем текущую команду
-        aIExecutor.ExecuteCommand();
+        aIExecutor.Tick();
     }
     public virtual void OnChunkFloatingOriginFixStart(SignalChunkFloatingOriginFixStart signal)
     {
@@ -245,6 +268,28 @@ public abstract class SpaceObject : MonoBehaviour
             return;
         }
         aIExecutor = gameObject.AddComponent<SpAIExecutor>();
+    }
+    public void StartCommand(string scommand, string s_params)
+    {
+        if (!aIExecutor)
+        {
+            Debug.Log("aIExecutor is not installed");
+            return;
+        }
+        string[] paramsArray = s_params.Split(';');
+        Dictionary<string, float> mainParams = new Dictionary<string, float>();
+        foreach (string param in paramsArray)
+        {
+            string[] p = param.Split(':');
+            if(p.Length > 1)
+            {
+                mainParams.Add(p[0], float.Parse(p[1]));
+            }
+        }
+        PatrolCommand command = new PatrolCommand();
+        command.spaceObject = this;
+        command.taskQueue.Enqueue(new IdleTask());
+        aIExecutor.IssueCommand(command, mainParams);
     }
     public void InstallController()
     {

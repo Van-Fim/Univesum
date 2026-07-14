@@ -339,6 +339,8 @@ public class NpcJobManager : IInitializable
         station.SetStarSystem(location.galaxy.id, location.system.id);
         station.Init();
         bool inst = station.TryInstallConfig(station._StarSystem);
+        station.InstallAi();
+        station.StartCommand(job.task, job.taskParams);
         station.InstallLoadout();
         station.SetOwner(faction);
         // Создание экземпляра джоба
@@ -417,6 +419,7 @@ public class NpcJobManager : IInitializable
         ship.InstallLoadout();
         ship.InstallController();
         ship.InstallAi();
+        ship.StartCommand(job.task, job.taskParams);
         ship.BuildLoadouts();
         ship.SetOwner(faction);
         string[] paramsList = job.taskParams.Split(';');

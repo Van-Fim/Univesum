@@ -7,7 +7,7 @@
     "maxUniverseCount": 1000,
     "maxGalaxyCount": 1000,
     "maxStarSystemCount": 1,
-    "faction": "Faction01",
+    "faction": "Faction02",
     "onOwnerSystem": true,
     "spawnRangeMin": 10000,
     "spawnRangeMax": 10000,

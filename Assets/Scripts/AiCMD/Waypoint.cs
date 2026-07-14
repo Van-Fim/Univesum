@@ -23,9 +23,9 @@ public class Waypoint
 
     public void Destroy()
     {
-        if (spAIExecutor != null && spAIExecutor.waypoints.Contains(this))
-        {
-            spAIExecutor.waypoints.Remove(this);
-        }
+        // if (spAIExecutor != null && spAIExecutor.waypoints.Contains(this))
+        // {
+        //     spAIExecutor.waypoints.Remove(this);
+        // }
     }
 }
