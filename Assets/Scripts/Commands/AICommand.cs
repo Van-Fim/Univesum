@@ -12,6 +12,7 @@ public class AICommand
     public virtual void UpdateCommand()
     {
         CheckSpace();
+        if (CheckForInterrupts()) return;
         Execute();
     }
     public virtual void Execute()
@@ -32,6 +33,9 @@ public class AICommand
     {
         isPlayerSpace = spaceObject.GetStarSystem() == PlayerService.singleton.GetStarSystem();
     }
-
+    public virtual bool CheckForInterrupts()
+        {
+            return false;
+        }
     public virtual bool IsCompleted => false;
 }
