@@ -50,6 +50,7 @@ public class Station : SpaceObject, ISelectable
         if (oldStarSystem != null && (oldStarSystem.galaxyId != galaxyId || oldStarSystem.id != systemId) && oldStarSystem.stations.Contains(this))
         {
             oldStarSystem.stations.Remove(this);
+            oldStarSystem.allObjs.Remove(this);
         }
 
         this.galaxyId = galaxyId;
@@ -58,6 +59,7 @@ public class Station : SpaceObject, ISelectable
         if (_StarSystem != null && !_StarSystem.stations.Contains(this))
         {
             _StarSystem.stations.Add(this);
+            _StarSystem.allObjs.Add(this);
         }
         return _StarSystem;
     }

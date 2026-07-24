@@ -10,6 +10,12 @@ public class Faction
     public int id;
     public string name;
     public FactionConfig factionConfig;
+    public float GetRelation(string name)
+    {
+        if (factionConfig.relationships == null) return 0;
+        var relation = factionConfig.relationships.FirstOrDefault(r => r.faction == name);
+        return relation != null ? relation.relation : 0;
+    }
 }
 public class FactionsManager : IInitializable
 {

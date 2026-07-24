@@ -288,7 +288,6 @@ public abstract class SpaceObject : MonoBehaviour
         }
         PatrolCommand command = new PatrolCommand();
         command.spaceObject = this;
-        command.taskQueue.Enqueue(new IdleTask());
         aIExecutor.IssueCommand(command, mainParams);
     }
     public void InstallController()

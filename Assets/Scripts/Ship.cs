@@ -43,6 +43,7 @@ public class Ship : SpaceObject
         if (oldStarSystem != null && (oldStarSystem.galaxyId != galaxyId || oldStarSystem.id != systemId) && oldStarSystem.ships.Contains(this))
         {
             oldStarSystem.ships.Remove(this);
+            oldStarSystem.allObjs.Remove(this);
         }
 
         this.galaxyId = galaxyId;
@@ -51,6 +52,7 @@ public class Ship : SpaceObject
         if (_StarSystem != null && !_StarSystem.ships.Contains(this))
         {
             _StarSystem.ships.Add(this);
+            _StarSystem.allObjs.Add(this);
             if (is_player)
             {
                 Debug.Log($"Player ship {name} added to star system {_StarSystem.name}");

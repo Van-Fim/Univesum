@@ -1,22 +1,19 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine;
-
-public interface IAITask
-{
-    bool Execute(SpaceObject spaceObject);
-    bool IsFinished { get; }
-    void Finish();
-}
-
 // Пример конкретной задачи: Полет к точке
-public class IdleTask : IAITask
+public class MoveAttack : IAITask
 {
-    private Vector3 targetPosition;
-    public bool IsFinished { get; set; }
+    private SpaceObject spaceObject;
+    public bool IsFinished { get; private set; }
 
-    public IdleTask()
-    {}
+    public MoveAttack()
+    { }
+
+    public MoveAttack(SpaceObject spaceObject)
+    {
+        this.spaceObject = spaceObject;
+    }
 
     public bool Execute(SpaceObject spaceObject)
     {

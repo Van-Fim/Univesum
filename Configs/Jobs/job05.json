@@ -3,7 +3,7 @@
     "loadoutName": "Ship01_Loadout01",
     "type": "ship",
     "task": "PatrolCommand",
-    "taskParams": "range:10000",
+    "taskParams": "range:5000",
     "maxUniverseCount": 1000,
     "maxGalaxyCount": 1000,
     "maxStarSystemCount": 1,

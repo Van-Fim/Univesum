@@ -9,6 +9,7 @@ public class StarSystem : PSpace
     public int galaxyId;
     public List<Ship> ships = new List<Ship>();
     public List<Station> stations = new List<Station>();
+    public List<SpaceObject> allObjs = new List<SpaceObject>();
     public List<AsteroidFieldConfig> asteroidFields = new List<AsteroidFieldConfig>();
     public List<StarSystem> neighbors = new List<StarSystem>();
     public class Factory : PlaceholderFactory<StarSystem> { }
