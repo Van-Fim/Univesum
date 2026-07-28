@@ -139,6 +139,7 @@ public abstract class SpaceObject : MonoBehaviour
 
     public static UnityAction<Type> OnDestroyAllAction;
     public static UnityAction OnTickAction;
+    public static UnityAction<SpaceObject> OnWarpAction;
 
     TargetSelect targetSelectPrefab;
 
@@ -155,6 +156,7 @@ public abstract class SpaceObject : MonoBehaviour
     public bool is_destroyed = false;
     public bool is_subscribed = false;
     public bool is_player;
+    public bool is_controller_installed = false;
     public bool Is_main_installed
     {
         get
@@ -287,14 +289,19 @@ public abstract class SpaceObject : MonoBehaviour
             }
         }
         PatrolCommand command = new PatrolCommand();
+        command.Init();
         command.spaceObject = this;
         aIExecutor.IssueCommand(command, mainParams);
     }
     public void InstallController()
     {
-        spaceObjectController = gameObject.AddComponent<ShipController>();
+        if (spaceObjectController == null)
+        {
+            spaceObjectController = gameObject.AddComponent<ShipController>();
+        }
         spaceObjectController._rigidbody = rigidbody;
         spaceObjectController.Sp_object = this;
+        is_controller_installed = true;
     }
     public bool TryInstallConfig(StarSystem starSystem = null)
     {
@@ -370,8 +377,13 @@ public abstract class SpaceObject : MonoBehaviour
             signalBus.Subscribe<SignalChunkFloatingOriginFixEnd>(OnChunkFloatingOriginFixEnd);
             OnDestroyAllAction += OnDestroyAll;
             OnTickAction += OnTick;
+            OnWarpAction += OnWarp;
             is_subscribed = true;
         }
+    }
+    public static void OnWarp(SpaceObject spaceObject)
+    {
+
     }
     public virtual void Start()
     {
@@ -425,6 +437,7 @@ public abstract class SpaceObject : MonoBehaviour
         if (this is Ship && !is_player && this.systemId == sys.id && this.galaxyId == sys.galaxyId)
         {
             BuildLoadouts();
+            InstallController();
         }
     }
     public virtual void OnSpDestroy(SpaceObjectOnDestroy signal)
@@ -680,6 +693,7 @@ public abstract class SpaceObject : MonoBehaviour
         signalBus.Unsubscribe<SignalChunkFloatingOriginFixEnd>(OnChunkFloatingOriginFixEnd);
         OnDestroyAllAction -= OnDestroyAll;
         OnTickAction -= OnTick;
+        OnWarpAction -= OnWarp;
         if (targetSelect)
         {
             targetSelect.Destroy();
@@ -697,5 +711,9 @@ public abstract class SpaceObject : MonoBehaviour
     public static void InvokeTick()
     {
         OnTickAction?.Invoke();
+    }
+    public static void InvokeWarp(SpaceObject spaceObject = null)
+    {
+        OnWarpAction?.Invoke(spaceObject);
     }
 }

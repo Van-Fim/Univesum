@@ -1,18 +1,24 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 // Пример конкретной задачи: Полет к точке
 public class MoveAttack : IAITask
 {
-    private SpaceObject spaceObject;
+    private int spaceObjectId;
+    private int targetObjectId;
+    SpaceObject spaceObject;
+    SpaceObject targetObject;
     public bool IsFinished { get; private set; }
 
     public MoveAttack()
     { }
 
-    public MoveAttack(SpaceObject spaceObject)
+    public MoveAttack(int spaceObjectId, int targetObjectId)
     {
-        this.spaceObject = spaceObject;
+        Universe universe = Universe.singleton;
+        spaceObject = universe.allSpaceObjects.Find(x => x.id == spaceObjectId);
+        targetObject = universe.allSpaceObjects.Find(x => x.id == targetObjectId);
     }
 
     public bool Execute(SpaceObject spaceObject)
@@ -20,6 +26,8 @@ public class MoveAttack : IAITask
         // Логика перемещения корабля к targetPosition
         // Если достигли точки -> IsFinished = true
 
+        spaceObject.spaceObjectController.Turn(targetObject.transform.position);
+        spaceObject.spaceObjectController.Move(1, targetObject.transform);
         return true;
     }
 

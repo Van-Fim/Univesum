@@ -38,24 +38,27 @@ public class PlayerService
         _signalBus.Fire(new SpaceObjectOnDestroyHide(null, null));
         _signalBus.Fire(new SignalChunkDestroy());
         SpaceObjectController sp = _player.currentController;
+        Debug.Log($"IIIIIIIIIIIIIIIIIIIIIIII {sp}");
         if (sp == null)
         {
             return;
         }
-        sp.Sp_object.SetStarSystem(starSystem.galaxyId, starSystem.id);
-        WorldChunkManager wcm = WorldChunkManager.singleton;
-        if (wcm)
-        {
-            wcm.Init();
-            wcm.isFirstChunksReady = false;
-            wcm.UpdateCurrentChunk();
-            wcm.UpdateChunksAround(wcm.currentChunk);
-            wcm.isFirstChunksReady = true;
-        }
-        _spaceContainer.transform.localPosition = Vector3.zero;
-        TargetSelect.currentSelectedItem = null;
-        TargetSelect.InvokeSelect();
-        _signalBus.Fire(new SignalOnPlayerChangedSystem(sp.Sp_object, starSystem));
+
+        sp.Warp(starSystem, position, rotation);
+        // sp.Sp_object.SetStarSystem(starSystem.galaxyId, starSystem.id);
+        // WorldChunkManager wcm = WorldChunkManager.singleton;
+        // if (wcm)
+        // {
+        //     wcm.Init();
+        //     wcm.isFirstChunksReady = false;
+        //     wcm.UpdateCurrentChunk();
+        //     wcm.UpdateChunksAround(wcm.currentChunk);
+        //     wcm.isFirstChunksReady = true;
+        // }
+        // _spaceContainer.transform.localPosition = Vector3.zero;
+        // TargetSelect.currentSelectedItem = null;
+        // TargetSelect.InvokeSelect();
+        // _signalBus.Fire(new SignalOnPlayerChangedSystem(sp.Sp_object, starSystem));
     }
 
     public void ChangeSkybox(SpaceConfigSkybox skyboxConfig)

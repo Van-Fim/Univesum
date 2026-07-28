@@ -99,11 +99,6 @@ public class PlayerShipController : SpaceObjectController
         }
     }
 
-    public override void Warp(StarSystem starSystem, Vector3 position, Vector3 rotation)
-    {
-
-    }
-
     private void FireWeapon()
     {
         _signalBus.Fire(new WeaponFiredSignal(Sp_object));
@@ -181,7 +176,7 @@ public class PlayerShipController : SpaceObjectController
     #endregion
 
     #region Movement Logic
-    public override void Move(Transform target = null)
+    public override void Move(float spfc = -1f, Transform target = null)
     {
         Ship ship = (Ship)Sp_object;
         if (ship.engine == null)
@@ -196,8 +191,11 @@ public class PlayerShipController : SpaceObjectController
             _currentSpeedFactor = _targetSpeedFactor = 0f;
             return;
         }
-
         float speedChangeFactor = Input.GetAxis("ChangeSpeed");
+        if (spfc != -1f)
+        {
+            _targetSpeedFactor = spfc;
+        }
         _targetSpeedFactor += speedChangeFactor;
 
         // Ограничение целевого фактора скорости

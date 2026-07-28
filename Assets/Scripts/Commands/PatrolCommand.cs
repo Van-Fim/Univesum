@@ -24,9 +24,8 @@ public class PatrolCommand : AICommand
 
         base.Execute();
     }
-    public override bool CheckForInterrupts()
+    public override void CheckForInterrupts()
     {
-        bool result = false;
         StarSystem sys = spaceObject.GetStarSystem();
         for (int i = 0; i < sys.allObjs.Count; i++)
         {
@@ -38,19 +37,20 @@ public class PatrolCommand : AICommand
             float distance = Vector3.Distance(so.transform.position, spaceObject.transform.position);
             Faction fc = so.GetOwner();
             float relation = fc.GetRelation(spaceObject.GetOwner().name);
-            if (distance < mainParams["range"] && relation < -5000)
+            if (currentTask is not MoveAttack && distance < mainParams["range"] && relation < -5000)
             {
                 currentTask.Finish();
                 currentTask = null;
-                result = false; // Если поставлю true, то выполнение задач остановлено
 
-                taskQueue.Enqueue(new MoveAttack(so));
+                taskQueue.Enqueue(new MoveAttack(spaceObject.id, so.id));
                 currentTask = taskQueue.Dequeue();
 
-                return result;
+                AIEnemyDetectedEvent enemyDetected = new AIEnemyDetectedEvent() { spaceObjectId = spaceObject.id, targetId = so.id };
+                AICommand.InvokeInterrupt(enemyDetected);
+
+                return;
             }
         }
-        return result;
     }
     public override bool IsCompleted => false;
 }

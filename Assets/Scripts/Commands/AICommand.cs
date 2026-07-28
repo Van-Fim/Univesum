@@ -1,11 +1,15 @@
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class AICommand
 {
     public Dictionary<string, float> mainParams = new Dictionary<string, float>();
     public Queue<IAITask> taskQueue = new Queue<IAITask>();
     public IAITask currentTask;
+
+    public static UnityAction<AIEvent> OnInterruptAction;
 
     public SpaceObject spaceObject;
     public bool isPlayerSpace;
@@ -19,10 +23,22 @@ public class AICommand
     private bool isEvading = false;
     private Vector3 evadeDirection;
     private float evadeTimer = 0f;
+    public virtual void Init()
+    {
+        OnInterruptAction += OnInterrupt;
+    }
+    public virtual void OnInterrupt(AIEvent interruptEvent)
+    {
+
+    }
+    public static void InvokeInterrupt(AIEvent interruptEvent)
+    {
+        OnInterruptAction?.Invoke(interruptEvent);
+    }
     public virtual void UpdateCommand()
     {
         CheckSpace();
-        if (CheckForInterrupts()) return;
+        CheckForInterrupts();
         Execute();
     }
     public virtual void Execute()
@@ -47,9 +63,9 @@ public class AICommand
     {
         isPlayerSpace = spaceObject.GetStarSystem() == PlayerService.singleton.GetStarSystem();
     }
-    public virtual bool CheckForInterrupts()
+    public virtual void CheckForInterrupts()
     {
-        return false;
+
     }
     public virtual bool IsCompleted => false;
 }

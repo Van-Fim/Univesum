@@ -91,7 +91,25 @@ public class SpaceObjectController : MonoBehaviour
 
     public virtual void Warp(StarSystem starSystem, Vector3 position, Vector3 rotation)
     {
+        if (Sp_object == null || SpaceContainer.singleton == null) return;
+        Sp_object.SetStarSystem(starSystem.galaxyId, starSystem.id);
+        Sp_object.transform.position = position;
+        Sp_object.transform.eulerAngles = rotation;
 
+        WorldChunkManager wcm = WorldChunkManager.singleton;
+        if (wcm)
+        {
+            wcm.Init();
+            wcm.isFirstChunksReady = false;
+            wcm.UpdateCurrentChunk();
+            wcm.UpdateChunksAround(wcm.currentChunk);
+            wcm.isFirstChunksReady = true;
+        }
+        SpaceContainer.singleton.transform.localPosition = Vector3.zero;
+        TargetSelect.currentSelectedItem = null;
+        TargetSelect.InvokeSelect();
+        _signalBus.Fire(new SignalOnPlayerChangedSystem(Sp_object, starSystem));
+        SpaceObject.InvokeWarp(Sp_object);
     }
     public virtual void TurnDir(Vector3 direction)
     {
@@ -116,7 +134,7 @@ public class SpaceObjectController : MonoBehaviour
     {
 
     }
-    public virtual void Move(Transform target = null)
+    public virtual void Move(float spfc = -1f, Transform target = null)
     {
 
     }
