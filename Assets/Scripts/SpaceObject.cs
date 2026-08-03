@@ -169,6 +169,19 @@ public abstract class SpaceObject : MonoBehaviour
 
     protected GameObject main = null;
     public StarSystem _StarSystem;
+    public float GetFiringRange()
+    {
+        float ret = 0;
+        float sum = 0;
+        for (int i = 0; i < weapons.Count; i++)
+        {
+            ProjectileConfig pr = weapons[i].projectileConfig;
+            sum += (pr.lifetime * pr.speed);
+        }
+        ret = sum / weapons.Count;
+        Debug.Log($"Weapons Count: {weapons.Count} GetFiringRange: ret={ret}");
+        return ret;
+    }
     public int GetId()
     {
         int id = -1;
@@ -694,6 +707,10 @@ public abstract class SpaceObject : MonoBehaviour
         OnDestroyAllAction -= OnDestroyAll;
         OnTickAction -= OnTick;
         OnWarpAction -= OnWarp;
+        if (spaceObjectController)
+        {
+            spaceObjectController.Destroy();
+        }
         if (targetSelect)
         {
             targetSelect.Destroy();

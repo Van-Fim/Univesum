@@ -18,11 +18,31 @@ public class PatrolCommand : AICommand
         if (currentTask == null)
         {
             targetPosition = UnityEngine.Random.insideUnitSphere * mainParams["range"];
-            taskQueue.Enqueue(new MoveToTask(targetPosition));
+            taskQueue.Enqueue(new MoveToTask(this, targetPosition));
             currentTask = taskQueue.Dequeue();
         }
 
         base.Execute();
+    }
+    public override void OnInterrupt(AIEvent interruptEvent)
+    {
+        base.OnInterrupt(interruptEvent);
+        if (spaceObject.id == interruptEvent.spaceObjectId && interruptEvent is AIEnemyDetectedEvent && spaceObject.rigidbody != null)
+        {
+            taskQueue.Clear();
+            taskQueue.Enqueue(new MoveAttack(this, interruptEvent.spaceObjectId, interruptEvent.targetId, spaceObject.GetFiringRange()));
+            currentTask = taskQueue.Dequeue();
+        }
+        if (spaceObject.id == interruptEvent.spaceObjectId && interruptEvent is AIFollowFightEvent && spaceObject.rigidbody != null)
+        {
+            taskQueue.Clear();
+            taskQueue.Enqueue(new FollowFight(this, interruptEvent.spaceObjectId, interruptEvent.targetId, spaceObject.GetFiringRange()));
+            currentTask = taskQueue.Dequeue();
+        }
+        if (spaceObject.id == interruptEvent.spaceObjectId && interruptEvent is AIEvadingEvent && spaceObject.rigidbody != null)
+        {
+            isEvading = true;
+        }
     }
     public override void CheckForInterrupts()
     {
@@ -37,13 +57,10 @@ public class PatrolCommand : AICommand
             float distance = Vector3.Distance(so.transform.position, spaceObject.transform.position);
             Faction fc = so.GetOwner();
             float relation = fc.GetRelation(spaceObject.GetOwner().name);
-            if (currentTask is not MoveAttack && distance < mainParams["range"] && relation < -5000)
+            if (currentTask is MoveToTask && distance < mainParams["range"] && relation < -5000)
             {
                 currentTask.Finish();
                 currentTask = null;
-
-                taskQueue.Enqueue(new MoveAttack(spaceObject.id, so.id));
-                currentTask = taskQueue.Dequeue();
 
                 AIEnemyDetectedEvent enemyDetected = new AIEnemyDetectedEvent() { spaceObjectId = spaceObject.id, targetId = so.id };
                 AICommand.InvokeInterrupt(enemyDetected);

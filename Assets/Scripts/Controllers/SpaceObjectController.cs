@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 public class SpaceObjectController : MonoBehaviour
 {
@@ -39,9 +40,22 @@ public class SpaceObjectController : MonoBehaviour
     public List<string> parameters;
     public List<string> prevParameters;
 
+    public static UnityAction OnTickAction;
+
+    public SpAIExecutor aIExecutor;
+
     public SpaceObjectController()
     {
         mainParameters = new List<string>();
+        OnTickAction += OnTick;
+    }
+    public virtual void Destroy()
+    {
+        OnTickAction -= OnTick;
+    }
+    public virtual void OnTick()
+    {
+        AvoidObstacles();
     }
 
     public void SetMainCommand(string command, List<string> args = null)
@@ -65,6 +79,7 @@ public class SpaceObjectController : MonoBehaviour
         set
         {
             sp_object = value;
+            aIExecutor = value.aIExecutor;
         }
     }
 
@@ -87,6 +102,39 @@ public class SpaceObjectController : MonoBehaviour
     public virtual void Update()
     {
 
+    }
+
+    public virtual void AvoidObstacles()
+    {
+        if (PlayerService.singleton.GetStarSystem() != Sp_object._StarSystem)
+        {
+            return;
+        }
+        float raycastDistance = 500f;
+        Collider[] hits = Physics.OverlapSphere(
+                    Sp_object.transform.position,
+                    raycastDistance,
+                    LayerMask.GetMask("Default", "Sensor")
+                );
+        List<Collider> detectedObjects = new List<Collider>();
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].gameObject != sp_object.gameObject && DirectionHelper.IsInFront(sp_object.transform, hits[i].transform, 30f))
+            {
+                detectedObjects.Add(hits[i]);
+            }
+        }
+        if (detectedObjects.Count > 0 && sp_object.aIExecutor != null)
+        {
+            AIEvadingEvent aIEvadingEvent = new AIEvadingEvent();
+            aIEvadingEvent.spaceObjectId = sp_object.id;
+            AICommand.InvokeInterrupt(aIEvadingEvent);
+        }
+    }
+
+    public static void InvokeTick()
+    {
+        OnTickAction?.Invoke();
     }
 
     public virtual void Warp(StarSystem starSystem, Vector3 position, Vector3 rotation)

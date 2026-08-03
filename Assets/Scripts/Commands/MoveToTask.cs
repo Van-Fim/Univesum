@@ -5,38 +5,54 @@ using UnityEngine;
 public class MoveToTask : IAITask
 {
     private Vector3 targetPosition;
-    public bool IsFinished { get; private set; }
+    public bool IsFinished { get; set; }
+    public AICommand AICommand{ get; set; }
 
     public MoveToTask()
     { }
 
-    public MoveToTask(Vector3 targetPosition)
+    public MoveToTask(AICommand command, Vector3 targetPosition)
     {
         this.targetPosition = targetPosition;
+        AICommand = command;
     }
 
     public bool Execute(SpaceObject spaceObject)
     {
-        // Логика перемещения корабля к targetPosition
-        // Если достигли точки -> IsFinished = true
-        Vector3 wpPosition = targetPosition;
-        float distanceToWaypoint = Vector3.Distance(spaceObject.transform.position, wpPosition);
-        if (PlayerService.singleton.GetStarSystem() == spaceObject._StarSystem)
+        if (!AICommand.isEvading)
         {
-            //Debug.Log($"Distance: {distanceToWaypoint} = {wpPosition}");
+            // Логика перемещения корабля к targetPosition
+            // Если достигли точки -> IsFinished = true
+            Vector3 wpPosition = targetPosition;
+            float distanceToWaypoint = Vector3.Distance(spaceObject.transform.position, wpPosition);
+            if (PlayerService.singleton.GetStarSystem() == spaceObject._StarSystem)
+            {
+                //Debug.Log($"Distance: {distanceToWaypoint} = {wpPosition}");
+            }
+            if (distanceToWaypoint < 300f)
+            {
+                IsFinished = true;
+                return true;
+            }
+            if (PlayerService.singleton.GetStarSystem() == spaceObject._StarSystem)
+            {
+                wpPosition = SpaceContainer.singleton.transform.position + targetPosition;
+            }
+            spaceObject.spaceObjectController.Turn(wpPosition);
+            spaceObject.spaceObjectController.Move(wpPosition);
         }
-        if (distanceToWaypoint < 300f)
+        else
         {
-            IsFinished = true;
+            Evading();
             return true;
         }
-        if (PlayerService.singleton.GetStarSystem() == spaceObject._StarSystem)
-        {
-            wpPosition = SpaceContainer.singleton.transform.position + targetPosition;
-        }
-        spaceObject.spaceObjectController.Turn(wpPosition);
-        spaceObject.spaceObjectController.Move(wpPosition);
+
         return true;
+    }
+
+    public void Evading()
+    {
+
     }
 
     public void Finish()

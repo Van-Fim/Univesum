@@ -124,6 +124,7 @@ public class Ship : SpaceObject
                             weapon.transform.localPosition = Vector3.zero;
                             weapon.transform.localRotation = Quaternion.identity;
                             weapon.InstallConfig();
+                            weapons.Add(weapon);
                         }
                     }
                 }
@@ -145,6 +146,7 @@ public class Ship : SpaceObject
                             turret.transform.localPosition = Vector3.zero;
                             turret.transform.localRotation = Quaternion.identity;
                             turret.InstallConfig();
+                            weapons.Add(turret);
                         }
                     }
                 }

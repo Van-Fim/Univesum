@@ -20,16 +20,23 @@ public class AICommand
     public float raycastDistance = 300f;
     public float evasiveTurnSpeed = 100f;
     public float evasiveDuration = 1.5f; // Сколько времени уклоняться
-    private bool isEvading = false;
+    public bool isEvading = false;
     private Vector3 evadeDirection;
     private float evadeTimer = 0f;
     public virtual void Init()
     {
         OnInterruptAction += OnInterrupt;
     }
+    public virtual void Destroy()
+    {
+        OnInterruptAction -= OnInterrupt;
+    }
     public virtual void OnInterrupt(AIEvent interruptEvent)
     {
+        if (spaceObject.id == interruptEvent.spaceObjectId)
+        {
 
+        }
     }
     public static void InvokeInterrupt(AIEvent interruptEvent)
     {

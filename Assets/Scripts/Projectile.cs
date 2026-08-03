@@ -21,6 +21,8 @@ public class Projectile : MonoBehaviour
         objCollider = GetComponent<Collider>();
         objCollider.isTrigger = true;
         weapon._signalBus.Subscribe<SignalChunkFloatingOriginFix>(OnChunkFloatingOriginFix);
+        Debug.Log("Projectile initialized");
+
     }
     public void OnChunkFloatingOriginFix(SignalChunkFloatingOriginFix signal)
     {
@@ -34,6 +36,7 @@ public class Projectile : MonoBehaviour
         rb.linearVelocity = direction * (this.config.speed) + v1;
 
         destroyTime = Time.time + config.lifetime;
+        Debug.Log("Firing range: " + (config.speed * config.lifetime));
         Invoke("SelfDestruct", config.lifetime);
     }
 

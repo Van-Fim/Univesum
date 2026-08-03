@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 // Пример конкретной задачи: Полет к точке
-public class MoveAttack : IAITask
+public class FollowFight : IAITask
 {
     private int spaceObjectId;
     private int targetObjectId;
@@ -11,13 +11,12 @@ public class MoveAttack : IAITask
     SpaceObject spaceObject;
     SpaceObject targetObject;
     public bool IsFinished { get; set; }
-    public AICommand AICommand { get; set; }
-    SpaceObject enemy;
+    public AICommand AICommand{ get; set; }
 
-    public MoveAttack()
+    public FollowFight()
     { }
 
-    public MoveAttack(AICommand command, int spaceObjectId, int targetObjectId, float firingRange)
+    public FollowFight(AICommand command, int spaceObjectId, int targetObjectId, float firingRange)
     {
         Universe universe = Universe.singleton;
         spaceObject = universe.allSpaceObjects.Find(x => x.id == spaceObjectId);
@@ -30,25 +29,9 @@ public class MoveAttack : IAITask
     {
         if (!AICommand.isEvading)
         {
-            // Логика перемещения корабля к targetPosition
-            // Если достигли точки -> IsFinished = true
-            float distance = Vector3.Distance(spaceObject.transform.position, targetObject.transform.position);
-            StarSystem starSystem = spaceObject.GetStarSystem();
-            StarSystem tstarSystem = targetObject.GetStarSystem();
-            if (distance <= firingRange && starSystem == tstarSystem)
-            {
-                if (enemy == null)
-                {
-                    AIFollowFightEvent followAttack = new AIFollowFightEvent() { spaceObjectId = spaceObject.id, targetId = targetObject.id };
-                    AICommand.InvokeInterrupt(followAttack);
-                    enemy = targetObject;
-                }
-            }
-            else if (enemy == targetObject)
-            {
-                enemy = null;
-            }
-
+            //...................................
+            // СРАЖЕНИЕ, СБЛИЖЕНИЕ, УВОРОТ, ТРЮКИ
+            // ..................................
             spaceObject.spaceObjectController.Turn(targetObject.transform.position);
             spaceObject.spaceObjectController.Move(1, targetObject.transform);
         }

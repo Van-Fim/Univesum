@@ -6,16 +6,18 @@ public interface IAITask
 {
     bool Execute(SpaceObject spaceObject);
     bool IsFinished { get; }
+    public AICommand AICommand{ get; set; }
     void Finish();
+    public void Evading();
 }
 
 // Пример конкретной задачи: Полет к точке
-public class IdleTask : IAITask
+public class AITask : IAITask
 {
     private Vector3 targetPosition;
     public bool IsFinished { get; set; }
-
-    public IdleTask()
+    public AICommand AICommand{ get; set; }
+    public AITask()
     {}
 
     public bool Execute(SpaceObject spaceObject)
@@ -24,6 +26,11 @@ public class IdleTask : IAITask
         // Если достигли точки -> IsFinished = true
 
         return true;
+    }
+
+    public void Evading()
+    {
+
     }
 
     public void Finish()
