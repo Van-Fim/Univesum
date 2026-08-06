@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using NUnit.Framework;
 using Unity.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using Zenject;
@@ -184,26 +185,7 @@ public abstract class SpaceObject : MonoBehaviour
     }
     public int GetId()
     {
-        int id = -1;
-        List<int> ints = new List<int>();
-        if (_universe.allSpaceObjects.Count == 0){
-            id = 0;
-            ints.Add(id);
-            return id;
-        }
-        for (int i = 0; i < _universe.allSpaceObjects.Count; i++)
-        {
-            if (ints.Contains(_universe.allSpaceObjects[i].id))
-            {
-                id++;
-                continue;
-            }
-            else
-            {
-                ints.Add(_universe.allSpaceObjects[i].id);
-            }
-        }
-        return id;
+        return _universe.GenerateId();
     }
     public void SetOwner(string name)
     {
@@ -718,6 +700,10 @@ public abstract class SpaceObject : MonoBehaviour
         if (_universe.allSpaceObjects.Contains(this))
         {
             _universe.allSpaceObjects.Remove(this);
+        }
+        if (_universe.freeIds.Count > 0)
+        {
+            _universe.freeIds.Remove(id);
         }
         Destroy(gameObject);
     }

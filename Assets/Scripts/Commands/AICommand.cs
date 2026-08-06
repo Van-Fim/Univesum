@@ -6,8 +6,8 @@ using UnityEngine.Events;
 public class AICommand
 {
     public Dictionary<string, float> mainParams = new Dictionary<string, float>();
-    public Queue<IAITask> taskQueue = new Queue<IAITask>();
-    public IAITask currentTask;
+    public Queue<AITask> taskQueue = new Queue<AITask>();
+    public AITask currentTask;
 
     public static UnityAction<AIEvent> OnInterruptAction;
 
@@ -21,7 +21,9 @@ public class AICommand
     public float evasiveTurnSpeed = 100f;
     public float evasiveDuration = 1.5f; // Сколько времени уклоняться
     public bool isEvading = false;
-    private Vector3 evadeDirection;
+    public AIEvadingEvent aIEvadingEvent;
+    private Vector3 targetPosition;
+    public Vector3 evadePosition;
     private float evadeTimer = 0f;
     public virtual void Init()
     {

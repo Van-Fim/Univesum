@@ -26,7 +26,6 @@ public class SpaceObjectFactory
             // Загружаем конфиг
             obj.spaceObjectConfig = JsonConfigLoader.LoadFromFile<SpaceObjectConfig>(configPath);
         }
-
         obj.id = obj.GetId();
         _universe.allSpaceObjects.Add(obj);
 

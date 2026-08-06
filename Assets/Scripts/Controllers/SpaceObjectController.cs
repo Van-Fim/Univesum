@@ -119,14 +119,23 @@ public class SpaceObjectController : MonoBehaviour
         List<Collider> detectedObjects = new List<Collider>();
         for (int i = 0; i < hits.Length; i++)
         {
-            if (hits[i].gameObject != sp_object.gameObject && DirectionHelper.IsInFront(sp_object.transform, hits[i].transform, 30f))
+            if (hits[i].gameObject != sp_object.gameObject && DirectionHelper.IsInFront(sp_object.transform, hits[i].transform, 10f))
             {
                 detectedObjects.Add(hits[i]);
             }
         }
         if (detectedObjects.Count > 0 && sp_object.aIExecutor != null)
         {
+            Vector3 obstaclePos = detectedObjects[0].transform.position;
+            Vector3 directionToObstacle = (obstaclePos - sp_object.transform.position).normalized;
+
+            // Используем локальную ось X или Y корабля для создания вектора облета
+            // Это заставит корабль уходить в сторону относительно своего курса
+            Vector3 sideStep = sp_object.transform.right * (Random.value > 0.5f ? 1 : -1);
+
             AIEvadingEvent aIEvadingEvent = new AIEvadingEvent();
+            aIEvadingEvent.evadingDirection = (directionToObstacle + sideStep).normalized;
+            aIEvadingEvent.evadingPosition = obstaclePos + aIEvadingEvent.evadingDirection * 300f;
             aIEvadingEvent.spaceObjectId = sp_object.id;
             AICommand.InvokeInterrupt(aIEvadingEvent);
         }

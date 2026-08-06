@@ -19,7 +19,22 @@ public class Universe
     public List<Galaxy> galaxiesList = new List<Galaxy>();
     public List<StarSystem> systemsList = new List<StarSystem>();
     public List<SpaceObject> allSpaceObjects = new List<SpaceObject>();
+
     public static Universe singleton;
+    private int _nextId = 0;
+    public List<int> freeIds = new List<int>();
+
+    public int GenerateId()
+    {
+        if(freeIds.Count > 0)
+        {
+            _nextId = freeIds[0];
+            freeIds.Remove(freeIds[0]);
+            return _nextId;
+        }
+        return _nextId++;
+    }
+
     public void Init()
     {
         GameObject gm = new GameObject();
@@ -65,7 +80,7 @@ public class Universe
         int numFractions = startFactions.Count;
 
         // Сразу сбрасываем фракции у всех систем в этой галактике (-1 = нейтральная)
-        foreach (StarSystem sys in allSystems) sys.faction = null; 
+        foreach (StarSystem sys in allSystems) sys.faction = null;
 
         // 2. Выбираем максимально удаленные стартовые точки (столицы)
         List<StarSystem> capitals = new List<StarSystem>();
@@ -101,7 +116,7 @@ public class Universe
                     .First();
                 capitals.Add(bestCapital);
             }
-            
+
             capitals[f].faction = factions[f]; // Задаем ID фракции (0, 1, 2, 3, 4)
             startFactions[f].systems_count--; // Уменьшаем лимит систем фракции, так как столица уже занята
         }
@@ -116,7 +131,7 @@ public class Universe
 
         // 3. Пошаговое круговое расширение
         bool systemsAssignedInThisTurn = true;
-        
+
         while (systemsAssignedInThisTurn)
         {
             systemsAssignedInThisTurn = false;
@@ -166,7 +181,7 @@ public class Universe
         //         .Where(s => s.faction != null)
         //         .OrderBy(s => Vector3.Distance(sys.transform.position, s.transform.position))
         //         .FirstOrDefault();
-                
+
         //     if (closestOccupied != null) sys.faction = closestOccupied.faction;
         // }
     }

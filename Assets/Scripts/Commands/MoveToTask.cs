@@ -2,11 +2,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine;
 // Пример конкретной задачи: Полет к точке
-public class MoveToTask : IAITask
+public class MoveToTask : AITask
 {
     private Vector3 targetPosition;
-    public bool IsFinished { get; set; }
-    public AICommand AICommand{ get; set; }
 
     public MoveToTask()
     { }
@@ -17,7 +15,7 @@ public class MoveToTask : IAITask
         AICommand = command;
     }
 
-    public bool Execute(SpaceObject spaceObject)
+    public override bool Execute(SpaceObject spaceObject)
     {
         if (!AICommand.isEvading)
         {
@@ -43,19 +41,14 @@ public class MoveToTask : IAITask
         }
         else
         {
-            Evading();
+            Evading(AICommand.aIEvadingEvent);
             return true;
         }
 
         return true;
     }
 
-    public void Evading()
-    {
-
-    }
-
-    public void Finish()
+    public override void Finish()
     {
         IsFinished = true;
     }

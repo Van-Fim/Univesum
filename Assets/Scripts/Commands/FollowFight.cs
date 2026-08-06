@@ -3,15 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 // Пример конкретной задачи: Полет к точке
-public class FollowFight : IAITask
+public class FollowFight : AITask
 {
-    private int spaceObjectId;
-    private int targetObjectId;
     public float firingRange = 560;
-    SpaceObject spaceObject;
-    SpaceObject targetObject;
-    public bool IsFinished { get; set; }
-    public AICommand AICommand{ get; set; }
 
     public FollowFight()
     { }
@@ -25,7 +19,7 @@ public class FollowFight : IAITask
         AICommand = command;
     }
 
-    public bool Execute(SpaceObject spaceObject)
+    public override bool Execute(SpaceObject spaceObject)
     {
         if (!AICommand.isEvading)
         {
@@ -37,19 +31,14 @@ public class FollowFight : IAITask
         }
         else
         {
-            Evading();
+            Evading(AICommand.aIEvadingEvent);
             return true;
         }
 
         return true;
     }
 
-    public void Evading()
-    {
-
-    }
-
-    public void Finish()
+    public override void Finish()
     {
         IsFinished = true;
     }

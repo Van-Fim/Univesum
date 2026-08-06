@@ -20,6 +20,7 @@ public class AIFollowFightEvent: AIEvent
 public class AIEvadingEvent: AIEvent
 {
     public Vector3 evadingPosition;
+    public Vector3 evadingDirection;
     public float evadingDuration;
     public float evadingSpeed;
 }

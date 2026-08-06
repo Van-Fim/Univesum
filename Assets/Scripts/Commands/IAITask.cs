@@ -12,15 +12,25 @@ public interface IAITask
 }
 
 // Пример конкретной задачи: Полет к точке
-public class AITask : IAITask
+public class AITask
 {
     private Vector3 targetPosition;
+    public Vector3 evadePosition;
     public bool IsFinished { get; set; }
-    public AICommand AICommand{ get; set; }
-    public AITask()
-    {}
+    public bool IsEvadePositionChanged = false;
+    public AICommand AICommand { get; set; }
 
-    public bool Execute(SpaceObject spaceObject)
+    private int spaceObjectId;
+    private int targetObjectId;
+    public SpaceObject spaceObject;
+    public SpaceObject targetObject;
+
+    public AITask()
+    {
+
+    }
+
+    public virtual bool Execute(SpaceObject spaceObject)
     {
         // Логика перемещения корабля к targetPosition
         // Если достигли точки -> IsFinished = true
@@ -28,12 +38,28 @@ public class AITask : IAITask
         return true;
     }
 
-    public void Evading()
+    public virtual void Evading(AIEvadingEvent ev)
     {
+        if (ev.spaceObjectId != spaceObject.id) return;
+        if (!IsEvadePositionChanged)
+        {
+            evadePosition = AICommand.evadePosition;
+            IsEvadePositionChanged = true;
+        }
+        float distanceToPoint = Vector3.Distance(spaceObject.transform.position, evadePosition);
+        if (distanceToPoint < 100f)
+        {
+            AICommand.isEvading = false;
+            IsEvadePositionChanged = false;
+        }
 
+        spaceObject.spaceObjectController.Turn(evadePosition);
+        spaceObject.spaceObjectController.Move(evadePosition);
+
+        AICommand.evadePosition = evadePosition;
     }
 
-    public void Finish()
+    public virtual void Finish()
     {
         IsFinished = true;
     }

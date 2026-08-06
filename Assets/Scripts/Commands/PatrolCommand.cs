@@ -27,20 +27,27 @@ public class PatrolCommand : AICommand
     public override void OnInterrupt(AIEvent interruptEvent)
     {
         base.OnInterrupt(interruptEvent);
-        if (spaceObject.id == interruptEvent.spaceObjectId && interruptEvent is AIEnemyDetectedEvent && spaceObject.rigidbody != null)
+        if (spaceObject.id != interruptEvent.spaceObjectId)
+        {
+            return;
+        }
+        if (interruptEvent is AIEnemyDetectedEvent && spaceObject.rigidbody != null)
         {
             taskQueue.Clear();
             taskQueue.Enqueue(new MoveAttack(this, interruptEvent.spaceObjectId, interruptEvent.targetId, spaceObject.GetFiringRange()));
             currentTask = taskQueue.Dequeue();
         }
-        if (spaceObject.id == interruptEvent.spaceObjectId && interruptEvent is AIFollowFightEvent && spaceObject.rigidbody != null)
+        if (interruptEvent is AIFollowFightEvent && spaceObject.rigidbody != null)
         {
             taskQueue.Clear();
             taskQueue.Enqueue(new FollowFight(this, interruptEvent.spaceObjectId, interruptEvent.targetId, spaceObject.GetFiringRange()));
             currentTask = taskQueue.Dequeue();
         }
-        if (spaceObject.id == interruptEvent.spaceObjectId && interruptEvent is AIEvadingEvent && spaceObject.rigidbody != null)
+        if (interruptEvent is AIEvadingEvent && spaceObject.rigidbody != null && !isEvading)
         {
+            AIEvadingEvent ev = (AIEvadingEvent)interruptEvent;
+            aIEvadingEvent = ev;
+            evadePosition = ev.evadingPosition;
             isEvading = true;
         }
     }
