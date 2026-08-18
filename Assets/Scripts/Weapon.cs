@@ -1,6 +1,6 @@
 using UnityEngine;
 using Zenject;
-public class Weapon : MonoBehaviour
+public class Weapon : UpgradeItem
 {
     public WeaponConfig _config;
     public ProjectileConfig projectileConfig;
@@ -38,7 +38,7 @@ public class Weapon : MonoBehaviour
     }
     public virtual void Init()
     {
-        
+
     }
     private void OnDestroy()
     {

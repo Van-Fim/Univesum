@@ -110,33 +110,62 @@ public class SpaceObjectController : MonoBehaviour
         {
             return;
         }
-        float raycastDistance = 500f;
+        Vector3 moveDir = Vector3.zero;
+        float raycastDistance = 100f;
         Collider[] hits = Physics.OverlapSphere(
                     Sp_object.transform.position,
                     raycastDistance,
                     LayerMask.GetMask("Default", "Sensor")
                 );
         List<Collider> detectedObjects = new List<Collider>();
+        Collider dsp = null;
+        SpaceObject dspSp = null;
         for (int i = 0; i < hits.Length; i++)
         {
             if (hits[i].gameObject != sp_object.gameObject && DirectionHelper.IsInFront(sp_object.transform, hits[i].transform, 10f))
             {
                 detectedObjects.Add(hits[i]);
+                dsp = hits[i];
+                dspSp = dsp.gameObject.GetComponent<SpaceObject>();
             }
         }
         if (detectedObjects.Count > 0 && sp_object.aIExecutor != null)
         {
-            Vector3 obstaclePos = detectedObjects[0].transform.position;
+            Vector3 obstaclePos = dsp.transform.position;
             Vector3 directionToObstacle = (obstaclePos - sp_object.transform.position).normalized;
 
             // Используем локальную ось X или Y корабля для создания вектора облета
             // Это заставит корабль уходить в сторону относительно своего курса
-            Vector3 sideStep = sp_object.transform.right * (Random.value > 0.5f ? 1 : -1);
+            int rn = Random.Range(0, 2);
+            if (rn == 1)
+            {
+                moveDir = sp_object.transform.right;
+            }
+            else
+            {
+                moveDir = sp_object.transform.up;
+            }
+            Vector3 sideStep = moveDir * (Random.value > 0.5f ? 1 : -1);
 
             AIEvadingEvent aIEvadingEvent = new AIEvadingEvent();
-            aIEvadingEvent.evadingDirection = (directionToObstacle + sideStep).normalized;
-            aIEvadingEvent.evadingPosition = obstaclePos + aIEvadingEvent.evadingDirection * 300f;
+            aIEvadingEvent.targetScale = 200;
+            Vector3 ppp = (directionToObstacle + sideStep).normalized;
+            if (dspSp)
+            {
+                aIEvadingEvent.targetScale = dspSp.scaleValue;
+            }
+            int sc = sp_object.scaleValue + aIEvadingEvent.targetScale;
+            aIEvadingEvent.evadingDirection = ppp;
+            aIEvadingEvent.evadingPosition = obstaclePos + aIEvadingEvent.evadingDirection * (sc*30);
             aIEvadingEvent.spaceObjectId = sp_object.id;
+
+            if (dspSp)
+            {
+                if(dspSp.debugSphere){
+                    dspSp.debugSphere.transform.localPosition = aIEvadingEvent.evadingPosition;
+                }
+            }
+
             AICommand.InvokeInterrupt(aIEvadingEvent);
         }
     }

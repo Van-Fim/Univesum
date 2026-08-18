@@ -23,4 +23,6 @@ public class AIEvadingEvent: AIEvent
     public Vector3 evadingDirection;
     public float evadingDuration;
     public float evadingSpeed;
+    public float evadingTime = 4f;
+    public int targetScale;
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.VFX;
 using Zenject;
 
-public class JetEngineController : MonoBehaviour
+public class JetEngineController : UpgradeItem
 {
     [Inject]
     SignalBus _signalBus;

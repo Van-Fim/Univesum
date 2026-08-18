@@ -12,4 +12,6 @@ public class LoadoutHP
 {
     public string hardpoint;
     public string item;
+    public Transform objTransform;
+    public UpgradeItem upgradeItem;
 }

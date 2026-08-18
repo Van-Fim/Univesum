@@ -49,15 +49,19 @@ public class PatrolCommand : AICommand
             aIEvadingEvent = ev;
             evadePosition = ev.evadingPosition;
             isEvading = true;
+            Debug.Log(evadePosition);
         }
     }
     public override void CheckForInterrupts()
     {
+        if(spaceObject == null || spaceObject.is_destroyed){
+            return;
+        }
         StarSystem sys = spaceObject.GetStarSystem();
         for (int i = 0; i < sys.allObjs.Count; i++)
         {
             SpaceObject so = sys.allObjs[i];
-            if (so == spaceObject)
+            if (so == spaceObject || spaceObject == null || so == null)
             {
                 continue;
             }

@@ -21,6 +21,8 @@ public class SpaceObjectData
     public int shield;
     public int jobId;
 
+    public int scaleValue = 10000;
+
     public int factionId;
     public string factionName;
 
@@ -64,6 +66,7 @@ public class SpaceObjectData
         is_initialized = spaceObject.is_initialized;
         is_subscribed = spaceObject.is_subscribed;
         is_player = spaceObject.is_player;
+        scaleValue = spaceObject.scaleValue;
         ret = true;
         return ret;
     }
@@ -97,6 +100,7 @@ public class SpaceObjectData
         spaceObject.is_destroyed = is_destroyed;
         spaceObject.is_initialized = is_initialized;
         spaceObject.is_player = is_player;
+        spaceObject.scaleValue = scaleValue;
 
         ret = true;
         return ret;
@@ -110,6 +114,7 @@ public abstract class SpaceObject : MonoBehaviour
     public int hull;
     public int maxShield = 10000;
     public int shield;
+    public int scaleValue;
     public int jobId = -1;
     public int jobInstId = -1;
     public List<LoadoutHP> loadoutHPs;
@@ -146,7 +151,7 @@ public abstract class SpaceObject : MonoBehaviour
 
     public Rigidbody rigidbody;
     public Transform hardpoints;
-    public GameObject sphere;
+    public GameObject debugSphere;
 
     public string loadoutName;
 
@@ -476,7 +481,17 @@ public abstract class SpaceObject : MonoBehaviour
         cam.transform.localPosition = Vector3.zero;
         cam.transform.localEulerAngles = Vector3.zero;
     }
-
+    public virtual void DestroyLoadoutsItems()
+    {
+        for (int i = 0; i < loadoutHPs.Count; i++)
+        {
+            LoadoutHP hp = loadoutHPs[i];
+            if(hp.upgradeItem)
+            {
+                hp.upgradeItem.Destroy();
+            }
+        }
+    }
     public virtual void InstallLoadout(Loadout loadout)
     {
         if (loadout == null || loadout.hardpoints == null)
@@ -596,18 +611,22 @@ public abstract class SpaceObject : MonoBehaviour
         rigidbody.angularDamping = spaceObjectConfig.angularDrag;
         meshCollider.convex = true;
         rigidbody.useGravity = false;
-
+        if(meshFilter)
+        {
+            Bounds bounds = meshFilter.sharedMesh.bounds;
+            scaleValue = (int)bounds.size.magnitude;
+        }
         if (spaceObjectConfig.pathToMaterial != null && spaceObjectConfig.pathToMaterial.Length > 0)
         {
             Material mat = Resources.Load<Material>(spaceObjectConfig.pathToMaterial);
             meshRenderer.material = mat;
         }
-        if (sphere == null)
+        if (debugSphere == null && main != null && this is Ship && !is_player)
         {
-            // sphere = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SphereCollider"));
-            // sphere.transform.SetParent(main.transform);
-            // sphere.name = "SPHERE";
-            // sphere.transform.localScale = Vector3.one * 30;
+            debugSphere = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SphereCollider"));
+            debugSphere.transform.SetParent(transform.parent);
+            debugSphere.name = "SPHERE";
+            debugSphere.transform.localScale = Vector3.one * 20;
         }
     }
 

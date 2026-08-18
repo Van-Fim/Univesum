@@ -60,6 +60,8 @@ public class ShipController : SpaceObjectController
 
     public override void Move(float spfc = -1f, Transform target = null)
     {
+        if (Sp_object.is_destroyed || _rigidbody == null)
+            return;
         Ship ship = (Ship)Sp_object;
         if (ship.engine == null)
         {

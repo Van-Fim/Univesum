@@ -63,9 +63,17 @@ public class Ship : SpaceObject
 
     public override void BuildLoadouts()
     {
-        Debug.Log($"Starting building loadouts {loadoutName}");
-        Debug.Log($"hardpoints exsists");
-        Debug.Log($"loadoutHPs {loadoutHPs.Count}");
+        if(is_player){
+            Debug.Log($"Starting building loadouts {loadoutName}");
+            Debug.Log($"hardpoints exsists");
+            Debug.Log($"loadoutHPs {loadoutHPs.Count}");
+
+            for (int i = 0; i < loadoutHPs.Count; i++)
+            {
+                LoadoutHP hp = loadoutHPs[i];
+                Debug.Log($"== {hp.hardpoint} {hp.item} {hp.upgradeItem}");
+            }
+        }
         for (int i = 0; i < loadoutHPs.Count; i++)
         {
             LoadoutHP hp = loadoutHPs[i];
@@ -96,6 +104,8 @@ public class Ship : SpaceObject
                             EngineSoundController engineSoundController = JetEngineGameObject.GetComponent<EngineSoundController>();
                             engineSoundController.InstallSounds(engine);
                             engineSoundController.sp_object = this;
+                            hp.objTransform = JetEngine.transform;
+                            hp.upgradeItem = JetEngine;
                         }
                     }
                 }
@@ -115,7 +125,7 @@ public class Ship : SpaceObject
                     for (int j = 0; j < hardpoints.childCount; j++)
                     {
                         Transform tr = hardpoints.GetChild(j);
-                        if (tr.name == hp.hardpoint)
+                        if (tr.name == hp.hardpoint && hp.upgradeItem == null)
                         {
                             WeaponConfig cfg = JsonConfigLoader.LoadFromFile<WeaponConfig>("Weapons/" + hp.item);
                             Weapon weapon = _weaponFactory.Create(this, cfg);
@@ -125,6 +135,8 @@ public class Ship : SpaceObject
                             weapon.transform.localRotation = Quaternion.identity;
                             weapon.InstallConfig();
                             weapons.Add(weapon);
+                            hp.objTransform = weapon.transform;
+                            hp.upgradeItem = weapon;
                         }
                     }
                 }
@@ -137,7 +149,7 @@ public class Ship : SpaceObject
                     for (int j = 0; j < hardpoints.childCount; j++)
                     {
                         Transform tr = hardpoints.GetChild(j);
-                        if (tr.name == hp.hardpoint)
+                        if (tr.name == hp.hardpoint && hp.upgradeItem == null)
                         {
                             WeaponConfig cfg = JsonConfigLoader.LoadFromFile<WeaponConfig>("Weapons/" + hp.item);
                             Weapon turret = _weaponFactory.Create(this, cfg);
@@ -147,11 +159,14 @@ public class Ship : SpaceObject
                             turret.transform.localRotation = Quaternion.identity;
                             turret.InstallConfig();
                             weapons.Add(turret);
+                            hp.objTransform = turret.transform;
+                            hp.upgradeItem = turret;
                         }
                     }
                 }
 
             }
+            loadoutHPs[i] = hp;
         }
     }
     public void OnSelect()

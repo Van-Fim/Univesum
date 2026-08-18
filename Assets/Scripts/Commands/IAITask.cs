@@ -6,7 +6,7 @@ public interface IAITask
 {
     bool Execute(SpaceObject spaceObject);
     bool IsFinished { get; }
-    public AICommand AICommand{ get; set; }
+    public AICommand AICommand { get; set; }
     void Finish();
     public void Evading();
 }
@@ -47,7 +47,7 @@ public class AITask
             IsEvadePositionChanged = true;
         }
         float distanceToPoint = Vector3.Distance(spaceObject.transform.position, evadePosition);
-        if (distanceToPoint < 100f)
+        if (distanceToPoint < 10f)
         {
             AICommand.isEvading = false;
             IsEvadePositionChanged = false;
@@ -55,6 +55,16 @@ public class AITask
 
         spaceObject.spaceObjectController.Turn(evadePosition);
         spaceObject.spaceObjectController.Move(evadePosition);
+
+        if (AICommand.isEvading)
+        {
+            ev.evadingTime -= Time.deltaTime;
+            if (ev.evadingTime <= 0)
+            {
+                //AICommand.isEvading = false;
+                //ev.evadingTime = 0;
+            }
+        }
 
         AICommand.evadePosition = evadePosition;
     }

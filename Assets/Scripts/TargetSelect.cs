@@ -118,6 +118,9 @@ public class TargetSelect : MonoBehaviour, IPointerClickHandler
     }
     public virtual void UpdateUiPos()
     {
+        if(playerService._player_sp_object == null || spaceObject == null){
+            return;
+        }
         float dst = Vector3.Distance(playerService._player_sp_object.transform.position, spaceObject.transform.position);
         if (spaceObject is Station)
         {

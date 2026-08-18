@@ -112,15 +112,21 @@ public class SaveManager
 
             ship.Init();
             if (ship.is_player)
+            {
                 _playerService.SetStarSystem(ship._StarSystem);
+            }
             if (!ship.Is_main_installed)
             {
                 ship.TryInstallConfig();
             }
+
             if (ship.is_player)
             {
                 var controller = _container.TryResolve<PlayerShipController>();
+                ship.DestroyLoadoutsItems();
+                ship.loadoutHPs = new List<LoadoutHP>();
                 _playerService.Warp(ship._StarSystem, pos, rot);
+
                 if (!controller)
                 {
                     controller = ship.gameObject.AddComponent<PlayerShipController>();

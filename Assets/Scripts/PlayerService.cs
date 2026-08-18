@@ -32,18 +32,18 @@ public class PlayerService
     public void Warp(StarSystem starSystem, Vector3 position, Vector3 rotation)
     {
         Random.InitState($"{_universe.seed}{starSystem.galaxyId}{starSystem.id}".GetHashCode());
+        SpaceObjectController sp = _player.currentController;
+
         int rndm = Random.Range(0, starSystem.config.skyboxes.Count);
         ChangeSkybox(starSystem.config.skyboxes[rndm]);
         _signalBus.Fire(new SpaceShowSignal(starSystem));
         _signalBus.Fire(new SpaceObjectOnDestroyHide(null, null));
         _signalBus.Fire(new SignalChunkDestroy());
-        SpaceObjectController sp = _player.currentController;
-        Debug.Log($"IIIIIIIIIIIIIIIIIIIIIIII {sp}");
+
         if (sp == null)
         {
             return;
         }
-
         sp.Warp(starSystem, position, rotation);
         // sp.Sp_object.SetStarSystem(starSystem.galaxyId, starSystem.id);
         // WorldChunkManager wcm = WorldChunkManager.singleton;
