@@ -71,7 +71,6 @@ public class Ship : SpaceObject
             for (int i = 0; i < loadoutHPs.Count; i++)
             {
                 LoadoutHP hp = loadoutHPs[i];
-                Debug.Log($"== {hp.hardpoint} {hp.item} {hp.upgradeItem}");
             }
         }
         for (int i = 0; i < loadoutHPs.Count; i++)

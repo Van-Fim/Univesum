@@ -7,22 +7,24 @@ public class SpAIExecutor : MonoBehaviour
     private Ship ship;
     private AICommand currentActiveCommand;
 
+    public AICommand CurrentActiveCommand { get => currentActiveCommand; set => currentActiveCommand = value; }
+
     void Start() => ship = GetComponent<Ship>();
 
     public void IssueCommand(AICommand newCommand, Dictionary<string, float> mainParams = null)
     {
         if (mainParams != null)
             newCommand.mainParams = mainParams;
-        currentActiveCommand = newCommand;
+        CurrentActiveCommand = newCommand;
     }
 
     public void Tick()
     {
-        if (currentActiveCommand != null)
+        if (CurrentActiveCommand != null)
         {
-            currentActiveCommand.UpdateCommand();
-            if (currentActiveCommand.IsCompleted)
-                currentActiveCommand = null;
+            CurrentActiveCommand.UpdateCommand();
+            if (CurrentActiveCommand.IsCompleted)
+                CurrentActiveCommand = null;
         }
     }
 }

@@ -8,7 +8,8 @@ public class AICommand
     public Dictionary<string, float> mainParams = new Dictionary<string, float>();
     public Queue<AITask> taskQueue = new Queue<AITask>();
     public AITask currentTask;
-
+    public string name;
+    public string s_params;
     public static UnityAction<AIEvent> OnInterruptAction;
 
     public SpaceObject spaceObject;

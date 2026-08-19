@@ -15,9 +15,9 @@ public class SpaceObjectData
 
     public int galaxyId;
     public int systemId;
-    public int maxHull = 10000;
+    public int maxHull = 1000;
     public int hull;
-    public int maxShield = 10000;
+    public int maxShield = 1000;
     public int shield;
     public int jobId;
 
@@ -33,6 +33,9 @@ public class SpaceObjectData
     public bool is_initialized;
     public bool is_subscribed;
     public bool is_player;
+
+    public string currentActiveCommand;
+    public string comTaskParams;
 
     public SpaceObjectConfig spaceObjectConfig;
     public List<LoadoutHP> loadoutHPs;
@@ -67,6 +70,11 @@ public class SpaceObjectData
         is_subscribed = spaceObject.is_subscribed;
         is_player = spaceObject.is_player;
         scaleValue = spaceObject.scaleValue;
+        if (spaceObject.aIExecutor && spaceObject.aIExecutor.CurrentActiveCommand != null)
+        {
+            currentActiveCommand = spaceObject.aIExecutor.CurrentActiveCommand.name;
+            comTaskParams = spaceObject.aIExecutor.CurrentActiveCommand.s_params;
+        }
         ret = true;
         return ret;
     }
@@ -291,6 +299,8 @@ public abstract class SpaceObject : MonoBehaviour
         PatrolCommand command = new PatrolCommand();
         command.Init();
         command.spaceObject = this;
+        command.name = scommand;
+        command.s_params = s_params;
         aIExecutor.IssueCommand(command, mainParams);
     }
     public void InstallController()
@@ -621,13 +631,13 @@ public abstract class SpaceObject : MonoBehaviour
             Material mat = Resources.Load<Material>(spaceObjectConfig.pathToMaterial);
             meshRenderer.material = mat;
         }
-        if (debugSphere == null && main != null && this is Ship && !is_player)
-        {
-            debugSphere = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SphereCollider"));
-            debugSphere.transform.SetParent(transform.parent);
-            debugSphere.name = "SPHERE";
-            debugSphere.transform.localScale = Vector3.one * 20;
-        }
+        // if (debugSphere == null && main != null && this is Ship && !is_player)
+        // {
+        //     debugSphere = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SphereCollider"));
+        //     debugSphere.transform.SetParent(transform.parent);
+        //     debugSphere.name = "SPHERE";
+        //     debugSphere.transform.localScale = Vector3.one * 20;
+        // }
     }
 
     public virtual void DestroyConfig()

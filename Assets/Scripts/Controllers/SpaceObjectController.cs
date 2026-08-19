@@ -106,7 +106,7 @@ public class SpaceObjectController : MonoBehaviour
 
     public virtual void AvoidObstacles()
     {
-        if (PlayerService.singleton.GetStarSystem() != Sp_object._StarSystem)
+        if (Sp_object == null || PlayerService.singleton.GetStarSystem() != Sp_object._StarSystem)
         {
             return;
         }
@@ -159,12 +159,12 @@ public class SpaceObjectController : MonoBehaviour
             aIEvadingEvent.evadingPosition = obstaclePos + aIEvadingEvent.evadingDirection * (sc*30);
             aIEvadingEvent.spaceObjectId = sp_object.id;
 
-            if (dspSp)
-            {
-                if(dspSp.debugSphere){
-                    dspSp.debugSphere.transform.localPosition = aIEvadingEvent.evadingPosition;
-                }
-            }
+            // if (dspSp)
+            // {
+            //     if(dspSp.debugSphere){
+            //         dspSp.debugSphere.transform.localPosition = aIEvadingEvent.evadingPosition;
+            //     }
+            // }
 
             AICommand.InvokeInterrupt(aIEvadingEvent);
         }

@@ -168,7 +168,7 @@ public class NpcJobManager : IInitializable
         for (int i = 0; i < jobsArr.Length; i++)
         {
             Job job = jobsArr[i];
-            job.id = jobsArr.Length - 1;
+            job.id = _jobs.Count;
             job.Init();
             _jobs.Add(job);
             _activeJobs[job.id] = new List<JobInstance>();
@@ -321,7 +321,6 @@ public class NpcJobManager : IInitializable
     }
     private void SpawnStationForJob(Job job, (Galaxy galaxy, StarSystem system) location)
     {
-        // Создание корабля через фабрику
         Station station = _spFactory.Create<Station>(
             "Prefabs/StationPrefab",
             "SpaceObjects/Stations/" + job.space_object
@@ -393,7 +392,32 @@ public class NpcJobManager : IInitializable
             job.starSystemCounts[station.systemId] = 0;
         job.starSystemCounts[station.systemId]++;
 
-        // Debug.Log($"Spawned {job.name} for {job.faction} in galaxy {location.galaxy.id}, system {location.system.id}");
+        Debug.Log($"------------ {job.id}");
+    }
+    public void AddShipForJob(Ship ship)
+    {
+        Job job = _jobs.Find(x => x.id == ship.jobId);
+        // Создание экземпляра джоба
+        var jobInstance = new JobInstance
+        {
+            job = job,
+            spaceObject = ship,
+            galaxyId = ship.galaxyId,
+            systemId = ship.systemId,
+            spawnTime = DateTime.Now
+        };
+
+        _activeJobs[job.id].Add(jobInstance);
+
+        // Обновление счетчиков
+        job.currentUniverseCount++;
+        if (!job.galaxyCounts.ContainsKey(ship.galaxyId))
+            job.galaxyCounts[ship.galaxyId] = 0;
+        job.galaxyCounts[ship.galaxyId]++;
+
+        if (!job.starSystemCounts.ContainsKey(ship.systemId))
+            job.starSystemCounts[ship.systemId] = 0;
+        job.starSystemCounts[ship.systemId]++;
     }
     private void SpawnShipForJob(Job job, (Galaxy galaxy, StarSystem system) location)
     {
@@ -402,6 +426,7 @@ public class NpcJobManager : IInitializable
             "Prefabs/ShipPrefab",
             "SpaceObjects/Ships/" + job.space_object
         );
+        
         StarSystem sys = PlayerService.singleton.GetStarSystem();
         int radius = UnityEngine.Random.Range(job.spawnRangeMin, job.spawnRangeMax + 1);
         Vector2 randomPoint2D = UnityEngine.Random.insideUnitCircle * radius;
@@ -450,7 +475,7 @@ public class NpcJobManager : IInitializable
         {
             ship.BuildLoadouts();
         }
-        Debug.Log($"Spawned {job.name} for {job.faction} in galaxy {location.galaxy.id}, system {location.system.id}");
+        // Debug.Log($"Spawned {job.name} for {job.faction} in galaxy {location.galaxy.id}, system {location.system.id}");
     }
 
     private void CleanupDestroyedShips()

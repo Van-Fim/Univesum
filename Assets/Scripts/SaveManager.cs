@@ -102,9 +102,11 @@ public class SaveManager
         for (int i = 0; i < saveData.shipDatas.Count; i++)
         {
             ShipData data = saveData.shipDatas[i];
+
             Ship ship = _spaceObjectFactory.Create<Ship>(
             "Prefabs/ShipPrefab"
             );
+            ship.InstallAi();
             data.InstallData(ship);
             Vector3 pos = ship.transform.localPosition;
             Vector3 rot = ship.transform.localEulerAngles;
@@ -152,10 +154,25 @@ public class SaveManager
                 WorldChunkManager.singleton.isFirstChunksReady = false;
                 WorldChunkManager.singleton.UpdateChunksAround(saveData.currentChunkPos);
                 WorldChunkManager.singleton.isFirstChunksReady = true;
+
+                _playerService._player_sp_object = ship;
             }
+            else
+            {
+                if (ship.jobId >= 0)
+                {
+                    _npcJobManager.AddShipForJob(ship);
+                }
+            }
+            
             ship.transform.localPosition = pos;
             ship.transform.localEulerAngles = rot;
             ship.BuildLoadouts();
+            if (data.currentActiveCommand.Length > 0 && data.comTaskParams.Length > 0)
+            {
+                ship.StartCommand(data.currentActiveCommand, data.comTaskParams);
+            }
+            
         }
         _npcJobManager.isEnabled = true;
     }

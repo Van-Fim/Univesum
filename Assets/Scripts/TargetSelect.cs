@@ -132,7 +132,7 @@ public class TargetSelect : MonoBehaviour, IPointerClickHandler
         }
 
         float ff = 1 + (1 * dst) * 2;
-
+        
         hullBar.fillAmount = (float)spaceObject.hull / spaceObject.maxHull;
         shieldBar.fillAmount = (float)spaceObject.shield / spaceObject.maxShield;
 
@@ -164,6 +164,7 @@ public class TargetSelect : MonoBehaviour, IPointerClickHandler
     public virtual void Destroy()
     {
         OnSelectAction -= OnSelect;
+        _signalBus.Unsubscribe<SignalOnUpdateTick>(OnUpdateTick);
         is_destroyed = true;
         Destroy(gameObject);
     }
