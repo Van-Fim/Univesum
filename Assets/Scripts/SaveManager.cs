@@ -108,6 +108,7 @@ public class SaveManager
             );
             ship.InstallAi();
             data.InstallData(ship);
+            
             Vector3 pos = ship.transform.localPosition;
             Vector3 rot = ship.transform.localEulerAngles;
             ship._StarSystem = ship.GetStarSystem();
@@ -163,6 +164,7 @@ public class SaveManager
                 {
                     _npcJobManager.AddShipForJob(ship);
                 }
+                ship.InstallController();
             }
             
             ship.transform.localPosition = pos;
@@ -171,6 +173,7 @@ public class SaveManager
             if (data.currentActiveCommand.Length > 0 && data.comTaskParams.Length > 0)
             {
                 ship.StartCommand(data.currentActiveCommand, data.comTaskParams);
+                ship.aIExecutor.CurrentActiveCommand.InstallData(data.aICommandData);
             }
             
         }

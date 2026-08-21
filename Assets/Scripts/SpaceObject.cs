@@ -39,6 +39,7 @@ public class SpaceObjectData
 
     public SpaceObjectConfig spaceObjectConfig;
     public List<LoadoutHP> loadoutHPs;
+    public AICommandData aICommandData;
 
     public virtual bool ReadData(SpaceObject spaceObject)
     {
@@ -74,6 +75,8 @@ public class SpaceObjectData
         {
             currentActiveCommand = spaceObject.aIExecutor.CurrentActiveCommand.name;
             comTaskParams = spaceObject.aIExecutor.CurrentActiveCommand.s_params;
+            aICommandData = new AICommandData();
+            aICommandData = spaceObject.aIExecutor.CurrentActiveCommand.ReadData(aICommandData);
         }
         ret = true;
         return ret;
@@ -228,8 +231,11 @@ public abstract class SpaceObject : MonoBehaviour
 
     public virtual void OnTick()
     {
+        if (!aIExecutor)
+        {
+            return;
+        }
         if (spaceObjectController == null || aIExecutor == null) return;
-
         // Выполняем текущую команду
         aIExecutor.Tick();
     }
@@ -277,7 +283,11 @@ public abstract class SpaceObject : MonoBehaviour
             Debug.Log("aIExecutor already installed");
             return;
         }
-        aIExecutor = gameObject.AddComponent<SpAIExecutor>();
+        else
+        {
+            aIExecutor = gameObject.AddComponent<SpAIExecutor>();
+            aIExecutor.ship = this.GetComponent<Ship>();
+        }
     }
     public void StartCommand(string scommand, string s_params)
     {
@@ -301,6 +311,7 @@ public abstract class SpaceObject : MonoBehaviour
         command.spaceObject = this;
         command.name = scommand;
         command.s_params = s_params;
+        
         aIExecutor.IssueCommand(command, mainParams);
     }
     public void InstallController()

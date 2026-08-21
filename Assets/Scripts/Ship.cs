@@ -176,6 +176,10 @@ public class Ship : SpaceObject
             TargetSelect.InvokeSelect();
         }
     }
+    public override void OnTick()
+    {
+        base.OnTick();
+    }
     public override void Update()
     {
         if (IsOwnedByLocalPlayer())
