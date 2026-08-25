@@ -9,8 +9,8 @@
     "maxStarSystemCount": 1,
     "faction": "Faction02",
     "onOwnerSystem": true,
-    "spawnRangeMin": 10000,
-    "spawnRangeMax": 10000,
+    "spawnRangeMin": 3000,
+    "spawnRangeMax": 3000,
     "heigthMin": 10,
     "heigthMax": 10
 }

@@ -129,6 +129,10 @@ public class SpaceObjectController : MonoBehaviour
                 dspSp = dsp.gameObject.GetComponent<SpaceObject>();
             }
         }
+        if (!dspSp)
+        {
+            return;
+        }
         if (detectedObjects.Count > 0 && sp_object.aIExecutor != null)
         {
             Vector3 obstaclePos = dsp.transform.position;

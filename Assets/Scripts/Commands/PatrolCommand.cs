@@ -49,7 +49,6 @@ public class PatrolCommand : AICommand
             aIEvadingEvent = ev;
             evadePosition = ev.evadingPosition;
             isEvading = true;
-            Debug.Log(evadePosition);
         }
     }
     public override void CheckForInterrupts()

@@ -19,11 +19,22 @@ public class AITask
     public bool IsFinished { get; set; }
     public bool IsEvadePositionChanged = false;
     public AICommand AICommand { get; set; }
+    public SpaceObject TargetObject
+    {
+        get => targetObject; set
+        {
+            targetObject = value;
+            if (spaceObject)
+            {
+                spaceObject.taskTarget = value;
+            }
+        }
+    }
 
     private int spaceObjectId;
     private int targetObjectId;
     public SpaceObject spaceObject;
-    public SpaceObject targetObject;
+    private SpaceObject targetObject;
 
     public AITask()
     {

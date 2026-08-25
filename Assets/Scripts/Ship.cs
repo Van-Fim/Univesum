@@ -36,7 +36,10 @@ public class Ship : SpaceObject
         shipData.ReadData(this);
         return shipData;
     }
-
+    public override void Fire()
+    {
+        signalBus.Fire(new WeaponFiredSignal(this));
+    }
     public override StarSystem SetStarSystem(int galaxyId, int systemId)
     {
         StarSystem oldStarSystem = _StarSystem;

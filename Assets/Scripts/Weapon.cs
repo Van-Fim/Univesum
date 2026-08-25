@@ -48,6 +48,7 @@ public class Weapon : UpgradeItem
     {
         if (signal.spaceObject != _parent)
             return;
+        
         TryFire();
     }
     public virtual void SetTransforms()
@@ -97,7 +98,14 @@ public class Weapon : UpgradeItem
     }
     public virtual void Fire()
     {
-        _pool.Spawn(this, projectileConfig, firePointTransform.position, _parent.cursorRaycaster.AimPoint, firePointTransform.rotation);
+        if (_parent.taskTarget)
+        {
+            _pool.Spawn(this, projectileConfig, firePointTransform.position, _parent.taskTarget.transform.position, firePointTransform.rotation);
+        }
+        else
+        {
+            _pool.Spawn(this, projectileConfig, firePointTransform.position, _parent.cursorRaycaster.AimPoint, firePointTransform.rotation);
+        }
         audioSource.Play();
     }
     private void TryFire()
@@ -113,9 +121,8 @@ public class Weapon : UpgradeItem
         {
             Ship pship = (Ship)_parent;
             PowerGenerator powerGenerator = pship.powerGenerator;
-            if (powerGenerator.TryConsume(_config.energyCost))
+            if (!pship.is_player || powerGenerator.TryConsume(_config.energyCost))
             {
-                powerGenerator.currentEnergy -= _config.energyCost;
                 Fire();
                 _nextFireTime = Time.time + (1f / _config.fireRate);
             }

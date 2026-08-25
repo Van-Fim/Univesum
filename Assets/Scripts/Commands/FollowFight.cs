@@ -14,7 +14,7 @@ public class FollowFight : AITask
     {
         Universe universe = Universe.singleton;
         spaceObject = universe.allSpaceObjects.Find(x => x.id == spaceObjectId);
-        targetObject = universe.allSpaceObjects.Find(x => x.id == targetObjectId);
+        TargetObject = universe.allSpaceObjects.Find(x => x.id == targetObjectId);
         this.firingRange = firingRange;
         AICommand = command;
     }
@@ -26,8 +26,9 @@ public class FollowFight : AITask
             //...................................
             // СРАЖЕНИЕ, СБЛИЖЕНИЕ, УВОРОТ, ТРЮКИ
             // ..................................
-            spaceObject.spaceObjectController.Turn(targetObject.transform.position);
-            spaceObject.spaceObjectController.Move(1, targetObject.transform);
+            spaceObject.spaceObjectController.Turn(TargetObject.transform.position);
+            spaceObject.spaceObjectController.Move(1, TargetObject.transform);
+            spaceObject.Fire();
         }
         else
         {

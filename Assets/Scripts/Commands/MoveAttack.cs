@@ -17,7 +17,7 @@ public class MoveAttack : AITask
     {
         Universe universe = Universe.singleton;
         spaceObject = universe.allSpaceObjects.Find(x => x.id == spaceObjectId);
-        targetObject = universe.allSpaceObjects.Find(x => x.id == targetObjectId);
+        TargetObject = universe.allSpaceObjects.Find(x => x.id == targetObjectId);
         this.firingRange = firingRange;
         AICommand = command;
     }
@@ -28,25 +28,25 @@ public class MoveAttack : AITask
         {
             // Логика перемещения корабля к targetPosition
             // Если достигли точки -> IsFinished = true
-            float distance = Vector3.Distance(spaceObject.transform.position, targetObject.transform.position);
+            float distance = Vector3.Distance(spaceObject.transform.position, TargetObject.transform.position);
             StarSystem starSystem = spaceObject.GetStarSystem();
-            StarSystem tstarSystem = targetObject.GetStarSystem();
+            StarSystem tstarSystem = TargetObject.GetStarSystem();
             if (distance <= firingRange && starSystem == tstarSystem)
             {
                 if (enemy == null)
                 {
-                    AIFollowFightEvent followAttack = new AIFollowFightEvent() { spaceObjectId = spaceObject.id, targetId = targetObject.id };
+                    AIFollowFightEvent followAttack = new AIFollowFightEvent() { spaceObjectId = spaceObject.id, targetId = TargetObject.id };
                     AICommand.InvokeInterrupt(followAttack);
-                    enemy = targetObject;
+                    enemy = TargetObject;
                 }
             }
-            else if (enemy == targetObject)
+            else if (enemy == TargetObject)
             {
                 enemy = null;
             }
 
-            spaceObject.spaceObjectController.Turn(targetObject.transform.position);
-            spaceObject.spaceObjectController.Move(1, targetObject.transform);
+            spaceObject.spaceObjectController.Turn(TargetObject.transform.position);
+            spaceObject.spaceObjectController.Move(1, TargetObject.transform);
         }
         else
         {

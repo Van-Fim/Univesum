@@ -136,6 +136,7 @@ public abstract class SpaceObject : MonoBehaviour
     public MeshCollider meshCollider;
     public TargetSelect targetSelect;
     public SpAIExecutor aIExecutor;
+    public SpaceObject taskTarget;
     public Faction owner;
     [Inject] public LangManager _langManager;
     [Inject] public SignalBus signalBus;
@@ -196,7 +197,7 @@ public abstract class SpaceObject : MonoBehaviour
             sum += (pr.lifetime * pr.speed);
         }
         ret = sum / weapons.Count;
-        Debug.Log($"Weapons Count: {weapons.Count} GetFiringRange: ret={ret}");
+
         return ret;
     }
     public int GetId()
@@ -546,6 +547,10 @@ public abstract class SpaceObject : MonoBehaviour
         {
             LoadoutHP hp = loadoutHPs[i];
         }
+    }
+    public virtual void Fire()
+    {
+        signalBus.Fire(new WeaponFiredSignal(this));
     }
     public virtual void InvokeTakeDamage(SpaceObject attacker, int damage)
     {
