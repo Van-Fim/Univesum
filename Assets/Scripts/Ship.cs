@@ -40,6 +40,10 @@ public class Ship : SpaceObject
     {
         signalBus.Fire(new WeaponFiredSignal(this));
     }
+    public override void InstallConfig()
+    {
+        base.InstallConfig();
+    }
     public override StarSystem SetStarSystem(int galaxyId, int systemId)
     {
         StarSystem oldStarSystem = _StarSystem;

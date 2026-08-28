@@ -22,7 +22,19 @@ public class PlayerShipController : SpaceObjectController
         Turn();
         Move();
     }
+    public override void OnTick()
+    {
+        if (Sp_object == null)
+        {
+            return;
+        }
+        float dv = (float)Sp_object.hull/(float)Sp_object.maxHull;
+        float dv1 = (float)Sp_object.shield/(float)Sp_object.maxShield;
 
+        Sp_object.canvasController.hull.fillAmount = dv;
+        Sp_object.canvasController.shield.fillAmount = dv1;
+        base.OnTick();
+    }
     public override void Update()
     {
         if (_playerService.IsInMenu())

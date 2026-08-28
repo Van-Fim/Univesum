@@ -10,11 +10,11 @@
         },
         {
             "hardpoint": "HPWeapon.001",
-            "item": "Weapon01"
+            "item": "Weapon02"
         },
         {
             "hardpoint": "HPWeapon.002",
-            "item": "Weapon01"
+            "item": "Weapon02"
         }
     ]
 }

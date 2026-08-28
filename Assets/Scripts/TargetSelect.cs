@@ -181,6 +181,10 @@ public class TargetSelect : MonoBehaviour, IPointerClickHandler
         else
         {
             SwitchImage(1);
+            if (spaceObject)
+            {
+                playerService._player_sp_object.taskTarget = spaceObject;
+            }
         }
     }
 

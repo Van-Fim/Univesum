@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 public class Weapon : UpgradeItem
@@ -98,15 +99,18 @@ public class Weapon : UpgradeItem
     }
     public virtual void Fire()
     {
+        float sp = _parent.rigidbody.linearVelocity.magnitude;
         if (_parent.taskTarget)
         {
-            _pool.Spawn(this, projectileConfig, firePointTransform.position, _parent.taskTarget.transform.position, firePointTransform.rotation);
+            Vector3 leadPos = _parent.taskTarget.GetLeadPosition(firePointTransform.position, sp + projectileConfig.speed);
+            _pool.Spawn(this, projectileConfig, firePointTransform.position, leadPos, firePointTransform.rotation);
         }
         else
         {
             _pool.Spawn(this, projectileConfig, firePointTransform.position, _parent.cursorRaycaster.AimPoint, firePointTransform.rotation);
         }
         audioSource.Play();
+        Projectile.InvokeOnCheckParent(_parent);
     }
     private void TryFire()
     {

@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Projectile : MonoBehaviour
 {
@@ -13,6 +16,12 @@ public class Projectile : MonoBehaviour
     bool is_collided;
     Collider objCollider;
 
+    public SpaceObject _parent;
+
+    public static UnityAction<SpaceObject> OnCheckParentAction;
+    public static List<Collider> ignoreList = new List<Collider>();
+    public Collider spaceObjectCollider;
+
     private float destroyTime;
     public void Init()
     {
@@ -21,7 +30,21 @@ public class Projectile : MonoBehaviour
         objCollider = GetComponent<Collider>();
         objCollider.isTrigger = true;
         weapon._signalBus.Subscribe<SignalChunkFloatingOriginFix>(OnChunkFloatingOriginFix);
-        Debug.Log("Projectile initialized");
+        float sc = body.main.startSize.constant;
+        objCollider.transform.localScale = new Vector3(sc,sc,sc);
+        OnCheckParentAction += OnCheckParent;
+        Collider col = this.GetComponent<Collider>();
+        for (int i = 0; i < ignoreList.Count; i++)
+        {
+            Physics.IgnoreCollision(col, ignoreList[i]);
+        }
+        if (!ignoreList.Contains(col))
+        {
+            ignoreList.Add(col);
+        }
+    }
+    public void OnCheckParent(SpaceObject parent)
+    {
 
     }
     public void OnChunkFloatingOriginFix(SignalChunkFloatingOriginFix signal)
@@ -46,6 +69,11 @@ public class Projectile : MonoBehaviour
             return;
         }
         SpaceObject sp = col.gameObject.GetComponent<SpaceObject>();
+        CoreCollider coreCollider = col.gameObject.GetComponent<CoreCollider>();
+        if (coreCollider != null)
+        {
+            sp = coreCollider._parent;
+        }
         if (sp != null && !is_collided)
         {
             sp.InvokeTakeDamage(weapon._parent, (int)config.damage);
@@ -72,6 +100,11 @@ public class Projectile : MonoBehaviour
     {
         rb.isKinematic = false;
         is_collided = false;
+
         weapon._pool.Despawn(this);
+    }
+    public static void InvokeOnCheckParent(SpaceObject parent)
+    {
+        OnCheckParentAction?.Invoke(parent);
     }
 }

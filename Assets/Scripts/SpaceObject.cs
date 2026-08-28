@@ -159,6 +159,8 @@ public abstract class SpaceObject : MonoBehaviour
     public static UnityAction OnTickAction;
     public static UnityAction<SpaceObject> OnWarpAction;
 
+    public CoreCollider coreCollider;
+
     TargetSelect targetSelectPrefab;
 
     public Rigidbody rigidbody;
@@ -199,6 +201,24 @@ public abstract class SpaceObject : MonoBehaviour
         ret = sum / weapons.Count;
 
         return ret;
+    }
+    public Vector3 GetLeadPosition(Vector3 startPosition, float projectileSpeed)
+    {
+        // 1. Определяем вектор движения цели
+        // Если используете Rigidbody, берем его скорость. 
+        // Если двигаете через transform, придется считать (pos - lastPos) / deltaTime
+        Vector3 targetVelocity = rigidbody.linearVelocity;
+
+        // 2. Считаем расстояние до цели
+        float distance = Vector3.Distance(startPosition, transform.position);
+
+        // 3. Определяем время, за которое снаряд долетит до цели
+        float travelTime = distance / projectileSpeed;
+
+        // 4. Вычисляем точку, где будет цель через это время
+        Vector3 leadPos = transform.position + (targetVelocity * travelTime);
+
+        return leadPos;
     }
     public int GetId()
     {
@@ -302,7 +322,7 @@ public abstract class SpaceObject : MonoBehaviour
         foreach (string param in paramsArray)
         {
             string[] p = param.Split(':');
-            if(p.Length > 1)
+            if (p.Length > 1)
             {
                 mainParams.Add(p[0], float.Parse(p[1]));
             }
@@ -312,7 +332,7 @@ public abstract class SpaceObject : MonoBehaviour
         command.spaceObject = this;
         command.name = scommand;
         command.s_params = s_params;
-        
+
         aIExecutor.IssueCommand(command, mainParams);
     }
     public void InstallController()
@@ -508,7 +528,7 @@ public abstract class SpaceObject : MonoBehaviour
         for (int i = 0; i < loadoutHPs.Count; i++)
         {
             LoadoutHP hp = loadoutHPs[i];
-            if(hp.upgradeItem)
+            if (hp.upgradeItem)
             {
                 hp.upgradeItem.Destroy();
             }
@@ -637,7 +657,7 @@ public abstract class SpaceObject : MonoBehaviour
         rigidbody.angularDamping = spaceObjectConfig.angularDrag;
         meshCollider.convex = true;
         rigidbody.useGravity = false;
-        if(meshFilter)
+        if (meshFilter)
         {
             Bounds bounds = meshFilter.sharedMesh.bounds;
             scaleValue = (int)bounds.size.magnitude;
@@ -654,6 +674,15 @@ public abstract class SpaceObject : MonoBehaviour
         //     debugSphere.name = "SPHERE";
         //     debugSphere.transform.localScale = Vector3.one * 20;
         // }
+
+            // if (this is Ship)
+            // {
+            //     coreCollider = GameObject.Instantiate(Resources.Load<CoreCollider>("Prefabs/CoreCollider"));
+            // coreCollider.transform.SetParent(transform);
+            // coreCollider.transform.localPosition = Vector3.zero;
+            // Physics.IgnoreCollision(coreCollider.GetComponent<Collider>(), meshCollider);
+            // coreCollider._parent = this;
+            // }
     }
 
     public virtual void DestroyConfig()

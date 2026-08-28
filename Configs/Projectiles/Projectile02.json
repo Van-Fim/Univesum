@@ -1,6 +1,6 @@
 {
     "damage": 290,
-    "speed": 500,
+    "speed": 200,
     "lifetime": 3.8,
     "explodeTime": 0.25,
     "pathToModel": "Models/Projectiles/Projectile01",
