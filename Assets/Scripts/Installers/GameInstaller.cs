@@ -45,6 +45,7 @@ public class GameInstaller : MonoInstaller
         Container.Bind<CameraManager>().AsSingle();
         Container.Bind<SpaceObjectFactory>().AsSingle();
         Container.Bind<SaveManager>().AsSingle();
+        CameraManager cameraManager = Container.Resolve<CameraManager>();
         SpaceObjectFactory spaceObjectFactory = Container.Resolve<SpaceObjectFactory>();
         CursorManager cursorManagerVar = Container.InstantiateComponent<CursorManager>(new GameObject());
         cursorManagerVar.gameObject.name = "CursorManager";
@@ -58,7 +59,7 @@ public class GameInstaller : MonoInstaller
         GameObject gmObj = Container.InstantiatePrefab(canvasController);
         CanvasController canvasControllerVar = gmObj.GetComponent<CanvasController>();
         Container.Bind<CanvasController>().FromInstance(canvasControllerVar).AsSingle();
-        
+
 
         UpdateManager updateManagerVar = gmObj.GetComponent<UpdateManager>();
         Container.Bind<UpdateManager>().FromInstance(updateManagerVar).AsSingle();
@@ -88,7 +89,7 @@ public class GameInstaller : MonoInstaller
         Container.BindSignal<SignalGameStarted>()
         .ToMethod<GameStartedHandler>(handler => handler.HandleGameStarted)
         .FromResolve();
-
+        cameraManager.Init();
         //     PlayerController playerControllerVar = null;
         //     Player player = Container.Resolve<Player>();
         //     if (startConfig.ship == null || startConfig.ship.Length == 0)

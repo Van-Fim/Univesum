@@ -16,6 +16,7 @@ public class Universe
     public Transform universeMap;
     public Transform galaxies;
     public Transform systems;
+    public Transform currentSystem;
     public List<Galaxy> galaxiesList = new List<Galaxy>();
     public List<StarSystem> systemsList = new List<StarSystem>();
     public List<SpaceObject> allSpaceObjects = new List<SpaceObject>();
@@ -43,8 +44,11 @@ public class Universe
         galaxies = gm.transform;
         gm = new GameObject();
         systems = gm.transform;
+        gm = new GameObject();
+        currentSystem = gm.transform;
         galaxies.SetParent(universeMap);
         systems.SetParent(universeMap);
+        currentSystem.SetParent(universeMap);
         universeMap.transform.rotation = Quaternion.identity;
         universeMap.transform.localPosition = Vector3.zero;
         universeMap.name = "UniverseMap";
@@ -54,6 +58,9 @@ public class Universe
         systems.transform.rotation = Quaternion.identity;
         systems.transform.localPosition = Vector3.zero;
         systems.name = "Systems";
+        currentSystem.transform.rotation = Quaternion.identity;
+        currentSystem.transform.localPosition = Vector3.zero;
+        currentSystem.name = "CurrentSystem";
         singleton = this;
     }
     public void Clear()

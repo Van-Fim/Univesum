@@ -77,6 +77,30 @@ public class PlayerShipController : SpaceObjectController
         }
         if (Input.GetKeyDown(KeyCode.M))
         {
+            CameraManager.InvokeMapSwitch(0);
+            Camera mainCam = _cameraManager.GetMainCamera();
+            Camera mapCam = _cameraManager.GetMapCamera();
+            StarSystem psys = _playerService.GetStarSystem();
+            bool st1 = mainCam.enabled;
+
+            mainCam.enabled = !st1;
+            mapCam.enabled = st1;
+            if (st1)
+            {
+                _canvasController.HideUi();
+            }
+            else
+            {
+                _canvasController.ShowUi();
+            }
+            mapCam.transform.localPosition = psys.transform.localPosition + new Vector3(0, 200, 0);
+            mapCam.transform.localEulerAngles = new Vector3(90, 0, 0);
+
+            PSpace.InvokeMinimapRender(typeof(StarSystem));
+        }
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            CameraManager.InvokeMapSwitch(1);
             Camera mainCam = _cameraManager.GetMainCamera();
             Camera mapCam = _cameraManager.GetMapCamera();
             StarSystem psys = _playerService.GetStarSystem();

@@ -73,7 +73,7 @@ public class PSpace : MonoBehaviour
     public virtual void OnMinimapRender(Type type)
     {
         Camera mapCam = _cameraManager.GetMapCamera();
-        bool v = mapCam.enabled;
+        bool v = mapCam.enabled && CameraManager.singleton.mapType == 0;
         
         if (v)
         {

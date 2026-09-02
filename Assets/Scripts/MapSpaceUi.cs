@@ -13,6 +13,7 @@ public class MapSpaceUi : MonoBehaviour, IPointerClickHandler
     public PSpace space;
     public static UnityAction OnTickAction;
     public static UnityAction OnSelectAction;
+    public static UnityAction<int> OnMapSwitchAction;
     public static MapSpaceUi currentSelectedItem;
     public static Color32 currentColor = new Color32(0, 100, 0, 255);
     public static Color32 selectedColor = new Color32(255, 255, 255, 255);
@@ -28,6 +29,7 @@ public class MapSpaceUi : MonoBehaviour, IPointerClickHandler
     {
         _signalBus.Subscribe<SignalOnUpdateTick>(OnUpdateTick);
         OnSelectAction += OnSelect;
+        OnMapSwitchAction += OnMapSwitch;
 
         image = GetComponent<Image>();
         Color32 c = image.color;
@@ -39,6 +41,13 @@ public class MapSpaceUi : MonoBehaviour, IPointerClickHandler
             {
                 s.mapSpaceUi.SetColor(0, s.faction.factionConfig.color);
             }
+        }
+    }
+    public void OnMapSwitch(int type)
+    {
+        if (type != 0)
+        {
+            gameObject.SetActive(false);
         }
     }
     public virtual void Destroy()
@@ -104,5 +113,9 @@ public class MapSpaceUi : MonoBehaviour, IPointerClickHandler
     public static void InvokeSelect()
     {
         OnSelectAction?.Invoke();
+    }
+    public static void InvokeMapSwitch(int type)
+    {
+        OnMapSwitchAction?.Invoke(type);
     }
 }
