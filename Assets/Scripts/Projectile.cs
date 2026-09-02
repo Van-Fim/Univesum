@@ -31,7 +31,7 @@ public class Projectile : MonoBehaviour
         objCollider.isTrigger = true;
         weapon._signalBus.Subscribe<SignalChunkFloatingOriginFix>(OnChunkFloatingOriginFix);
         float sc = body.main.startSize.constant;
-        objCollider.transform.localScale = new Vector3(sc,sc,sc);
+        objCollider.transform.localScale = new Vector3(sc, sc, sc);
         OnCheckParentAction += OnCheckParent;
         Collider col = this.GetComponent<Collider>();
         for (int i = 0; i < ignoreList.Count; i++)
@@ -55,8 +55,13 @@ public class Projectile : MonoBehaviour
     {
         this.config = config;
 
-        Vector3 v1 = weapon._parent.rigidbody.linearVelocity;
-        rb.linearVelocity = direction * (this.config.speed) + v1;
+        // Рассчитываем, насколько скорость корабля совпадает с направлением выстрела
+        Vector3 shipVelocity = weapon._parent.rigidbody.linearVelocity;
+        float forwardImpulse = Vector3.Dot(shipVelocity, direction);
+
+        rb.linearVelocity = direction * (this.config.speed + forwardImpulse);
+
+        transform.rotation = Quaternion.LookRotation(rb.linearVelocity);
 
         destroyTime = Time.time + config.lifetime;
         Invoke("SelfDestruct", config.lifetime);

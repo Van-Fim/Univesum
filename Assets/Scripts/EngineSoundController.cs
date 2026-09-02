@@ -11,8 +11,11 @@ public class EngineSoundController : MonoBehaviour
     {
         float speed = sp_object.rigidbody.linearVelocity.magnitude;
         float maxSpeed = sp_object.engine.maxSpeed;
-
-        float sp = Mathf.Lerp(0.3f, 1.0f, speed / maxSpeed);
+        float sp = 1;
+        if (maxSpeed > 0)
+        {
+            sp = Mathf.Lerp(0.3f, 1.0f, speed / maxSpeed);
+        }
         idleSource.pitch = sp;
         idleSource.volume = sp / 20;
     }

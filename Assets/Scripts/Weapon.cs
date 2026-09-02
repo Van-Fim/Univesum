@@ -37,6 +37,12 @@ public class Weapon : UpgradeItem
         this.container = container;
         _pool = container.ResolveId<ProjectilePool>(projectileConfig.name);
     }
+    public static Vector3 CalculateLeadPosition(Vector3 targetPos, Vector3 targetVel, Vector3 weaponPos, float speed)
+    {
+        float distance = Vector3.Distance(weaponPos, targetPos);
+        float travelTime = distance / speed;
+        return targetPos + (targetVel * travelTime);
+    }
     public virtual void Init()
     {
 
@@ -49,7 +55,7 @@ public class Weapon : UpgradeItem
     {
         if (signal.spaceObject != _parent)
             return;
-        
+
         TryFire();
     }
     public virtual void SetTransforms()
@@ -100,9 +106,11 @@ public class Weapon : UpgradeItem
     public virtual void Fire()
     {
         float sp = _parent.rigidbody.linearVelocity.magnitude;
+
         if (_parent.taskTarget)
         {
-            Vector3 leadPos = _parent.taskTarget.GetLeadPosition(firePointTransform.position, sp + projectileConfig.speed);
+            Vector3 leadPos = SpaceObject.GetLeadPosition(_parent, _parent.taskTarget, firePointTransform.position, projectileConfig.speed);
+
             _pool.Spawn(this, projectileConfig, firePointTransform.position, leadPos, firePointTransform.rotation);
         }
         else

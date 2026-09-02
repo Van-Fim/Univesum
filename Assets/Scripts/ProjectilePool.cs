@@ -12,7 +12,7 @@ public class ProjectilePool : MonoMemoryPool<Weapon, ProjectileConfig, Vector3, 
         item.transform.position = pos;
         item.transform.rotation = rot;
 
-        Vector3 baseDir = (targetPos - weapon.baseTransform.position).normalized;
+        Vector3 baseDir = (targetPos - weapon.firePointTransform.position).normalized;
         Collider col = item.GetComponent<Collider>();
         Physics.IgnoreCollision(col, weapon._parent.meshCollider);
         if (item.spaceObjectCollider != null && item.spaceObjectCollider != weapon._parent.meshCollider)

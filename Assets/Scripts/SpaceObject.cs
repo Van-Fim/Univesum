@@ -202,22 +202,47 @@ public abstract class SpaceObject : MonoBehaviour
 
         return ret;
     }
-    public Vector3 GetLeadPosition(Vector3 startPosition, float projectileSpeed)
+
+    public static Vector3 GetLeadPosition(SpaceObject p, SpaceObject t, Vector3 startPosition, float projectileBaseSpeed)
     {
-        // 1. Определяем вектор движения цели
-        // Если используете Rigidbody, берем его скорость. 
-        // Если двигаете через transform, придется считать (pos - lastPos) / deltaTime
-        Vector3 targetVelocity = rigidbody.linearVelocity;
+        Vector3 targetPos = t.transform.position;
+        Vector3 targetVel = t.rigidbody.linearVelocity;
 
-        // 2. Считаем расстояние до цели
-        float distance = Vector3.Distance(startPosition, transform.position);
+        // Снаряд наследует векторную скорость корабля-носителя
+        Vector3 shooterVelocity = p.rigidbody.linearVelocity;
 
-        // 3. Определяем время, за которое снаряд долетит до цели
-        float travelTime = distance / projectileSpeed;
+        // Для первой итерации берем текущее расстояние
+        float distance = Vector3.Distance(startPosition, targetPos);
+        float timeToReach = distance / projectileBaseSpeed;
 
-        // 4. Вычисляем точку, где будет цель через это время
-        Vector3 leadPos = transform.position + (targetVelocity * travelTime);
+        // Итеративное уточнение (2 раза), чтобы учесть, что цель сместится
+        // Прогнозируем позицию цели через время travelTime
+        Vector3 predictedPos = targetPos + targetVel * timeToReach;
+        float distToPredicted = Vector3.Distance(startPosition, predictedPos);
 
+        // Пересчитываем время с учетом новой дистанции
+        // Важно: используем эффективную скорость снаряда относительно цели
+        float relativeSpeed = projectileBaseSpeed;
+        // Если нужно учитывать влияние скорости корабля на время:
+        relativeSpeed = (projectileBaseSpeed + Vector3.Dot(shooterVelocity, (predictedPos - startPosition).normalized));
+
+        timeToReach = distToPredicted / relativeSpeed;
+        Vector3 leadPos = targetPos + targetVel * timeToReach;
+        // if (p.is_player)
+        // {
+        //     if (t.debugSphere == null && t.main != null && t is Ship && !t.is_player)
+        //     {
+        //         t.debugSphere = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SphereCollider"));
+        //         t.debugSphere.transform.SetParent(t.transform.parent);
+        //         t.debugSphere.transform.position = leadPos;
+        //         t.debugSphere.name = "SPHERE";
+        //         t.debugSphere.transform.localScale = Vector3.one * 2;
+        //     }
+        //     if (t.debugSphere)
+        //     {
+        //         t.debugSphere.transform.position = leadPos;
+        //     }
+        // }
         return leadPos;
     }
     public int GetId()
@@ -675,14 +700,14 @@ public abstract class SpaceObject : MonoBehaviour
         //     debugSphere.transform.localScale = Vector3.one * 20;
         // }
 
-            // if (this is Ship)
-            // {
-            //     coreCollider = GameObject.Instantiate(Resources.Load<CoreCollider>("Prefabs/CoreCollider"));
-            // coreCollider.transform.SetParent(transform);
-            // coreCollider.transform.localPosition = Vector3.zero;
-            // Physics.IgnoreCollision(coreCollider.GetComponent<Collider>(), meshCollider);
-            // coreCollider._parent = this;
-            // }
+        // if (this is Ship)
+        // {
+        //     coreCollider = GameObject.Instantiate(Resources.Load<CoreCollider>("Prefabs/CoreCollider"));
+        // coreCollider.transform.SetParent(transform);
+        // coreCollider.transform.localPosition = Vector3.zero;
+        // Physics.IgnoreCollision(coreCollider.GetComponent<Collider>(), meshCollider);
+        // coreCollider._parent = this;
+        // }
     }
 
     public virtual void DestroyConfig()
