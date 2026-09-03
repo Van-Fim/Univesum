@@ -88,7 +88,7 @@ public class SpaceObjectData
         {
             return ret;
         }
-        spaceObject.transform.localPosition = position;
+        spaceObject.SetPosition(position, true);
         spaceObject.transform.localEulerAngles = rotation;
 
         Faction faction = FactionsManager.singleton.GetFaction(factionName);
@@ -166,6 +166,7 @@ public abstract class SpaceObject : MonoBehaviour
     public Rigidbody rigidbody;
     public Transform hardpoints;
     public GameObject debugSphere;
+    public GameObject mapObject;
 
     public string loadoutName;
 
@@ -189,6 +190,7 @@ public abstract class SpaceObject : MonoBehaviour
 
     protected GameObject main = null;
     public StarSystem _StarSystem;
+    public static int scaleFactor = 25;
     public float GetFiringRange()
     {
         float ret = 0;
@@ -249,6 +251,17 @@ public abstract class SpaceObject : MonoBehaviour
     {
         return _universe.GenerateId();
     }
+    public void SetPosition(Vector3 position, bool isLocal = false)
+    {
+        if (isLocal)
+        {
+            transform.localPosition = position;
+        }
+        else
+        {
+            transform.position = position;
+        }
+    }
     public void SetOwner(string name)
     {
         Faction faction = FactionsManager.singleton.GetFaction(name);
@@ -277,6 +290,27 @@ public abstract class SpaceObject : MonoBehaviour
 
     public virtual void OnTick()
     {
+        if (CameraManager.isMapOpened && mapObject)
+        {
+            //bool psys = playerService._player_sp_object.GetStarSystem() == this.GetStarSystem();
+            StarSystem psys = Universe.singleton.FindSystem(0,0);
+            if ( this.GetStarSystem() != psys)
+            {
+                mapObject.SetActive(false);
+            }
+            else
+            {
+                mapObject.SetActive(true);
+            }
+            if (!is_player)
+            {
+                mapObject.transform.localPosition = transform.localPosition/SpaceObject.scaleFactor;
+            }
+            else
+            {
+                mapObject.transform.localPosition = (transform.localPosition - WorldChunkManager.singleton.worldPos)/SpaceObject.scaleFactor;
+            }
+        }
         if (!aIExecutor)
         {
             return;

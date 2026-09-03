@@ -91,7 +91,7 @@ public class SaveManager
 
             station.Init();
             station.TryInstallConfig();
-            station.transform.localPosition = pos;
+            station.SetPosition(pos, true);
             station.transform.localEulerAngles = rot;
             station.BuildLoadouts();
             if (station.jobId >= 0)
@@ -167,7 +167,7 @@ public class SaveManager
                 ship.InstallController();
             }
             
-            ship.transform.localPosition = pos;
+            ship.SetPosition(pos, true);
             ship.transform.localEulerAngles = rot;
             ship.BuildLoadouts();
             if (data.currentActiveCommand.Length > 0 && data.comTaskParams.Length > 0)

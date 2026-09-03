@@ -322,7 +322,7 @@ public class WorldChunkManager : MonoBehaviour
         asteroid.chunk = chunk;
         asteroid.transform.SetParent(chunk.transform);
         asteroid.transform.localScale = new Vector3(scale, scale, scale);
-        asteroid.transform.localPosition = localOffset;
+        asteroid.SetPosition(localOffset, true);
         asteroid.transform.localEulerAngles = new Vector3(rotX, rotY, rotZ);
         return asteroid;
     }

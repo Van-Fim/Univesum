@@ -10,6 +10,7 @@ public class CameraManager
     public int mapType;
     public static UnityAction<int> OnMapSwitchAction;
     public static CameraManager singleton;
+    public static bool isMapOpened;
 
     public void Init()
     {

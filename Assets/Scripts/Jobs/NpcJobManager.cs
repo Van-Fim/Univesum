@@ -333,7 +333,7 @@ public class NpcJobManager : IInitializable
         Faction faction = FactionsManager.singleton.GetFaction(job.faction);
         station.jobId = job.id;
         station.loadoutName = "Station01_Loadout01";
-        station.transform.localPosition = newPos;
+        station.SetPosition(newPos, true);
         station.transform.localEulerAngles = Vector3.zero;
         station.SetStarSystem(location.galaxy.id, location.system.id);
         station.Init();
@@ -391,8 +391,6 @@ public class NpcJobManager : IInitializable
         if (!job.starSystemCounts.ContainsKey(station.systemId))
             job.starSystemCounts[station.systemId] = 0;
         job.starSystemCounts[station.systemId]++;
-
-        Debug.Log($"------------ {job.id}");
     }
     public void AddShipForJob(Ship ship)
     {
@@ -440,7 +438,7 @@ public class NpcJobManager : IInitializable
         ship.SetStarSystem(location.galaxy.id, location.system.id);
         ship.Init();
         bool inst = ship.TryInstallConfig(ship._StarSystem);
-        ship.transform.localPosition = newPos;
+        ship.SetPosition(newPos, true);
         ship.InstallLoadout();
         ship.InstallController();
         ship.InstallAi();

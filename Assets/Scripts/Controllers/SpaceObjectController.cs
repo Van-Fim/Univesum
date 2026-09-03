@@ -183,7 +183,7 @@ public class SpaceObjectController : MonoBehaviour
     {
         if (Sp_object == null || SpaceContainer.singleton == null) return;
         Sp_object.SetStarSystem(starSystem.galaxyId, starSystem.id);
-        Sp_object.transform.position = position;
+        Sp_object.SetPosition(position);
         Sp_object.transform.eulerAngles = rotation;
 
         WorldChunkManager wcm = WorldChunkManager.singleton;

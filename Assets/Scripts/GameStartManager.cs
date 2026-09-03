@@ -107,7 +107,7 @@ public class GameStartManager
         _playerService._player.currentController = controller;
         _playerService._player_sp_object = suit;
 
-        suit.transform.localPosition = _config.start_position;
+        suit.SetPosition(_config.start_position, true);
         suit.transform.localEulerAngles = _config.start_position;
         suit.SetStarSystem(_config.galaxyId, _config.systemId);
     }
@@ -150,7 +150,7 @@ public class GameStartManager
             ship.InstallLoadout(loadout);
         }
         ship.BuildLoadouts();
-        ship.transform.localPosition = _config.start_position;
+        ship.SetPosition(_config.start_position, true);
         ship.transform.localEulerAngles = _config.start_position;
         ship.SetStarSystem(_config.galaxyId, _config.systemId);
 

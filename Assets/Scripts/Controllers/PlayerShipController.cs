@@ -70,7 +70,7 @@ public class PlayerShipController : SpaceObjectController
             int rnd = Random.Range(0, _universe.systemsList.Count);
             StarSystem fsys = (StarSystem)MapSpaceUi.currentSelectedItem.space;
             _playerService.Warp(fsys, Vector3.zero, Vector3.zero);
-
+            // Debug.Log($"{fsys.galaxyId} {fsys.id}");
             psys = _playerService.GetStarSystem();
             mapCam.transform.localPosition = psys.transform.localPosition + new Vector3(0, 200, 0);
             mapCam.transform.localEulerAngles = new Vector3(90, 0, 0);
@@ -87,10 +87,12 @@ public class PlayerShipController : SpaceObjectController
             mapCam.enabled = st1;
             if (st1)
             {
+                CameraManager.isMapOpened = true;
                 _canvasController.HideUi();
             }
             else
             {
+                CameraManager.isMapOpened = false;
                 _canvasController.ShowUi();
             }
             mapCam.transform.localPosition = psys.transform.localPosition + new Vector3(0, 200, 0);
@@ -110,13 +112,15 @@ public class PlayerShipController : SpaceObjectController
             mapCam.enabled = st1;
             if (st1)
             {
+                CameraManager.isMapOpened = true;
                 _canvasController.HideUi();
             }
             else
             {
+                CameraManager.isMapOpened = false;
                 _canvasController.ShowUi();
             }
-            mapCam.transform.localPosition = psys.transform.localPosition + new Vector3(0, 200, 0);
+            mapCam.transform.localPosition = psys.transform.localPosition + new Vector3(0, 1000, 0);
             mapCam.transform.localEulerAngles = new Vector3(90, 0, 0);
 
             PSpace.InvokeMinimapRender(typeof(StarSystem));
